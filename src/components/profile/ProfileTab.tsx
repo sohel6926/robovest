@@ -28,7 +28,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   onNavigateToBank, 
   onNavigateToContact 
 }) => {
-  const { user, transactions, setShowAuthModal } = useApp();
+  const { user, transactions, setShowAuthModal, setShowAdminPanel } = useApp();
   const [activeSubModal, setActiveSubModal] = useState<
     'personal' | 'balanceDetails' | 'withdrawalDetails' | 'notifications' | 'about' | null
   >(null);
@@ -217,6 +217,28 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               <div>
                 <h3 className="font-bold text-sm text-slate-900">Notification Center</h3>
                 <p className="text-[11px] text-slate-500">Announcements and alerts</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </button>
+
+          {/* Admin Control Center */}
+          <button
+            onClick={() => setShowAdminPanel(true)}
+            className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition text-left border-b border-slate-100 bg-gradient-to-r from-blue-50/60 to-indigo-50/40"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs">
+                <ShieldCheck className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm text-slate-900">Admin Control Panel</h3>
+                  <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 text-[9px] font-black uppercase">
+                    Master
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">Edit plans, balances, approve withdrawals & settings</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400" />

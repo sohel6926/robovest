@@ -14,7 +14,8 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
     setShowBankCardModal, 
     checkWithdrawalEligibility,
     advanceTimeToNextDayAfter1230,
-    resetSimulatedTime
+    resetSimulatedTime,
+    platformSettings,
   } = useApp();
 
   const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
@@ -22,6 +23,8 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
   const eligibility = checkWithdrawalEligibility();
+  const minWth = platformSettings?.minWithdrawal || 150;
+  const feePercent = platformSettings?.withdrawalFeePercent || 10;
 
   const handlePercentageClick = (percentage: number) => {
     const calculated = Math.floor((user.withdrawableBalance * percentage) / 100);
@@ -41,8 +44,8 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
   };
 
   const handleWithdrawSubmit = () => {
-    if (withdrawAmount < 150) {
-      setStatusMessage({ text: 'Minimum withdrawal amount is ₹150.', isError: true });
+    if (withdrawAmount < minWth) {
+      setStatusMessage({ text: `Minimum withdrawal amount is ₹${minWth.toLocaleString()}.`, isError: true });
       return;
     }
 
@@ -61,7 +64,7 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
     }
   };
 
-  const fee = Math.round(withdrawAmount * 0.10 * 100) / 100;
+  const fee = Math.round(withdrawAmount * (feePercent / 100) * 100) / 100;
   const netReceive = Math.max(0, withdrawAmount - fee);
 
   return (

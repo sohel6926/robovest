@@ -1,5 +1,5 @@
 export interface InvestmentProduct {
-  id: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  id: string;
   name: string;
   tagline: string;
   price: number;
@@ -13,14 +13,27 @@ export interface InvestmentProduct {
   image: string;
   imagePosition?: string;
   badge?: string;
-  tier: 'Standard' | 'Elite' | 'Quantum Apex';
+  tier: 'Standard' | 'Elite' | 'Quantum Apex' | string;
   robotModel: string;
   specs: string[];
+  isActive?: boolean;
+}
+
+export interface PlatformSettings {
+  minRecharge: number;
+  minWithdrawal: number;
+  withdrawalFeePercent: number;
+  dailyWithdrawalWindowStart: string; // e.g. "00:30"
+  dailyWithdrawalWindowEnd: string;   // e.g. "17:00"
+  enforceNextDayWithdrawalLock: boolean;
+  telegramSupportUrl: string;
+  telegramChannelUrl: string;
+  platformAnnouncement: string;
 }
 
 export interface UserInvestment {
   id: string;
-  productId: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  productId: string;
   productName: string;
   robotModel: string;
   quantity: number;
@@ -58,14 +71,47 @@ export interface BankAccount {
   isBound: boolean;
 }
 
+export interface MemberPlanHolding {
+  id: string;
+  planId: string;
+  planName: string;
+  robotModel: string;
+  quantity: number;
+  unitPrice: number;
+  totalInvested: number;
+  dailyYield: number;
+  purchaseDate: string;
+  daysElapsed: number;
+  durationDays: number;
+  totalEarned: number;
+  status: 'ACTIVE' | 'COMPLETED';
+}
+
 export interface TeamMember {
   id: string;
   phone: string;
   joinDate: string;
   level: 1 | 2 | 3;
+  inviterId?: string;
+  inviteCount: number;
   rechargeAmount: number;
+  teamInvested: number;
   commissionGenerated: number;
   status: 'ACTIVE' | 'INACTIVE';
+  plans: MemberPlanHolding[];
+}
+
+export interface DailyWithdrawalLog {
+  date: string;
+  formattedDate: string;
+  totalRequested: number;
+  totalFees: number;
+  totalNet: number;
+  totalRequests: number;
+  completedAmount: number;
+  processingAmount: number;
+  rejectedAmount: number;
+  transactions: Transaction[];
 }
 
 export interface UserProfile {

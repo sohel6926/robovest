@@ -1,11 +1,12 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Shield, Bot } from 'lucide-react';
+import { Shield, Bot, Key } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { 
     user, 
-    setShowAuthModal
+    setShowAuthModal,
+    setShowAdminPanel,
   } = useApp();
 
   return (
@@ -33,6 +34,16 @@ export const Navbar: React.FC = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-1.5">
+          {/* Admin Panel Quick Trigger */}
+          <button
+            onClick={() => setShowAdminPanel(true)}
+            title="Open Admin Panel"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold border border-slate-700 shadow-xs transition active:scale-95"
+          >
+            <Key className="w-3 h-3 text-amber-400" />
+            <span>Admin</span>
+          </button>
+
           {/* User Status */}
           <button
             onClick={() => setShowAuthModal(true)}

@@ -19,9 +19,9 @@ const PRESET_AMOUNTS = [
 ];
 
 export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWithdraw }) => {
-  const { user, rechargeWallet } = useApp();
-  const [selectedAmount, setSelectedAmount] = useState<number>(520);
-  const [customInput, setCustomInput] = useState<string>('520');
+  const { user, rechargeWallet, platformSettings } = useApp();
+  const [selectedAmount, setSelectedAmount] = useState<number>(platformSettings?.minRecharge || 520);
+  const [customInput, setCustomInput] = useState<string>((platformSettings?.minRecharge || 520).toString());
   const [showPaymentSheet, setShowPaymentSheet] = useState<boolean>(false);
   const [utrNumber, setUtrNumber] = useState<string>('827192039182');
   const [copiedUpi, setCopiedUpi] = useState<boolean>(false);
@@ -44,8 +44,9 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const handleContinue = () => {
-    if (selectedAmount < 520) {
-      alert('Minimum recharge amount is ₹520.');
+    const minRec = platformSettings?.minRecharge || 520;
+    if (selectedAmount < minRec) {
+      alert(`Minimum recharge amount is ₹${minRec.toLocaleString()}.`);
       return;
     }
     setShowPaymentSheet(true);
