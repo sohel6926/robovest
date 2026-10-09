@@ -69,7 +69,6 @@ export const BuyModal: React.FC = () => {
             <img
               src={product.image}
               alt={product.robotModel}
-              referrerPolicy="no-referrer"
               className={`w-full h-full object-cover ${product.imagePosition || 'object-center'}`}
             />
           </div>

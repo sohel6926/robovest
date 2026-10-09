@@ -1,6 +1,14 @@
 import { InvestmentProduct } from '../types';
+import heroImage from '../assets/images/hero_home_robot_1791407310783.jpg';
+import planAImage from '../assets/images/plan_a_micro_nao.jpg';
+import planBImage from '../assets/images/plan_b_spot_dog.jpg';
+import planCImage from '../assets/images/plan_c_asimo_biped.jpg';
+import planDImage from '../assets/images/plan_d_atlas_lab.jpg';
+import planEImage from '../assets/images/plan_e_titan_freight.jpg';
+import planFImage from '../assets/images/plan_f_valkyrie_hero.jpg';
+import planGImage from '../assets/images/plan_g_colossus_titan.jpg';
 
-export const HERO_IMAGE = '/src/assets/images/hero_home_robot_1791407310783.jpg';
+export const HERO_IMAGE = heroImage;
 
 export const PRODUCTS_CATALOG: InvestmentProduct[] = [
   {
@@ -16,7 +24,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: false,
-    image: '/src/assets/images/plan_a_micro_nao.jpg',
+    image: planAImage,
     imagePosition: 'object-top',
     badge: 'Popular Starter',
     tier: 'Standard',
@@ -35,7 +43,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: false,
-    image: '/src/assets/images/plan_b_spot_dog.jpg',
+    image: planBImage,
     imagePosition: 'object-center',
     badge: 'Best Value',
     tier: 'Standard',
@@ -54,7 +62,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: false,
-    image: '/src/assets/images/plan_c_asimo_biped.jpg',
+    image: planCImage,
     imagePosition: 'object-top',
     badge: 'High Growth',
     tier: 'Standard',
@@ -73,7 +81,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: false,
-    image: '/src/assets/images/plan_d_atlas_lab.jpg',
+    image: planDImage,
     imagePosition: 'object-center',
     badge: 'Super Tier',
     tier: 'Standard',
@@ -92,7 +100,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: true,
-    image: '/src/assets/images/plan_e_titan_freight.jpg',
+    image: planEImage,
     imagePosition: 'object-center',
     badge: 'VIP Elite',
     tier: 'Elite',
@@ -111,7 +119,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: true,
-    image: '/src/assets/images/plan_f_valkyrie_hero.jpg',
+    image: planFImage,
     imagePosition: 'object-top',
     badge: 'Executive Elite',
     tier: 'Elite',
@@ -130,7 +138,7 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     minPurchase: 1,
     maxPurchase: 10,
     requiresPriorInvestment: true,
-    image: '/src/assets/images/plan_g_colossus_titan.jpg',
+    image: planGImage,
     imagePosition: 'object-top',
     badge: 'Apex Masterpiece',
     tier: 'Quantum Apex',

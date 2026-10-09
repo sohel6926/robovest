@@ -34,7 +34,6 @@ export const WelcomeModal: React.FC = () => {
             <img
               src={HERO_IMAGE}
               alt="Autonomous Robotics Fleet"
-              referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-top scale-105 transition-transform duration-700 hover:scale-100"
             />
 

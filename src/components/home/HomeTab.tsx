@@ -32,7 +32,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
         <img 
           src={HERO_IMAGE} 
           alt="Autonomous Robotics Industrial Headquarters"
-          referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center"
         />
         {/* Top contrast scrim for navigation pills */}
@@ -181,7 +180,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
                   <img
                     src={product.image}
                     alt={product.robotModel}
-                    referrerPolicy="no-referrer"
                     className={`w-full h-full object-cover ${product.imagePosition || 'object-center'}`}
                   />
                   
@@ -234,16 +232,16 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
                   </div>
 
                   {/* Daily & Total Stats Rows with Emerald Profit Highlight */}
-                  <div className="space-y-1.5 my-1">
+                  <div className="space-y-1.5 my-1.5">
                     {/* Daily Row */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-md bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-600">
-                          <Calendar className="w-3 h-3" />
+                        <div className="w-6 h-6 rounded-md bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-600 shrink-0">
+                          <Calendar className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-xs text-slate-600 font-semibold">Daily</span>
+                        <span className="text-sm text-slate-700 font-bold">Daily</span>
                       </div>
-                      <span className="text-xs font-black text-emerald-600 tabular-nums">
+                      <span className="text-base font-black text-emerald-600 tabular-nums font-['Space_Grotesk']">
                         ₹{product.dailyIncome.toLocaleString()}
                       </span>
                     </div>
@@ -251,12 +249,12 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
                     {/* Total Row */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-md bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
-                          <Coins className="w-3 h-3" />
+                        <div className="w-6 h-6 rounded-md bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600 shrink-0">
+                          <Coins className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-xs text-slate-600 font-semibold">Total</span>
+                        <span className="text-sm text-slate-700 font-bold">Total</span>
                       </div>
-                      <span className="text-xs font-black text-blue-600 tabular-nums">
+                      <span className="text-base font-black text-blue-600 tabular-nums font-['Space_Grotesk']">
                         ₹{product.totalReturn.toLocaleString()}
                       </span>
                     </div>
