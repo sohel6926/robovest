@@ -39,7 +39,8 @@ export const WelcomeModal: React.FC = () => {
 
             {/* Subtle cyber grid vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none" />
+            {/* Reduced White Gradient: clean subtle bottom edge blend so the robot visual remains completely crisp */}
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
 
             {/* Live Fleet Pill Indicator (Top Left) */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider shadow-md">
@@ -62,15 +63,20 @@ export const WelcomeModal: React.FC = () => {
                 <Sparkles className="w-3 h-3 text-blue-600" />
                 <span>WELCOME TO</span>
               </div>
-              <div className="flex items-center justify-center gap-1.5 mt-0.5">
-                <span className="font-black text-2xl tracking-wider text-slate-900 font-['Space_Grotesk'] drop-shadow-sm">
-                  ROBO<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">VEST</span>
-                </span>
+
+              {/* ROBOVEST Brand with High-Contrast Frosted Badge */}
+              <div className="flex items-center justify-center mt-1">
+                <div className="inline-flex items-center justify-center px-4 py-0.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-sm">
+                  <span className="font-black text-2xl tracking-wider text-slate-900 font-['Space_Grotesk'] leading-none">
+                    ROBO<span className="text-blue-600 font-black">VEST</span>
+                  </span>
+                </div>
               </div>
-              <p className="text-xs font-black text-slate-800 tracking-tight mt-0.5">
+
+              <p className="text-xs font-black text-slate-900 tracking-tight mt-1 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)]">
                 More Robots · A Better Tomorrow
               </p>
-              <div className="flex items-center justify-center gap-2 text-[10px] font-semibold text-slate-500 mt-0.5">
+              <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 mt-0.5 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)]">
                 <span>Safe Fleets</span>
                 <span className="text-blue-500">●</span>
                 <span>More Opportunities</span>
