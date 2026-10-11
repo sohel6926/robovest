@@ -24,7 +24,7 @@ export const WelcomeModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-300">
       <div 
-        className="relative w-full max-w-[390px] bg-white border border-slate-200/90 rounded-[32px] shadow-[0_25px_70px_rgba(15,23,42,0.25),0_0_50px_rgba(37,99,235,0.12)] overflow-hidden max-h-[92vh] flex flex-col text-slate-800 transition-all transform scale-100"
+        className="relative w-full max-w-[390px] bg-white border border-slate-200/90 rounded-[32px] shadow-[0_25px_70px_rgba(15,23,42,0.25),0_0_50px_rgba(254,70,0,0.14)] overflow-hidden max-h-[92vh] flex flex-col text-slate-800 transition-all transform scale-100"
       >
         {/* Scrollable Container with elegant padding and hidden scrollbar */}
         <div className="overflow-y-auto space-y-3 pb-5 scroll-smooth">
@@ -258,7 +258,7 @@ export const WelcomeModal: React.FC = () => {
                   setShowWelcomeModal(false);
                   setShowCustomerCare(true);
                 }}
-                className="relative w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm flex items-center justify-between shadow-[0_12px_25px_-5px_rgba(37,99,235,0.45)] border-t border-white/30 active:scale-[0.98] transition-all group overflow-hidden"
+                className="relative w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm flex items-center justify-between shadow-[0_12px_25px_-5px_rgba(254,70,0,0.45)] border-t border-white/30 active:scale-[0.98] transition-all group overflow-hidden"
               >
                 {/* Subtle shine sweep */}
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-in-out pointer-events-none" />

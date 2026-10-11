@@ -71,15 +71,15 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
           </div>
           <h1 className="text-2xl font-black leading-tight tracking-tight font-['Space_Grotesk'] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
             More Robots <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-yellow-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               A Better Tomorrow
             </span>
           </h1>
           <p className="text-[11px] text-slate-200 mt-1 font-semibold flex items-center gap-1.5 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
             <span>Safe Fleets</span>
-            <span className="text-blue-400">·</span>
+            <span className="text-orange-400">·</span>
             <span>More Opportunities</span>
-            <span className="text-blue-400">·</span>
+            <span className="text-orange-400">·</span>
             <span>Growing Together</span>
           </p>
         </div>
@@ -91,7 +91,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
           {/* Recharge */}
           <button
             onClick={onNavigateToRecharge}
-            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(37,99,235,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.18)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
+            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(254,70,0,0.09),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(254,70,0,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
           >
             <div className="flex-1 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-blue-600 fill-current" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
           {/* Withdraw */}
           <button
             onClick={onNavigateToWithdraw}
-            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(37,99,235,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.18)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
+            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(254,70,0,0.09),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(254,70,0,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
           >
             <div className="flex-1 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-blue-600 fill-current" viewBox="0 0 24 24">
@@ -117,7 +117,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
           {/* Channel */}
           <button
             onClick={() => setShowCustomerCare(true)}
-            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(37,99,235,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.18)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
+            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(254,70,0,0.09),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(254,70,0,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
           >
             <div className="flex-1 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-blue-600 fill-current -rotate-12 translate-x-0.5" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
           {/* Online */}
           <button
             onClick={() => setShowCustomerCare(true)}
-            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(37,99,235,0.08),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.18)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
+            className="flex flex-col items-center justify-between h-[98px] py-3 px-1 rounded-[22px] bg-gradient-to-b from-white via-white/95 to-blue-50/70 border border-blue-100/80 shadow-[0_4px_14px_rgba(254,70,0,0.09),0_1px_3px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_20px_rgba(254,70,0,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all text-center group"
           >
             <div className="flex-1 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-blue-600 fill-current" viewBox="0 0 24 24">
@@ -199,9 +199,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
 
 
                   {/* Bottom Bonus Badge */}
-                  <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-white/95 backdrop-blur-xs text-blue-700 text-[10px] font-black py-0.5 px-2 rounded-lg text-center border border-slate-200 shadow-xs flex items-center justify-center gap-1">
-                    <span className="text-slate-500 font-bold">BONUS</span>
-                    <span className="text-blue-700 text-xs">₹{product.bonus.toLocaleString()}</span>
+                  <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-white/95 backdrop-blur-xs py-1 px-2 rounded-xl text-center border border-slate-200/90 shadow-xs flex items-center justify-center gap-1.5">
+                    <span className="text-slate-600 font-black text-xs tracking-wider">BONUS</span>
+                    <span className="text-blue-700 text-sm font-black font-['Space_Grotesk']">₹{product.bonus.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -221,11 +221,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({ onNavigateToRecharge, onNaviga
                     </div>
 
                     {/* Price / 150 Days */}
-                    <div className="mt-0.5 flex items-baseline gap-1">
+                    <div className="mt-0.5 flex items-baseline gap-1.5">
                       <span className="text-2xl font-black text-blue-600 font-['Space_Grotesk']">
                         ₹{product.price.toLocaleString()}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium">
+                      <span className="text-lg font-extrabold text-slate-600 font-['Space_Grotesk'] tracking-tight">
                         /{product.durationDays} Days
                       </span>
                     </div>

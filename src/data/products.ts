@@ -147,11 +147,11 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
 ];
 
 export const COLOR_TRUST_RATIONALE = {
-  title: 'Financial Design: Why Half-White / Cream & Royal Blue Establish Maximum Trust',
+  title: 'Financial Design: Why Half-White / Cream & FanCode Electric Orange Establish Maximum Trust',
   bullets: [
     {
-      heading: 'Institutional Security (Royal Blue #2563EB / #1D4ED8)',
-      text: 'Global fintech giants and leading banking institutions rely on Royal Blue. Financial UX studies confirm blue is the #1 color associated with fiduciary reliability, cybersecurity, and financial integrity.'
+      heading: 'High-Impact Athletic Brand Energy (FanCode Orange #FE4600 / #D93B00)',
+      text: 'Dynamic fintech platforms and sporting platforms rely on high-energy Electric Orange. UX studies confirm vivid orange drives engagement, action confidence, and unmistakable brand presence.'
     },
     {
       heading: 'Warm Passbook Texture (Soft Cream #FAF7F2 & Half-White #FFFDF9)',
@@ -159,7 +159,7 @@ export const COLOR_TRUST_RATIONALE = {
     },
     {
       heading: 'Modern Autonomous Tech Aesthetics',
-      text: 'Clean cream chassis with electric royal blue accents creates high contrast for financial ledgers, withdrawal rules, and yield calculations.'
+      text: 'Clean cream chassis with electric FanCode orange accents creates high contrast for financial ledgers, withdrawal rules, and yield calculations.'
     }
   ]
 };

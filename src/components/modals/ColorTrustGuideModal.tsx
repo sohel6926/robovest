@@ -18,7 +18,7 @@ export const ColorTrustGuideModal: React.FC = () => {
             </div>
             <div>
               <h3 className="font-bold text-sm text-slate-900">Design Palette System</h3>
-              <p className="text-[10px] text-blue-600 font-medium">Option 2: Clean Fintech (Stripe & Revolut)</p>
+              <p className="text-[10px] text-blue-600 font-medium">FanCode Electric Orange Theme</p>
             </div>
           </div>
           <button
@@ -32,7 +32,7 @@ export const ColorTrustGuideModal: React.FC = () => {
         {/* Introduction */}
         <div className="text-xs text-slate-600 leading-relaxed space-y-2">
           <p>
-            You selected <strong className="text-blue-600">Option 2 (Clean Modern Fintech)</strong>. The app utilizes a crisp <strong className="text-slate-800">Ice-White slate canvas</strong> with pure white cards, high-contrast <strong className="text-blue-600">Deep Cobalt</strong> primaries, and <strong className="text-emerald-600">Emerald Mint</strong> yield indicators.
+            You selected <strong className="text-blue-600">Electric Orange Fintech</strong>. The app utilizes a crisp <strong className="text-slate-800">Ice-White slate canvas</strong> with pure white cards, high-contrast <strong className="text-blue-600">FanCode Orange</strong> primaries, and <strong className="text-emerald-600">Emerald Mint</strong> yield indicators.
           </p>
         </div>
 
@@ -60,8 +60,8 @@ export const ColorTrustGuideModal: React.FC = () => {
               {/* Swatch 3 */}
               <div className="space-y-1 text-center">
                 <div className="h-10 rounded-lg bg-blue-600 border border-blue-700 shadow-xs text-white" />
-                <span className="text-[9px] text-blue-600 block font-mono font-bold">#2563EB</span>
-                <span className="text-[8px] text-slate-500 block">Cobalt CTA</span>
+                <span className="text-[9px] text-blue-600 block font-mono font-bold">#FE4600</span>
+                <span className="text-[8px] text-slate-500 block">FanCode CTA</span>
               </div>
               {/* Swatch 4 */}
               <div className="space-y-1 text-center">
