@@ -28,23 +28,57 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     platformSettings
   } = useApp();
 
-  const getStatSize = (val: string | number) => {
-    const s = typeof val === 'number' ? `₹${val.toLocaleString()}` : String(val);
-    if (s.length >= 10) return 'text-[12px]';
-    if (s.length >= 8) return 'text-[13.5px]';
-    return 'text-[15px]';
-  };
+  const [activeBannerDot, setActiveBannerDot] = useState(0);
 
   return (
     <div className="pb-28 max-w-md mx-auto bg-[#F5F6F9] min-h-screen text-slate-900 select-none">
       
-      {/* Top Sports Montage Banner - Fixed edge-to-edge flush with the screen */}
-      <div className="w-full">
-        <div className="relative w-full h-52 sm:h-56 overflow-hidden shadow-xs bg-slate-900">
+      {/* Top Sports Montage Banner (FANCODE LIVE SPORTS EVERY MOMENT) */}
+      <div className="px-3 pt-3">
+        <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-sm bg-gradient-to-r from-orange-500 to-amber-500">
           <img 
             src={HERO_IMAGE} 
             alt="FanCode Live Sports Every Moment"
             className="w-full h-full object-cover object-center"
+          />
+
+          {/* Watch Now Action Pill Button at bottom-left */}
+          <div className="absolute bottom-3 left-3.5 z-10">
+            <button 
+              onClick={() => setShowCustomerCare(true)}
+              className="py-1.5 px-3.5 rounded-full bg-gradient-to-r from-[#FF5A00] to-[#FF3D00] text-white text-[11px] font-black flex items-center gap-1 shadow-lg shadow-black/40 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Watch Now</span>
+              <ChevronRight className="w-3 h-3 stroke-[3]" />
+            </button>
+          </div>
+        </div>
+
+        {/* Banner Carousel Indicator Dots */}
+        <div className="flex items-center justify-center gap-1.5 mt-2 mb-1">
+          <span 
+            onClick={() => setActiveBannerDot(0)}
+            className={`cursor-pointer transition-all ${
+              activeBannerDot === 0 
+                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
+                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
+            }`} 
+          />
+          <span 
+            onClick={() => setActiveBannerDot(1)}
+            className={`cursor-pointer transition-all ${
+              activeBannerDot === 1 
+                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
+                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
+            }`} 
+          />
+          <span 
+            onClick={() => setActiveBannerDot(2)}
+            className={`cursor-pointer transition-all ${
+              activeBannerDot === 2 
+                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
+                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
+            }`} 
           />
         </div>
       </div>
@@ -136,7 +170,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               className="relative overflow-hidden rounded-[22px] bg-white border border-slate-100 p-3 shadow-[0_4px_16px_rgba(0,0,0,0.03)] transition-all duration-300 hover:shadow-md flex gap-3"
             >
               {/* Left Column: Image with FANCODE Overlay and Bonus Pill */}
-              <div className="relative w-[124px] sm:w-[136px] self-stretch min-h-[215px] rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100">
+              <div className="relative w-36 self-stretch min-h-[215px] rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -152,7 +186,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-xs py-1 px-2 rounded-full border border-slate-100 shadow-sm flex items-center justify-center gap-1.5">
                   <Gift className="w-3.5 h-3.5 text-[#FF4A00]" />
                   <span className="text-[#FF4A00] font-black text-xs font-['Space_Grotesk']">
-                    ₹{product.bonus.toLocaleString()} Bonus
+                    ₹{product.bonus} Bonus
                   </span>
                 </div>
               </div>
@@ -183,10 +217,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
                 {/* 2. Separate Box: Investment Amount */}
                 <div className="bg-[#FFF7F2] rounded-xl px-2.5 py-1.5 my-1.5 border border-[#FFE8DC]">
-                  <p className="text-[11px] text-slate-700 font-bold leading-none tracking-tight">
+                  <p className="text-[10px] text-slate-400 font-semibold leading-none">
                     Investment Amount
                   </p>
-                  <div className="text-[23px] font-black text-[#FF4800] font-['Space_Grotesk'] leading-tight mt-0.5">
+                  <div className="text-[22px] font-black text-[#FF4800] font-['Space_Grotesk'] leading-tight mt-0.5">
                     ₹{product.price.toLocaleString()}
                   </div>
                 </div>
@@ -195,60 +229,60 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <div className="grid grid-cols-2 gap-1.5 mb-2">
                   
                   {/* Box 1: Daily Payout (Soft Mint Green Box) */}
-                  <div className="bg-[#EDFBF5] rounded-xl px-2 py-1.5 border border-[#D0F3E2] flex items-center gap-1.5 overflow-hidden">
+                  <div className="bg-[#EDFBF5] rounded-xl p-1.5 border border-[#D0F3E2] flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded-md bg-emerald-100/80 text-[#00B074] flex items-center justify-center shrink-0">
                       <Calendar className="w-3 h-3 stroke-[2.5]" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] text-slate-700 font-bold leading-none truncate">
+                    <div className="min-w-0">
+                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
                         Daily Payout
                       </div>
-                      <div className={`${getStatSize(product.dailyIncome)} font-black text-[#00B074] font-['Space_Grotesk'] leading-tight mt-0.5 truncate`}>
+                      <div className="text-[13px] font-black text-[#00B074] font-['Space_Grotesk'] leading-tight mt-0.5">
                         ₹{product.dailyIncome.toLocaleString()}
                       </div>
                     </div>
                   </div>
 
                   {/* Box 2: Duration (Soft Cool Gray/Blue Box) */}
-                  <div className="bg-[#F1F5F9] rounded-xl px-2 py-1.5 border border-[#E2E8F0] flex items-center gap-1.5 overflow-hidden">
+                  <div className="bg-[#F1F5F9] rounded-xl p-1.5 border border-[#E2E8F0] flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded-md bg-slate-200/80 text-slate-600 flex items-center justify-center shrink-0">
                       <Clock className="w-3 h-3 stroke-[2.5]" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] text-slate-700 font-bold leading-none truncate">
+                    <div className="min-w-0">
+                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
                         Duration
                       </div>
-                      <div className={`${getStatSize(product.durationDays + ' Days')} font-black text-slate-800 font-['Space_Grotesk'] leading-tight mt-0.5 truncate`}>
+                      <div className="text-[13px] font-black text-slate-800 font-['Space_Grotesk'] leading-tight mt-0.5">
                         {product.durationDays} Days
                       </div>
                     </div>
                   </div>
 
                   {/* Box 3: Total Payout (Soft Warm Peach/Orange Box) */}
-                  <div className="bg-[#FFF4EC] rounded-xl px-2 py-1.5 border border-[#FFE3D1] flex items-center gap-1.5 overflow-hidden">
+                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 border border-[#FFE3D1] flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded-md bg-orange-100/90 text-[#FF4A00] flex items-center justify-center shrink-0">
                       <Coins className="w-3 h-3 stroke-[2.5]" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] text-slate-700 font-bold leading-none truncate">
+                    <div className="min-w-0">
+                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
                         Total Payout
                       </div>
-                      <div className={`${getStatSize(product.totalReturn)} font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5 truncate`}>
+                      <div className="text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5">
                         ₹{product.totalReturn.toLocaleString()}
                       </div>
                     </div>
                   </div>
 
                   {/* Box 4: Bonus (Soft Warm Peach/Orange Box) */}
-                  <div className="bg-[#FFF4EC] rounded-xl px-2 py-1.5 border border-[#FFE3D1] flex items-center gap-1.5 overflow-hidden">
+                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 border border-[#FFE3D1] flex items-center gap-1.5">
                     <div className="w-5 h-5 rounded-md bg-orange-100/90 text-[#FF4A00] flex items-center justify-center shrink-0">
-                      <Gift className="w-3.5 h-3 stroke-[2.5]" />
+                      <Gift className="w-3 h-3 stroke-[2.5]" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] text-slate-700 font-bold leading-none truncate">
+                    <div className="min-w-0">
+                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
                         Bonus
                       </div>
-                      <div className={`${getStatSize(product.bonus)} font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5 truncate`}>
+                      <div className="text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5">
                         ₹{product.bonus.toLocaleString()}
                       </div>
                     </div>
