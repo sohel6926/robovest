@@ -306,13 +306,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return localStorage.getItem('robovest_admin_auth') === 'true';
   });
 
-  // Dynamic Catalog with LocalStorage persistence
+  // Dynamic Catalog with LocalStorage persistence - always sync images from PRODUCTS_CATALOG
   const [catalog, setCatalog] = useState<InvestmentProduct[]>(() => {
     try {
-      const saved = localStorage.getItem('robovest_catalog');
+      // Clear legacy robot catalog cache
+      localStorage.removeItem('robovest_catalog');
+      const saved = localStorage.getItem('fancode_catalog_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Sync with latest sports images and models
+          return parsed.map((item: InvestmentProduct) => {
+            const def = PRODUCTS_CATALOG.find(p => p.id === item.id);
+            return def ? { ...item, image: def.image, robotModel: def.robotModel, tagline: def.tagline, badge: def.badge || item.badge } : item;
+          });
+        }
       }
     } catch (e) {
       console.error('Failed to parse catalog from storage', e);
@@ -534,7 +542,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem('robovest_catalog', JSON.stringify(catalog));
+    localStorage.setItem('fancode_catalog_v3', JSON.stringify(catalog));
   }, [catalog]);
 
   useEffect(() => {

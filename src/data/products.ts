@@ -1,12 +1,12 @@
 import { InvestmentProduct } from '../types';
-import heroImage from '../assets/images/hero_home_robot_1791407310783.jpg';
-import planAImage from '../assets/images/plan_a_micro_nao.jpg';
-import planBImage from '../assets/images/plan_b_spot_dog.jpg';
-import planCImage from '../assets/images/plan_c_asimo_biped.jpg';
-import planDImage from '../assets/images/plan_d_atlas_lab.jpg';
-import planEImage from '../assets/images/plan_e_titan_freight.jpg';
-import planFImage from '../assets/images/plan_f_valkyrie_hero.jpg';
-import planGImage from '../assets/images/plan_g_colossus_titan.jpg';
+import heroImage from '../assets/images/fancode_banner.jpg';
+import planAImage from '../assets/images/fancode_cricket_card.jpg';
+import planBImage from '../assets/images/fancode_f1_card.jpg';
+import planCImage from '../assets/images/fancode_football_card.jpg';
+import planDImage from '../assets/images/fancode_basketball_card.jpg';
+import planEImage from '../assets/images/fancode_tennis_card.jpg';
+import planFImage from '../assets/images/fancode_badminton_card.jpg';
+import planGImage from '../assets/images/fancode_boxing_card.jpg';
 
 export const HERO_IMAGE = heroImage;
 
@@ -14,9 +14,9 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
   {
     id: 'A',
     name: 'Product A',
-    tagline: 'Nao-Micro Autonomous Desktop Assistant',
-    robotModel: 'Nao Core Micro Assistant',
-    price: 520,
+    tagline: 'FanCode Premier League Cricket Tier',
+    robotModel: 'Cricket Premier League',
+    price: 5200,
     dailyIncome: 130,
     durationDays: 150,
     totalReturn: 19500,
@@ -25,16 +25,16 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     maxPurchase: 10,
     requiresPriorInvestment: false,
     image: planAImage,
-    imagePosition: 'object-top',
-    badge: 'Popular Starter',
+    imagePosition: 'object-center',
+    badge: 'POPULAR',
     tier: 'Standard',
-    specs: ['25.0% Daily ROI Yield', 'Automated Micro-Tasks', 'Instant ₹50 Cash Bonus']
+    specs: ['Daily Payout ₹130', '150 Days Duration', 'Instant ₹50 Bonus']
   },
   {
     id: 'B',
     name: 'Product B',
-    tagline: 'Spot-X Agile Quadruped Scout & Courier',
-    robotModel: 'Spot-X Quadruped Patrol Bot',
+    tagline: 'FanCode Formula 1 Velocity Grand Prix',
+    robotModel: 'Formula 1 Grand Prix',
     price: 2100,
     dailyIncome: 500,
     durationDays: 150,
@@ -45,15 +45,15 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     requiresPriorInvestment: false,
     image: planBImage,
     imagePosition: 'object-center',
-    badge: 'Best Value',
+    badge: 'BEST VALUE',
     tier: 'Standard',
-    specs: ['23.8% Daily Yield', 'Agile Terrain Mobility', 'Instant ₹100 Cash Bonus']
+    specs: ['Daily Payout ₹500', '150 Days Duration', 'Instant ₹100 Bonus']
   },
   {
     id: 'C',
     name: 'Product C',
-    tagline: 'ASIMO-V Kinetic Bipedal Android',
-    robotModel: 'ASIMO-V Precision Service Biped',
+    tagline: 'FanCode Champions League Striker League',
+    robotModel: 'Football Champions League',
     price: 4000,
     dailyIncome: 950,
     durationDays: 150,
@@ -63,16 +63,16 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     maxPurchase: 10,
     requiresPriorInvestment: false,
     image: planCImage,
-    imagePosition: 'object-top',
-    badge: 'High Growth',
+    imagePosition: 'object-center',
+    badge: 'HIGH GROWTH',
     tier: 'Standard',
-    specs: ['23.75% Daily Yield', 'Kinetic Smart Automation', 'Instant ₹250 Cash Bonus']
+    specs: ['Daily Payout ₹950', '150 Days Duration', 'Instant ₹250 Bonus']
   },
   {
     id: 'D',
     name: 'Product D',
-    tagline: 'Atlas Prime Neural Laboratory Android',
-    robotModel: 'Atlas Prime AI Diagnostics Android',
+    tagline: 'FanCode NBA Slam Dunk Arena Championship',
+    robotModel: 'Basketball NBA Pro Arena',
     price: 8200,
     dailyIncome: 2000,
     durationDays: 150,
@@ -83,15 +83,15 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     requiresPriorInvestment: false,
     image: planDImage,
     imagePosition: 'object-center',
-    badge: 'Super Tier',
+    badge: 'SUPER TIER',
     tier: 'Standard',
-    specs: ['24.39% Daily Yield', 'Algorithmic Arbitrage', 'Instant ₹500 Cash Bonus']
+    specs: ['Daily Payout ₹2,000', '150 Days Duration', 'Instant ₹500 Bonus']
   },
   {
     id: 'E',
     name: 'Product E',
-    tagline: 'Aurora Heavy Industrial Logistics Titan',
-    robotModel: 'Aurora Unit-04 Heavy Freight Titan',
+    tagline: 'FanCode Grand Slam Tennis Masters',
+    robotModel: 'Tennis Grand Slam Masters',
     price: 15500,
     dailyIncome: 3500,
     durationDays: 150,
@@ -102,15 +102,15 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     requiresPriorInvestment: true,
     image: planEImage,
     imagePosition: 'object-center',
-    badge: 'VIP Elite',
+    badge: 'VIP ELITE',
     tier: 'Elite',
-    specs: ['Requires Product A, B, C, or D', '450KG Freight Payload', 'Instant ₹1,200 Cash Bonus']
+    specs: ['Requires Product A, B, C, or D', 'Daily Payout ₹3,500', 'Instant ₹1,200 Bonus']
   },
   {
     id: 'F',
     name: 'Product F',
-    tagline: 'Valkyrie R5 Deep-Space Sovereign Android',
-    robotModel: 'Valkyrie R5 Orbital Space Sentinel',
+    tagline: 'FanCode World Badminton Super Series',
+    robotModel: 'Badminton World Tour Series',
     price: 35000,
     dailyIncome: 8000,
     durationDays: 150,
@@ -120,16 +120,16 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     maxPurchase: 10,
     requiresPriorInvestment: true,
     image: planFImage,
-    imagePosition: 'object-top',
-    badge: 'Executive Elite',
+    imagePosition: 'object-center',
+    badge: 'EXECUTIVE ELITE',
     tier: 'Elite',
-    specs: ['Requires Product A, B, C, or D', 'Autonomous Data Syndicate', 'Instant ₹3,000 Cash Bonus']
+    specs: ['Requires Product A, B, C, or D', 'Daily Payout ₹8,000', 'Instant ₹3,000 Bonus']
   },
   {
     id: 'G',
     name: 'Product G',
-    tagline: 'Omega Freedom Colossal Super-Titan',
-    robotModel: 'Omega Freedom Apex Defense Titan',
+    tagline: 'FanCode Heavyweight Boxing Championship',
+    robotModel: 'Combat Heavyweight World Title',
     price: 75000,
     dailyIncome: 16500,
     durationDays: 150,
@@ -139,27 +139,23 @@ export const PRODUCTS_CATALOG: InvestmentProduct[] = [
     maxPurchase: 10,
     requiresPriorInvestment: true,
     image: planGImage,
-    imagePosition: 'object-top',
-    badge: 'Apex Masterpiece',
+    imagePosition: 'object-center',
+    badge: 'APEX MASTERPIECE',
     tier: 'Quantum Apex',
-    specs: ['Requires Product A, B, C, or D', 'Colossal Apex Grid Core', 'Instant ₹5,000 Cash Bonus']
+    specs: ['Requires Product A, B, C, or D', 'Daily Payout ₹16,500', 'Instant ₹5,000 Bonus']
   }
 ];
 
 export const COLOR_TRUST_RATIONALE = {
-  title: 'Financial Design: Why Half-White / Cream & FanCode Electric Orange Establish Maximum Trust',
+  title: 'FanCode Official Sports Investment Platform',
   bullets: [
     {
-      heading: 'High-Impact Athletic Brand Energy (FanCode Orange #FE4600 / #D93B00)',
-      text: 'Dynamic fintech platforms and sporting platforms rely on high-energy Electric Orange. UX studies confirm vivid orange drives engagement, action confidence, and unmistakable brand presence.'
+      heading: 'FanCode Electric Orange (#FE4600 / #FF5100)',
+      text: 'Dynamic sports entertainment energy and high visibility UX driving confidence and clarity.'
     },
     {
-      heading: 'Warm Passbook Texture (Soft Cream #FAF7F2 & Half-White #FFFDF9)',
-      text: 'Replacing harsh clinical stark white with subtle half-white and cream tones provides a warm, tactile banking passbook aesthetic that reduces eye strain and establishes authentic trust.'
-    },
-    {
-      heading: 'Modern Autonomous Tech Aesthetics',
-      text: 'Clean cream chassis with electric FanCode orange accents creates high contrast for financial ledgers, withdrawal rules, and yield calculations.'
+      heading: 'Crisp White Surface Cards with Rounded Aesthetics',
+      text: 'High-clarity sports investment cards delivering transparent daily payouts, bonuses, and terms.'
     }
   ]
 };

@@ -209,10 +209,10 @@ export const BuyModal: React.FC = () => {
           <button
             onClick={handleConfirmPurchase}
             disabled={quantity > maxAvailableToBuy}
-            className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm shadow-lg shadow-blue-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white font-black text-sm shadow-lg shadow-orange-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Zap className="w-4 h-4 fill-white" />
-            <span>Confirm Deployment (₹{totalCost.toLocaleString()})</span>
+            <span>Confirm Plan (₹{totalCost.toLocaleString()})</span>
           </button>
         )}
       </div>
