@@ -24,7 +24,7 @@ export const WelcomeModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-300">
       <div 
-        className="relative w-full max-w-[390px] bg-white border border-slate-200/90 rounded-[32px] shadow-[0_25px_70px_rgba(15,23,42,0.25),0_0_50px_rgba(254,70,0,0.14)] overflow-hidden max-h-[92vh] flex flex-col text-slate-800 transition-all transform scale-100"
+        className="relative w-full max-w-[390px] bg-[#FFF7F2] border border-[#FFE8DC] rounded-[32px] shadow-[0_25px_70px_rgba(15,23,42,0.25),0_0_50px_rgba(254,70,0,0.14)] overflow-hidden max-h-[92vh] flex flex-col text-slate-800 transition-all transform scale-100"
       >
         {/* Scrollable Container with elegant padding and hidden scrollbar */}
         <div className="overflow-y-auto space-y-3 pb-5 scroll-smooth">
@@ -39,8 +39,8 @@ export const WelcomeModal: React.FC = () => {
 
             {/* Subtle cyber grid vignette overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
-            {/* Reduced White Gradient: clean subtle bottom edge blend so the robot visual remains completely crisp */}
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            {/* Reduced Gradient: clean subtle bottom edge blend into modal background */}
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#FFF7F2] to-transparent pointer-events-none" />
 
             {/* Live Fleet Pill Indicator (Top Left) */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider shadow-md">
@@ -90,30 +90,30 @@ export const WelcomeModal: React.FC = () => {
             {/* Top 2 Cards: Minimum Recharge & Minimum Withdrawal */}
             <div className="grid grid-cols-2 gap-2.5">
               {/* Minimum Recharge */}
-              <div className="relative p-2.5 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 overflow-hidden group">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
+              <div className="relative p-2.5 rounded-2xl bg-white border border-[#FFE8DC] shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 overflow-hidden group">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF5E00] to-[#FF4500] text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-500/25 group-hover:scale-105 transition-transform">
                   <Wallet className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-slate-500 block leading-tight truncate">
                     Min Recharge
                   </span>
-                  <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200/80 text-blue-700 font-black text-xs shadow-xs">
+                  <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-orange-50 border border-orange-200/80 text-[#FF4A00] font-black text-xs shadow-xs">
                     ₹520
                   </div>
                 </div>
               </div>
 
               {/* Minimum Withdrawal */}
-              <div className="relative p-2.5 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 overflow-hidden group">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform">
+              <div className="relative p-2.5 rounded-2xl bg-white border border-[#FFE8DC] shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 overflow-hidden group">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF5E00] to-[#FF4500] text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-500/25 group-hover:scale-105 transition-transform">
                   <Wallet className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-slate-500 block leading-tight truncate">
                     Min Withdrawal
                   </span>
-                  <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200/80 text-blue-700 font-black text-xs shadow-xs">
+                  <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-orange-50 border border-orange-200/80 text-[#FF4A00] font-black text-xs shadow-xs">
                     ₹150
                   </div>
                 </div>
