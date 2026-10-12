@@ -48,7 +48,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 1: Recharge */}
           <button
             onClick={onNavigateToRecharge}
-            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer"
+            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
           >
             <div className="w-8 h-8 rounded-xl bg-orange-50/80 flex items-center justify-center text-[#FF4A00] mb-1 group-hover:scale-110 transition-transform">
               {/* Wallet with plus icon */}
@@ -64,7 +64,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 2: Withdraw */}
           <button
             onClick={onNavigateToWithdraw}
-            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer"
+            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
           >
             <div className="w-8 h-8 rounded-xl bg-orange-50/80 flex items-center justify-center text-[#FF4A00] mb-1 group-hover:scale-110 transition-transform">
               {/* ATM / Bank Card Icon */}
@@ -86,7 +86,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 setShowCustomerCare(true);
               }
             }}
-            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer"
+            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
           >
             <div className="w-8 h-8 rounded-xl bg-orange-50/80 flex items-center justify-center text-[#FF4A00] mb-1 group-hover:scale-110 transition-transform">
               {/* Telegram Icon */}
@@ -102,7 +102,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           {/* Action 4: Online */}
           <button
             onClick={() => setShowCustomerCare(true)}
-            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer"
+            className="flex flex-col items-center justify-center h-20 py-2 px-1 rounded-2xl bg-white border border-slate-100/90 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all text-center group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0"
           >
             <div className="w-8 h-8 rounded-xl bg-orange-50/80 flex items-center justify-center text-[#FF4A00] mb-1 group-hover:scale-110 transition-transform">
               {/* Online Support Chat Icon */}

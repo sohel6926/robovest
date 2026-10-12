@@ -4,6 +4,15 @@
     -webkit-tap-highlight-color: transparent;
   }
   
+  *:focus,
+  *:focus-visible,
+  button:focus,
+  button:focus-visible,
+  a:focus,
+  a:focus-visible {
+    outline: none !important;
+  }
+  
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #F8FAFC;
