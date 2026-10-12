@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { HERO_IMAGE } from '../../data/products';
 import { 
@@ -28,8 +28,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     platformSettings
   } = useApp();
 
-  const [activeBannerDot, setActiveBannerDot] = useState(0);
-
   return (
     <div className="pb-28 max-w-md mx-auto bg-[#F5F6F9] min-h-screen text-slate-900 select-none">
       
@@ -40,45 +38,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             src={HERO_IMAGE} 
             alt="FanCode Live Sports Every Moment"
             className="w-full h-full object-cover object-center"
-          />
-
-          {/* Watch Now Action Pill Button at bottom-left */}
-          <div className="absolute bottom-3 left-3.5 z-10">
-            <button 
-              onClick={() => setShowCustomerCare(true)}
-              className="py-1.5 px-3.5 rounded-full bg-gradient-to-r from-[#FF5A00] to-[#FF3D00] text-white text-[11px] font-black flex items-center gap-1 shadow-lg shadow-black/40 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
-            >
-              <span>Watch Now</span>
-              <ChevronRight className="w-3 h-3 stroke-[3]" />
-            </button>
-          </div>
-        </div>
-
-        {/* Banner Carousel Indicator Dots */}
-        <div className="flex items-center justify-center gap-1.5 mt-2 mb-1">
-          <span 
-            onClick={() => setActiveBannerDot(0)}
-            className={`cursor-pointer transition-all ${
-              activeBannerDot === 0 
-                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
-                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
-            }`} 
-          />
-          <span 
-            onClick={() => setActiveBannerDot(1)}
-            className={`cursor-pointer transition-all ${
-              activeBannerDot === 1 
-                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
-                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
-            }`} 
-          />
-          <span 
-            onClick={() => setActiveBannerDot(2)}
-            className={`cursor-pointer transition-all ${
-              activeBannerDot === 2 
-                ? 'w-4 h-1.5 rounded-full bg-[#FF4A00]' 
-                : 'w-1.5 h-1.5 rounded-full bg-slate-300'
-            }`} 
           />
         </div>
       </div>
