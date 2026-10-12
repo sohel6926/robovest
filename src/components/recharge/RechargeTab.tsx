@@ -73,7 +73,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   return (
-    <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#F8FAFC] text-slate-900">
+    <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900">
       {/* Top Header */}
       <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200/90 shadow-sm">
         <button

@@ -29,7 +29,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   } = useApp();
 
   return (
-    <div className="pb-28 max-w-md mx-auto bg-[#F5F6F9] min-h-screen text-slate-900 select-none">
+    <div className="pb-28 max-w-md mx-auto bg-[#FFF7F2] min-h-screen text-slate-900 select-none">
       
       {/* Top Sports Montage Banner (FANCODE LIVE SPORTS EVERY MOMENT) */}
       <div className="px-3 pt-3">
