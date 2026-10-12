@@ -37,7 +37,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           <img 
             src={HERO_IMAGE} 
             alt="FanCode Live Sports Every Moment"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-top"
           />
         </div>
       </div>
