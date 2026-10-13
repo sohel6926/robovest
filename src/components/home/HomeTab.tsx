@@ -126,10 +126,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           return (
             <div
               key={product.id}
-              className="relative overflow-hidden rounded-[22px] bg-white border border-slate-100 p-3 shadow-[0_4px_16px_rgba(0,0,0,0.03)] transition-all duration-300 hover:shadow-md flex gap-3"
+              className="relative overflow-hidden rounded-[22px] bg-white border border-slate-100 p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(0,0,0,0.03)] transition-all duration-300 hover:shadow-md flex gap-2.5 sm:gap-3"
             >
               {/* Left Column: Image with FANCODE Overlay and Bonus Pill */}
-              <div className="relative w-36 self-stretch min-h-[215px] rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100">
+              <div className="relative w-28 sm:w-36 self-stretch min-h-[200px] sm:min-h-[215px] rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100">
                 <img
                   src={product.image}
                   alt={product.name}
@@ -142,9 +142,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </div>
 
                 {/* Bottom Overlay: Bonus Pill Badge */}
-                <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur-xs py-1 px-2 rounded-full border border-slate-100 shadow-sm flex items-center justify-center gap-1.5">
-                  <Gift className="w-3.5 h-3.5 text-[#FF4A00]" />
-                  <span className="text-[#FF4A00] font-black text-xs font-['Space_Grotesk']">
+                <div className="absolute bottom-2 left-1.5 right-1.5 bg-white/95 backdrop-blur-xs py-1 px-1.5 rounded-full border border-slate-100 shadow-sm flex items-center justify-center gap-1">
+                  <Gift className="w-3 h-3 text-[#FF4A00] shrink-0" />
+                  <span className="text-[#FF4A00] font-black text-[11px] sm:text-xs font-['Space_Grotesk'] truncate">
                     ₹{product.bonus} Bonus
                   </span>
                 </div>
@@ -154,32 +154,32 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <div className="flex-1 flex flex-col justify-between min-w-0">
                 
                 {/* 1. Header Row: Product Name + POPULAR Crown Badge */}
-                <div className="flex items-center justify-between gap-1">
-                  <h3 className="font-black text-lg text-slate-900 font-['Space_Grotesk'] leading-tight truncate">
+                <div className="flex items-center justify-between gap-1.5 min-w-0">
+                  <h3 className="font-black text-base sm:text-lg text-slate-900 font-['Space_Grotesk'] leading-tight truncate shrink min-w-0">
                     {product.name}
                   </h3>
 
                   {/* POPULAR Crown Badge (Matching Product A in screenshot) */}
                   {(isProductA || product.badge === 'POPULAR') && (
-                    <span className="shrink-0 bg-gradient-to-r from-[#FF6600] to-[#FF4500] text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
-                      <Crown className="w-3 h-3 fill-white" />
+                    <span className="shrink-0 bg-gradient-to-r from-[#FF6600] to-[#FF4500] text-white text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                      <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white" />
                       <span>POPULAR</span>
                     </span>
                   )}
 
                   {!isProductA && product.badge && product.badge !== 'POPULAR' && (
-                    <span className="shrink-0 bg-orange-50 text-[#FF4A00] border border-orange-200 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md">
+                    <span className="shrink-0 bg-orange-50 text-[#FF4A00] border border-orange-200 text-[8.5px] sm:text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md">
                       {product.badge}
                     </span>
                   )}
                 </div>
 
                 {/* 2. Separate Box: Investment Amount */}
-                <div className="bg-[#FFF7F2] rounded-xl px-2.5 py-1.5 my-1.5 border border-[#FFE8DC]">
+                <div className="bg-[#FFF7F2] rounded-xl px-2.5 py-1.5 my-1 sm:my-1.5 border border-[#FFE8DC]">
                   <p className="text-[10px] text-slate-400 font-semibold leading-none">
                     Investment Amount
                   </p>
-                  <div className="text-[22px] font-black text-[#FF4800] font-['Space_Grotesk'] leading-tight mt-0.5">
+                  <div className="text-[19px] sm:text-[22px] font-black text-[#FF4800] font-['Space_Grotesk'] leading-tight mt-0.5 truncate">
                     ₹{product.price.toLocaleString()}
                   </div>
                 </div>
@@ -188,62 +188,58 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <div className="grid grid-cols-2 gap-1.5 mb-2">
                   
                   {/* Box 1: Daily Payout (Soft Mint Green Box) */}
-                  <div className="bg-[#EDFBF5] rounded-xl p-1.5 border border-[#D0F3E2] flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-md bg-emerald-100/80 text-[#00B074] flex items-center justify-center shrink-0">
-                      <Calendar className="w-3 h-3 stroke-[2.5]" />
+                  <div className="bg-[#EDFBF5] rounded-xl p-1.5 px-2 border border-[#D0F3E2] flex flex-col justify-center min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-500 font-semibold leading-none min-w-0">
+                      <div className="w-3.5 h-3.5 rounded bg-emerald-100 text-[#00B074] flex items-center justify-center shrink-0">
+                        <Calendar className="w-2.5 h-2.5 stroke-[2.5]" />
+                      </div>
+                      <span className="truncate">Daily Payout</span>
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
-                        Daily Payout
-                      </div>
-                      <div className="text-[13px] font-black text-[#00B074] font-['Space_Grotesk'] leading-tight mt-0.5">
-                        ₹{product.dailyIncome.toLocaleString()}
-                      </div>
+                    <div className="text-xs sm:text-[13px] font-black text-[#00B074] font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                      ₹{product.dailyIncome.toLocaleString()}
                     </div>
                   </div>
 
                   {/* Box 2: Duration (Soft Cool Gray/Blue Box) */}
-                  <div className="bg-[#F1F5F9] rounded-xl p-1.5 border border-[#E2E8F0] flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-md bg-slate-200/80 text-slate-600 flex items-center justify-center shrink-0">
-                      <Clock className="w-3 h-3 stroke-[2.5]" />
+                  <div className="bg-[#F1F5F9] rounded-xl p-1.5 px-2 border border-[#E2E8F0] flex flex-col justify-center min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-500 font-semibold leading-none min-w-0">
+                      <div className="w-3.5 h-3.5 rounded bg-slate-200/90 text-slate-600 flex items-center justify-center shrink-0">
+                        <Clock className="w-2.5 h-2.5 stroke-[2.5]" />
+                      </div>
+                      <span className="truncate">Duration</span>
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
-                        Duration
-                      </div>
-                      <div className="text-[13px] font-black text-slate-800 font-['Space_Grotesk'] leading-tight mt-0.5">
-                        {product.durationDays} Days
-                      </div>
+                    <div className="text-xs sm:text-[13px] font-black text-slate-800 font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                      {product.durationDays} Days
                     </div>
                   </div>
 
                   {/* Box 3: Total Payout (Soft Warm Peach/Orange Box) */}
-                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 border border-[#FFE3D1] flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-md bg-orange-100/90 text-[#FF4A00] flex items-center justify-center shrink-0">
-                      <Coins className="w-3 h-3 stroke-[2.5]" />
+                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 px-2 border border-[#FFE3D1] flex flex-col justify-center min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-500 font-semibold leading-none min-w-0">
+                      <div className="w-3.5 h-3.5 rounded bg-orange-100 text-[#FF4A00] flex items-center justify-center shrink-0">
+                        <Coins className="w-2.5 h-2.5 stroke-[2.5]" />
+                      </div>
+                      <span className="truncate">Total Payout</span>
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
-                        Total Payout
-                      </div>
-                      <div className="text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5">
-                        ₹{product.totalReturn.toLocaleString()}
-                      </div>
+                    <div className={`font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-1 truncate tracking-tight ${
+                      product.totalReturn >= 1000000 
+                        ? 'text-[11px] sm:text-xs' 
+                        : 'text-xs sm:text-[13px]'
+                    }`}>
+                      ₹{product.totalReturn.toLocaleString()}
                     </div>
                   </div>
 
                   {/* Box 4: Bonus (Soft Warm Peach/Orange Box) */}
-                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 border border-[#FFE3D1] flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-md bg-orange-100/90 text-[#FF4A00] flex items-center justify-center shrink-0">
-                      <Gift className="w-3 h-3 stroke-[2.5]" />
+                  <div className="bg-[#FFF4EC] rounded-xl p-1.5 px-2 border border-[#FFE3D1] flex flex-col justify-center min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-500 font-semibold leading-none min-w-0">
+                      <div className="w-3.5 h-3.5 rounded bg-orange-100 text-[#FF4A00] flex items-center justify-center shrink-0">
+                        <Gift className="w-2.5 h-2.5 stroke-[2.5]" />
+                      </div>
+                      <span className="truncate">Bonus</span>
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-[9px] text-slate-500 font-medium leading-none truncate">
-                        Bonus
-                      </div>
-                      <div className="text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-0.5">
-                        ₹{product.bonus.toLocaleString()}
-                      </div>
+                    <div className="text-xs sm:text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                      ₹{product.bonus.toLocaleString()}
                     </div>
                   </div>
                 </div>

@@ -42,10 +42,10 @@ export const WelcomeModal: React.FC = () => {
             {/* Reduced Gradient: clean subtle bottom edge blend into modal background */}
             <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#FFF7F2] to-transparent pointer-events-none" />
 
-            {/* Live Fleet Pill Indicator (Top Left) */}
+            {/* Live Sports Pill Indicator (Top Left) */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider shadow-md">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <span className="font-mono">AI FLEET ONLINE</span>
+              <span className="font-mono">LIVE SPORTS ONLINE</span>
             </div>
 
             {/* Frosted Glass Close Button (Top Right) */}
@@ -60,27 +60,27 @@ export const WelcomeModal: React.FC = () => {
             {/* Hero Branding Overlay */}
             <div className="absolute bottom-1.5 left-3 right-3 text-center">
               <div className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-black uppercase tracking-widest shadow-sm border border-slate-100">
-                <Sparkles className="w-3 h-3 text-blue-600" />
+                <Sparkles className="w-3 h-3 text-[#FF4A00]" />
                 <span>WELCOME TO</span>
               </div>
 
-              {/* ROBOVEST Brand with High-Contrast Frosted Badge */}
+              {/* FANCODE Brand with High-Contrast Frosted Badge */}
               <div className="flex items-center justify-center mt-1">
-                <div className="inline-flex items-center justify-center px-4 py-0.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-sm">
-                  <span className="font-black text-2xl tracking-wider text-slate-900 font-['Space_Grotesk'] leading-none">
-                    ROBO<span className="text-blue-600 font-black">VEST</span>
+                <div className="inline-flex items-center justify-center px-5 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-sm">
+                  <span className="font-black italic text-2xl tracking-tight text-slate-900 font-['Space_Grotesk'] leading-none">
+                    FAN<span className="text-[#FF4A00]">CODE</span>
                   </span>
                 </div>
               </div>
 
               <p className="text-xs font-black text-slate-900 tracking-tight mt-1 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)]">
-                More Robots · A Better Tomorrow
+                Live Sports · Anytime · Anywhere
               </p>
               <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-600 mt-0.5 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)]">
-                <span>Safe Fleets</span>
-                <span className="text-blue-500">●</span>
-                <span>More Opportunities</span>
-                <span className="text-blue-500">●</span>
+                <span>Instant Payouts</span>
+                <span className="text-[#FF4A00]">●</span>
+                <span>Live Action</span>
+                <span className="text-[#FF4A00]">●</span>
                 <span>Growing Together</span>
               </div>
             </div>

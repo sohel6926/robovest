@@ -38,6 +38,17 @@ const AppContent: React.FC = () => {
 
   const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>('none');
 
+  React.useEffect(() => {
+    const checkAdminHash = () => {
+      if (window.location.hash.toLowerCase() === '#admin' || window.location.search.toLowerCase().includes('admin')) {
+        setShowAdminPanel(true);
+      }
+    };
+    checkAdminHash();
+    window.addEventListener('hashchange', checkAdminHash);
+    return () => window.removeEventListener('hashchange', checkAdminHash);
+  }, [setShowAdminPanel]);
+
   const handleOpenRecharge = () => {
     setCurrentSubView('recharge');
   };
@@ -58,8 +69,8 @@ const AppContent: React.FC = () => {
 
       {/* Main Container: Mobile view on phones, luxury flagship smartphone bezel on desktop */}
       <div className="w-full max-w-md min-h-screen sm:min-h-[92vh] bg-[#FFF7F2] relative shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_50px_rgba(255,74,0,0.15)] sm:rounded-[36px] border-x sm:border border-slate-200/90 flex flex-col overflow-hidden">
-        {/* Sticky Top Bar (Only visible when not in Home or full-screen subviews like Recharge/Withdraw) */}
-        {currentSubView === 'none' && activeTab !== 'home' && <Navbar />}
+        {/* Sticky Top Bar Header */}
+        {currentSubView === 'none' && <Navbar />}
 
         {/* Main Content Area */}
         <main className="flex-1">
