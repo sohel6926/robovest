@@ -11,6 +11,28 @@ import {
   DailyWithdrawalLog
 } from '../types';
 import { PRODUCTS_CATALOG } from '../data/products';
+import { 
+  supabase,
+  fetchPlatformSettings,
+  updatePlatformSettingsDB,
+  fetchInvestmentProducts,
+  saveInvestmentProductDB,
+  deleteInvestmentProductDB,
+  fetchUserProfile,
+  updateUserProfileDB,
+  updateBankAccountDB,
+  fetchTransactions,
+  insertTransactionDB,
+  updateTransactionStatusDB,
+  fetchUserInvestments,
+  saveUserInvestmentDB,
+  cancelUserInvestmentDB,
+  fetchTeamMembersWithPlans,
+  saveTeamMemberDB,
+  deleteTeamMemberDB,
+  saveMemberPlanHoldingDB,
+  deleteMemberPlanHoldingDB
+} from '../lib/supabase';
 
 interface AppContextType {
   user: UserProfile;
@@ -289,7 +311,7 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   enforceNextDayWithdrawalLock: true,
   telegramSupportUrl: 'https://t.me/robovest_support',
   telegramChannelUrl: 'https://t.me/robovest_official',
-  platformAnnouncement: 'Autonomous Robotics Fleet v2.4 active. Daily yields processing 24/7.',
+  platformAnnouncement: 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -306,21 +328,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return localStorage.getItem('robovest_admin_auth') === 'true';
   });
 
-  // Dynamic Catalog with LocalStorage persistence - always sync images from PRODUCTS_CATALOG
+  // Dynamic Catalog backed by Supabase
   const [catalog, setCatalog] = useState<InvestmentProduct[]>(() => {
     try {
-      // Clear legacy robot catalog cache
-      localStorage.removeItem('robovest_catalog');
       const saved = localStorage.getItem('fancode_catalog_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Sync with latest sports images and models
-          return parsed.map((item: InvestmentProduct) => {
-            const def = PRODUCTS_CATALOG.find(p => p.id === item.id);
-            return def ? { ...item, image: def.image, robotModel: def.robotModel, tagline: def.tagline, badge: def.badge || item.badge } : item;
-          });
-        }
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {
       console.error('Failed to parse catalog from storage', e);
@@ -328,7 +342,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return PRODUCTS_CATALOG;
   });
 
-  // Platform Settings with LocalStorage persistence
+  // Platform Settings backed by Supabase
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => {
     try {
       const saved = localStorage.getItem('robovest_settings');
@@ -342,7 +356,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Simulated Time
   const [simulatedTime, setSimulatedTime] = useState<Date>(new Date());
 
-  // User Profile
+  // User Profile backed by Supabase
   const [user, setUser] = useState<UserProfile>(() => {
     try {
       const saved = localStorage.getItem('robovest_user');
@@ -364,7 +378,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   });
 
-  // Investments
+  // Investments backed by Supabase
   const [investments, setInvestments] = useState<UserInvestment[]>(() => {
     try {
       const saved = localStorage.getItem('robovest_investments');
@@ -392,7 +406,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     ];
   });
 
-  // Transactions with comprehensive withdrawal logs spanning dates
+  // Transactions backed by Supabase
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
       const saved = localStorage.getItem('robovest_transactions');
@@ -400,133 +414,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (e) {
       console.error('Failed to parse transactions from storage', e);
     }
-
-    const now = Date.now();
-    const oneDay = 86400000;
-
-    return [
-      // Today (Oct 10)
-      {
-        id: 'TXN-WTH-1001',
-        type: 'WITHDRAWAL',
-        amount: -2100,
-        fee: 210,
-        netAmount: 1890,
-        status: 'PROCESSING',
-        timestamp: now - 3600000 * 2,
-        formattedTime: '2026-10-10 11:15 AM',
-        description: 'Withdrawal to HDFC Bank (A/C ...7264)',
-        referenceId: 'PO-88192019'
-      },
-      {
-        id: 'TXN-WTH-1002',
-        type: 'WITHDRAWAL',
-        amount: -520,
-        fee: 52,
-        netAmount: 468,
-        status: 'COMPLETED',
-        timestamp: now - 3600000 * 6,
-        formattedTime: '2026-10-10 07:30 AM',
-        description: 'Withdrawal to HDFC Bank (A/C ...7264)',
-        referenceId: 'PO-88192018'
-      },
-      // Yesterday (Oct 9)
-      {
-        id: 'TXN-WTH-0901',
-        type: 'WITHDRAWAL',
-        amount: -4000,
-        fee: 400,
-        netAmount: 3600,
-        status: 'COMPLETED',
-        timestamp: now - oneDay - 3600000 * 4,
-        formattedTime: '2026-10-09 02:45 PM',
-        description: 'Withdrawal to ICICI Bank (A/C ...9102)',
-        referenceId: 'PO-77291048'
-      },
-      {
-        id: 'TXN-WTH-0902',
-        type: 'WITHDRAWAL',
-        amount: -1500,
-        fee: 150,
-        netAmount: 1350,
-        status: 'COMPLETED',
-        timestamp: now - oneDay - 3600000 * 8,
-        formattedTime: '2026-10-09 10:10 AM',
-        description: 'Withdrawal to State Bank of India (A/C ...4410)',
-        referenceId: 'PO-77291049'
-      },
-      {
-        id: 'TXN-WTH-0903',
-        type: 'WITHDRAWAL',
-        amount: -300,
-        fee: 30,
-        netAmount: 270,
-        status: 'PENDING',
-        timestamp: now - oneDay - 3600000 * 12,
-        formattedTime: '2026-10-09 06:15 AM',
-        description: 'Withdrawal to HDFC Bank (REJECTED: Incorrect IFSC Code)',
-        referenceId: 'PO-77291050'
-      },
-      // 2 Days ago (Oct 8)
-      {
-        id: 'TXN-WTH-0801',
-        type: 'WITHDRAWAL',
-        amount: -8200,
-        fee: 820,
-        netAmount: 7380,
-        status: 'COMPLETED',
-        timestamp: now - oneDay * 2 - 3600000 * 3,
-        formattedTime: '2026-10-08 03:20 PM',
-        description: 'Withdrawal to Axis Bank (A/C ...8821)',
-        referenceId: 'PO-66192031'
-      },
-      {
-        id: 'TXN-WTH-0802',
-        type: 'WITHDRAWAL',
-        amount: -500,
-        fee: 50,
-        netAmount: 450,
-        status: 'COMPLETED',
-        timestamp: now - oneDay * 2 - 3600000 * 9,
-        formattedTime: '2026-10-08 09:40 AM',
-        description: 'Withdrawal to HDFC Bank (A/C ...7264)',
-        referenceId: 'PO-66192032'
-      },
-      // Recharges & Returns
-      {
-        id: 'TXN-901',
-        type: 'RECHARGE',
-        amount: 4000,
-        status: 'COMPLETED',
-        timestamp: now - oneDay * 3,
-        formattedTime: '2026-10-05 11:30 AM',
-        description: 'Account Wallet Top-Up via UPI',
-        referenceId: 'UPI-77829104819'
-      },
-      {
-        id: 'TXN-902',
-        type: 'PRODUCT_BONUS',
-        amount: 50,
-        status: 'COMPLETED',
-        timestamp: now - oneDay * 3,
-        formattedTime: '2026-10-05 11:32 AM',
-        description: 'Instant Bonus for Product A Purchase',
-        referenceId: 'BONUS-A'
-      },
-      {
-        id: 'TXN-903',
-        type: 'DAILY_RETURN',
-        amount: 260,
-        status: 'COMPLETED',
-        timestamp: now - oneDay * 2,
-        formattedTime: '2026-10-06 01:00 AM',
-        description: 'Daily Fleet Earnings (Nao Gen-1)',
-        referenceId: 'FLEET-PAYOUT'
-      }
-    ];
+    return [];
   });
 
-  // Team Members State with LocalStorage persistence
+  // Team Members backed by Supabase
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
     try {
       const saved = localStorage.getItem('robovest_team_members');
@@ -540,7 +431,76 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return INITIAL_TEAM;
   });
 
-  // Sync to localStorage
+  // ---------------------------------------------------------------------------
+  // SUPABASE DATA FETCHING & REALTIME SYNCHRONIZATION
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDataFromSupabase() {
+      try {
+        const [
+          remoteSettings,
+          remoteProducts,
+          remoteUserData,
+          remoteInvestments,
+          remoteTransactions,
+          remoteTeam
+        ] = await Promise.all([
+          fetchPlatformSettings(),
+          fetchInvestmentProducts(),
+          fetchUserProfile('User5294'),
+          fetchUserInvestments('User5294'),
+          fetchTransactions('User5294'),
+          fetchTeamMembersWithPlans()
+        ]);
+
+        if (!isMounted) return;
+
+        if (remoteSettings) {
+          setPlatformSettings(remoteSettings);
+        }
+        if (remoteProducts && remoteProducts.length > 0) {
+          setCatalog(remoteProducts);
+        }
+        if (remoteUserData) {
+          setUser(remoteUserData.user);
+        }
+        if (remoteInvestments && remoteInvestments.length > 0) {
+          setInvestments(remoteInvestments);
+        }
+        if (remoteTransactions && remoteTransactions.length > 0) {
+          setTransactions(remoteTransactions);
+        }
+        if (remoteTeam && remoteTeam.length > 0) {
+          setTeamMembers(remoteTeam);
+        }
+      } catch (err) {
+        console.error('Failed to load initial data from Supabase:', err);
+      }
+    }
+
+    loadDataFromSupabase();
+
+    // Listen to real-time changes across public schema tables
+    const subscription = supabase
+      .channel('public_schema_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public' },
+        () => {
+          loadDataFromSupabase();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(subscription);
+    };
+  }, []);
+
+  // Sync to localStorage as offline cache
   useEffect(() => {
     localStorage.setItem('fancode_catalog_v3', JSON.stringify(catalog));
   }, [catalog]);
@@ -701,13 +661,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: utr || `UTR-${Math.floor(100000000000 + Math.random() * 900000000000)}`
     };
 
+    const newBalance = user.availableBalance + amount;
+    const newTotalRecharge = user.totalRecharge + amount;
+
     setUser(prev => ({
       ...prev,
-      availableBalance: prev.availableBalance + amount,
-      totalRecharge: prev.totalRecharge + amount,
+      availableBalance: newBalance,
+      totalRecharge: newTotalRecharge,
     }));
 
     setTransactions(prev => [newTxn, ...prev]);
+
+    // Persist to Supabase
+    insertTransactionDB(user.id, newTxn);
+    updateUserProfileDB(user.id, {
+      availableBalance: newBalance,
+      totalRecharge: newTotalRecharge,
+    });
 
     return { success: true, message: `Successfully recharged ₹${amount.toLocaleString()} into your account!` };
   };
@@ -787,15 +757,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: `BONUS-${productId}`
     };
 
+    const updatedAvailBalance = user.availableBalance - totalCost + totalBonus;
+    const updatedWithdrawableBalance = user.withdrawableBalance + totalBonus;
+    const updatedTotalIncome = user.totalIncome + totalBonus;
+
     setUser(prev => ({
       ...prev,
-      availableBalance: prev.availableBalance - totalCost + totalBonus,
-      withdrawableBalance: prev.withdrawableBalance + totalBonus,
-      totalIncome: prev.totalIncome + totalBonus,
+      availableBalance: updatedAvailBalance,
+      withdrawableBalance: updatedWithdrawableBalance,
+      totalIncome: updatedTotalIncome,
     }));
 
     setInvestments(prev => [newInvestment, ...prev]);
     setTransactions(prev => [bonusTxn, purchaseTxn, ...prev]);
+
+    // Persist to Supabase
+    saveUserInvestmentDB(user.id, newInvestment);
+    insertTransactionDB(user.id, purchaseTxn);
+    insertTransactionDB(user.id, bonusTxn);
+    updateUserProfileDB(user.id, {
+      availableBalance: updatedAvailBalance,
+      withdrawableBalance: updatedWithdrawableBalance,
+      totalIncome: updatedTotalIncome,
+    });
 
     return {
       success: true,
@@ -842,13 +826,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: `PO-${Math.floor(10000000 + Math.random() * 90000000)}`
     };
 
+    const updatedWithdrawable = user.withdrawableBalance - amount;
+    const updatedAvailable = user.availableBalance >= amount ? user.availableBalance - amount : user.availableBalance;
+
     setUser(prev => ({
       ...prev,
-      withdrawableBalance: prev.withdrawableBalance - amount,
-      availableBalance: prev.availableBalance >= amount ? prev.availableBalance - amount : prev.availableBalance,
+      withdrawableBalance: updatedWithdrawable,
+      availableBalance: updatedAvailable,
     }));
 
     setTransactions(prev => [newTxn, ...prev]);
+
+    // Persist to Supabase
+    insertTransactionDB(user.id, newTxn);
+    updateUserProfileDB(user.id, {
+      withdrawableBalance: updatedWithdrawable,
+      availableBalance: updatedAvailable,
+    });
 
     return {
       success: true,
@@ -858,10 +852,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Bank account binding
   const updateBankAccount = (bank: BankAccount) => {
+    const updatedBank = { ...bank, isBound: true };
     setUser(prev => ({
       ...prev,
-      bankAccount: { ...bank, isBound: true }
+      bankAccount: updatedBank
     }));
+
+    // Persist to Supabase
+    updateBankAccountDB(user.id, updatedBank);
   };
 
   // Claim daily accumulated returns
@@ -885,14 +883,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: `CLAIM-${Date.now().toString().slice(-4)}`
     };
 
+    const newWithdrawable = user.withdrawableBalance + totalDaily;
+    const newAvailable = user.availableBalance + totalDaily;
+    const newTotalIncome = user.totalIncome + totalDaily;
+
     setUser(prev => ({
       ...prev,
-      withdrawableBalance: prev.withdrawableBalance + totalDaily,
-      availableBalance: prev.availableBalance + totalDaily,
-      totalIncome: prev.totalIncome + totalDaily,
+      withdrawableBalance: newWithdrawable,
+      availableBalance: newAvailable,
+      totalIncome: newTotalIncome,
     }));
 
     setTransactions(prev => [newTxn, ...prev]);
+
+    // Persist to Supabase
+    insertTransactionDB(user.id, newTxn);
+    updateUserProfileDB(user.id, {
+      withdrawableBalance: newWithdrawable,
+      availableBalance: newAvailable,
+      totalIncome: newTotalIncome,
+    });
 
     return {
       success: true,
@@ -926,6 +936,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     setCatalog(prev => [...prev, newPlan]);
+
+    // Persist to Supabase
+    saveInvestmentProductDB(newPlan);
+
     return { success: true, message: `Plan "${newPlan.name}" (${newPlan.id}) added successfully!` };
   };
 
@@ -933,6 +947,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updatePlan = (id: string, updatedPlan: Partial<InvestmentProduct>) => {
     const exists = catalog.some(p => p.id === id);
     if (!exists) return { success: false, message: 'Plan not found.' };
+
+    let updatedInstance: InvestmentProduct | null = null;
 
     setCatalog(prev =>
       prev.map(p => {
@@ -943,9 +959,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             merged.totalReturn = (Number(merged.dailyIncome) || 0) * (Number(merged.durationDays) || 150);
           }
         }
+        updatedInstance = merged;
         return merged;
       })
     );
+
+    // Persist to Supabase
+    if (updatedInstance) {
+      saveInvestmentProductDB(updatedInstance);
+    }
 
     return { success: true, message: `Plan "${id}" updated successfully!` };
   };
@@ -953,17 +975,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 3. Delete Plan
   const deletePlan = (id: string) => {
     setCatalog(prev => prev.filter(p => p.id !== id));
+
+    // Persist to Supabase
+    deleteInvestmentProductDB(id);
+
     return { success: true, message: `Plan "${id}" deleted.` };
   };
 
   // 4. Reset Catalog to Default
   const resetCatalogToDefault = () => {
     setCatalog(PRODUCTS_CATALOG);
+    PRODUCTS_CATALOG.forEach(p => saveInvestmentProductDB(p));
   };
 
   // 5. Update User Profile
   const updateUserProfile = (updated: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...updated }));
+    updateUserProfileDB(user.id, updated);
   };
 
   // 6. Adjust User Balance
@@ -980,13 +1008,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: `ADMIN-${Date.now().toString().slice(-4)}`
     };
 
+    const newAvail = Math.max(0, user.availableBalance + amount);
+    const newWithdr = Math.max(0, user.withdrawableBalance + amount);
+
     setUser(prev => ({
       ...prev,
-      availableBalance: Math.max(0, prev.availableBalance + amount),
-      withdrawableBalance: Math.max(0, prev.withdrawableBalance + amount),
+      availableBalance: newAvail,
+      withdrawableBalance: newWithdr,
     }));
 
     setTransactions(prev => [newTxn, ...prev]);
+
+    // Persist to Supabase
+    insertTransactionDB(user.id, newTxn);
+    updateUserProfileDB(user.id, {
+      availableBalance: newAvail,
+      withdrawableBalance: newWithdr,
+    });
   };
 
   // 7. Approve Withdrawal
@@ -999,6 +1037,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return t;
       })
     );
+
+    // Persist to Supabase
+    updateTransactionStatusDB(transactionId, 'COMPLETED');
+
     return { success: true, message: 'Withdrawal approved and marked COMPLETED.' };
   };
 
@@ -1020,11 +1062,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       })
     );
 
+    const newWithdr = user.withdrawableBalance + refundAmount;
+    const newAvail = user.availableBalance + refundAmount;
+
     setUser(prev => ({
       ...prev,
-      withdrawableBalance: prev.withdrawableBalance + refundAmount,
-      availableBalance: prev.availableBalance + refundAmount,
+      withdrawableBalance: newWithdr,
+      availableBalance: newAvail,
     }));
+
+    // Persist to Supabase
+    updateTransactionStatusDB(transactionId, 'REJECTED', reason);
+    updateUserProfileDB(user.id, {
+      withdrawableBalance: newWithdr,
+      availableBalance: newAvail,
+    });
 
     return { success: true, message: `Withdrawal rejected and ₹${refundAmount.toLocaleString()} refunded to user.` };
   };
@@ -1038,6 +1090,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       formattedTime: simulatedTime.toLocaleString(),
     };
     setTransactions(prev => [newTxn, ...prev]);
+
+    // Persist to Supabase
+    insertTransactionDB(user.id, newTxn);
   };
 
   // 10. Cancel Investment
@@ -1050,17 +1105,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return inv;
       })
     );
+
+    // Persist to Supabase
+    cancelUserInvestmentDB(investmentId);
+
     return { success: true, message: `Investment "${investmentId}" marked as completed/cancelled.` };
   };
 
   // 11. Update Platform Settings
   const updatePlatformSettings = (settings: Partial<PlatformSettings>) => {
     setPlatformSettings(prev => ({ ...prev, ...settings }));
+    updatePlatformSettingsDB(settings);
   };
 
   // 12. Reset Settings
   const resetPlatformSettings = () => {
     setPlatformSettings(DEFAULT_SETTINGS);
+    updatePlatformSettingsDB(DEFAULT_SETTINGS);
   };
 
   // ================= REFERRAL NETWORK & MEMBER PLANS ADMIN ACTIONS =================
@@ -1068,7 +1129,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 13. Update Team Member
   const updateTeamMember = (id: string, updated: Partial<TeamMember>) => {
     setTeamMembers(prev =>
-      prev.map(m => (m.id === id ? { ...m, ...updated } : m))
+      prev.map(m => {
+        if (m.id === id) {
+          const merged = { ...m, ...updated };
+          saveTeamMemberDB(merged, user.id);
+          return merged;
+        }
+        return m;
+      })
     );
   };
 
@@ -1078,12 +1146,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return { success: false, message: `Member ID "${member.id}" already exists.` };
     }
     setTeamMembers(prev => [member, ...prev]);
+    saveTeamMemberDB(member, user.id);
     return { success: true, message: `Member ${member.phone} (${member.id}) added to network.` };
   };
 
   // 15. Delete Team Member
   const deleteTeamMember = (id: string) => {
     setTeamMembers(prev => prev.filter(m => m.id !== id));
+    deleteTeamMemberDB(id);
     return { success: true, message: `Member "${id}" deleted.` };
   };
 
@@ -1098,6 +1168,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTeamMembers(prev =>
       prev.map(m => (m.id === memberId ? { ...m, plans: newPlans, rechargeAmount: newRecharge } : m))
     );
+
+    saveMemberPlanHoldingDB(memberId, plan);
+    saveTeamMemberDB({ ...member, plans: newPlans, rechargeAmount: newRecharge }, user.id);
+
     return { success: true, message: `Added ${plan.planName} (${plan.quantity} unit) to member ${memberId}.` };
   };
 
@@ -1106,10 +1180,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTeamMembers(prev =>
       prev.map(m => {
         if (m.id !== memberId) return m;
-        const updatedPlans = (m.plans || []).map(p =>
-          p.id === planHoldingId ? { ...p, ...updated } : p
-        );
+        let savedPlan: MemberPlanHolding | null = null;
+        const updatedPlans = (m.plans || []).map(p => {
+          if (p.id === planHoldingId) {
+            const merged = { ...p, ...updated };
+            savedPlan = merged;
+            return merged;
+          }
+          return p;
+        });
         const newRecharge = updatedPlans.reduce((sum, p) => sum + p.totalInvested, 0);
+        if (savedPlan) {
+          saveMemberPlanHoldingDB(memberId, savedPlan);
+        }
+        saveTeamMemberDB({ ...m, plans: updatedPlans, rechargeAmount: newRecharge }, user.id);
         return { ...m, plans: updatedPlans, rechargeAmount: newRecharge };
       })
     );
@@ -1123,6 +1207,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (m.id !== memberId) return m;
         const updatedPlans = (m.plans || []).filter(p => p.id !== planHoldingId);
         const newRecharge = updatedPlans.reduce((sum, p) => sum + p.totalInvested, 0);
+        deleteMemberPlanHoldingDB(planHoldingId);
+        saveTeamMemberDB({ ...m, plans: updatedPlans, rechargeAmount: newRecharge }, user.id);
         return { ...m, plans: updatedPlans, rechargeAmount: newRecharge };
       })
     );
@@ -1132,6 +1218,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 19. Reset Team to Default
   const resetTeamToDefault = () => {
     setTeamMembers(INITIAL_TEAM);
+    INITIAL_TEAM.forEach(m => {
+      saveTeamMemberDB(m, user.id);
+      m.plans.forEach(p => saveMemberPlanHoldingDB(m.id, p));
+    });
   };
 
   // ================= DAILY WITHDRAWAL LOGS AGGREGATOR =================

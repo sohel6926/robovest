@@ -1,0 +1,344 @@
+import pg from 'pg';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const { Client } = pg;
+
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error('DATABASE_URL environment variable is required to run migrations.');
+  process.exit(1);
+}
+
+console.log('Connecting to Postgres via:', connectionString.replace(/:[^:]*@/, ':****@'));
+
+const client = new Client({
+  connectionString,
+  ssl: { rejectUnauthorized: false }
+});
+
+const schemaSQL = `
+-- 1. PLATFORM SETTINGS
+CREATE TABLE IF NOT EXISTS platform_settings (
+  id TEXT PRIMARY KEY DEFAULT 'default',
+  min_recharge NUMERIC NOT NULL DEFAULT 520,
+  min_withdrawal NUMERIC NOT NULL DEFAULT 150,
+  withdrawal_fee_percent NUMERIC NOT NULL DEFAULT 10,
+  daily_withdrawal_window_start TEXT NOT NULL DEFAULT '00:30',
+  daily_withdrawal_window_end TEXT NOT NULL DEFAULT '17:00',
+  enforce_next_day_withdrawal_lock BOOLEAN NOT NULL DEFAULT true,
+  telegram_support_url TEXT NOT NULL DEFAULT 'https://t.me/robovest_support',
+  telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/robovest_official',
+  platform_announcement TEXT NOT NULL DEFAULT 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. INVESTMENT PRODUCTS CATALOG
+CREATE TABLE IF NOT EXISTS investment_products (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  tagline TEXT NOT NULL,
+  robot_model TEXT NOT NULL,
+  price NUMERIC NOT NULL,
+  daily_income NUMERIC NOT NULL,
+  duration_days INTEGER NOT NULL DEFAULT 150,
+  total_return NUMERIC NOT NULL,
+  bonus NUMERIC NOT NULL DEFAULT 0,
+  min_purchase INTEGER NOT NULL DEFAULT 1,
+  max_purchase INTEGER NOT NULL DEFAULT 10,
+  requires_prior_investment BOOLEAN NOT NULL DEFAULT false,
+  image TEXT NOT NULL,
+  image_position TEXT DEFAULT 'object-center',
+  badge TEXT,
+  tier TEXT NOT NULL DEFAULT 'Standard',
+  specs JSONB NOT NULL DEFAULT '[]'::jsonb,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. USER PROFILES
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id TEXT PRIMARY KEY DEFAULT 'User5294',
+  phone TEXT NOT NULL DEFAULT '+91 98452 77192',
+  password TEXT NOT NULL DEFAULT 'password123',
+  invite_code TEXT NOT NULL DEFAULT '203C03',
+  inviter_code TEXT DEFAULT 'TOP_ADMIN',
+  vip_level INTEGER NOT NULL DEFAULT 1,
+  available_balance NUMERIC NOT NULL DEFAULT 4000,
+  withdrawable_balance NUMERIC NOT NULL DEFAULT 850,
+  total_recharge NUMERIC NOT NULL DEFAULT 4000,
+  total_income NUMERIC NOT NULL DEFAULT 1357.6,
+  is_logged_in BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. BANK ACCOUNTS
+CREATE TABLE IF NOT EXISTS bank_accounts (
+  id TEXT PRIMARY KEY DEFAULT 'bank_main',
+  user_id TEXT NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  account_holder TEXT NOT NULL DEFAULT 'Rahul Sharma',
+  account_number TEXT NOT NULL DEFAULT '50100492817264',
+  ifsc_code TEXT NOT NULL DEFAULT 'HDFC0001234',
+  bank_name TEXT NOT NULL DEFAULT 'HDFC Bank',
+  upi_id TEXT DEFAULT 'rahul.robo@okaxis',
+  is_bound BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. TRANSACTIONS
+CREATE TABLE IF NOT EXISTS transactions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  status TEXT NOT NULL DEFAULT 'COMPLETED',
+  timestamp BIGINT NOT NULL,
+  formatted_time TEXT NOT NULL,
+  description TEXT NOT NULL,
+  reference_id TEXT,
+  fee NUMERIC DEFAULT 0,
+  net_amount NUMERIC DEFAULT 0,
+  rejection_reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. USER INVESTMENTS
+CREATE TABLE IF NOT EXISTS user_investments (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL,
+  product_name TEXT NOT NULL,
+  robot_model TEXT NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  unit_price NUMERIC NOT NULL,
+  total_invested NUMERIC NOT NULL,
+  daily_income NUMERIC NOT NULL,
+  bonus_received NUMERIC NOT NULL DEFAULT 0,
+  purchase_timestamp BIGINT NOT NULL,
+  purchase_date_formatted TEXT NOT NULL,
+  days_elapsed INTEGER NOT NULL DEFAULT 0,
+  total_earned NUMERIC NOT NULL DEFAULT 0,
+  next_payout_countdown TEXT,
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. TEAM MEMBERS (Referral Network)
+CREATE TABLE IF NOT EXISTS team_members (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES user_profiles(id) ON DELETE SET NULL,
+  phone TEXT NOT NULL,
+  join_date TEXT NOT NULL,
+  level INTEGER NOT NULL DEFAULT 1,
+  inviter_id TEXT DEFAULT 'User5294 (You)',
+  invite_count INTEGER NOT NULL DEFAULT 0,
+  recharge_amount NUMERIC NOT NULL DEFAULT 0,
+  team_invested NUMERIC NOT NULL DEFAULT 0,
+  commission_generated NUMERIC NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 8. MEMBER PLAN HOLDINGS
+CREATE TABLE IF NOT EXISTS member_plan_holdings (
+  id TEXT PRIMARY KEY,
+  member_id TEXT NOT NULL REFERENCES team_members(id) ON DELETE CASCADE,
+  plan_id TEXT NOT NULL,
+  plan_name TEXT NOT NULL,
+  robot_model TEXT NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  unit_price NUMERIC NOT NULL,
+  total_invested NUMERIC NOT NULL,
+  daily_yield NUMERIC NOT NULL,
+  purchase_date TEXT NOT NULL,
+  days_elapsed INTEGER NOT NULL DEFAULT 0,
+  duration_days INTEGER NOT NULL DEFAULT 150,
+  total_earned NUMERIC NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ACTIVE',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. DAILY WITHDRAWAL LOGS
+CREATE TABLE IF NOT EXISTS daily_withdrawal_logs (
+  id TEXT PRIMARY KEY,
+  date TEXT NOT NULL UNIQUE,
+  formatted_date TEXT NOT NULL,
+  total_requested NUMERIC NOT NULL DEFAULT 0,
+  total_fees NUMERIC NOT NULL DEFAULT 0,
+  total_net NUMERIC NOT NULL DEFAULT 0,
+  total_requests INTEGER NOT NULL DEFAULT 0,
+  completed_amount NUMERIC NOT NULL DEFAULT 0,
+  processing_amount NUMERIC NOT NULL DEFAULT 0,
+  rejected_amount NUMERIC NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 10. ADMIN SETTINGS
+CREATE TABLE IF NOT EXISTS admin_settings (
+  id TEXT PRIMARY KEY DEFAULT 'admin_config',
+  admin_pin TEXT NOT NULL DEFAULT 'admin888',
+  backup_pins JSONB NOT NULL DEFAULT '["admin", "1234"]'::jsonb,
+  is_locked BOOLEAN NOT NULL DEFAULT false,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ENABLE ROW LEVEL SECURITY & OPEN POLICIES FOR SUPABASE CLIENT ACCESS
+DO $$
+DECLARE
+  t text;
+  tbls text[] := ARRAY[
+    'platform_settings', 
+    'investment_products', 
+    'user_profiles', 
+    'bank_accounts', 
+    'transactions', 
+    'user_investments', 
+    'team_members', 
+    'member_plan_holdings', 
+    'daily_withdrawal_logs', 
+    'admin_settings'
+  ];
+BEGIN
+  FOREACH t IN ARRAY tbls LOOP
+    EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY;', t);
+    EXECUTE format('DROP POLICY IF EXISTS "Public access on %s" ON %I;', t, t);
+    EXECUTE format('CREATE POLICY "Public access on %s" ON %I FOR ALL USING (true) WITH CHECK (true);', t, t);
+    EXECUTE format('GRANT ALL ON TABLE %I TO anon, authenticated, service_role;', t);
+  END LOOP;
+END $$;
+`;
+
+const seedSQL = `
+-- SEED PLATFORM SETTINGS
+INSERT INTO platform_settings (id, min_recharge, min_withdrawal, withdrawal_fee_percent, daily_withdrawal_window_start, daily_withdrawal_window_end, enforce_next_day_withdrawal_lock, telegram_support_url, telegram_channel_url, platform_announcement)
+VALUES ('default', 520, 150, 10, '00:30', '17:00', true, 'https://t.me/robovest_support', 'https://t.me/robovest_official', 'Autonomous Fleet v2.4 active. Daily yields processing 24/7.')
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED USER PROFILE
+INSERT INTO user_profiles (id, phone, password, invite_code, inviter_code, vip_level, available_balance, withdrawable_balance, total_recharge, total_income, is_logged_in)
+VALUES ('User5294', '+91 98452 77192', 'password123', '203C03', 'TOP_ADMIN', 1, 4000, 850, 4000, 1357.6, true)
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED BANK ACCOUNT
+INSERT INTO bank_accounts (id, user_id, account_holder, account_number, ifsc_code, bank_name, upi_id, is_bound)
+VALUES ('bank_main', 'User5294', 'Rahul Sharma', '50100492817264', 'HDFC0001234', 'HDFC Bank', 'rahul.robo@okaxis', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED ADMIN SETTINGS
+INSERT INTO admin_settings (id, admin_pin, backup_pins)
+VALUES ('admin_config', 'admin888', '["admin", "1234"]'::jsonb)
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED INVESTMENT PRODUCTS
+INSERT INTO investment_products (id, name, tagline, robot_model, price, daily_income, duration_days, total_return, bonus, min_purchase, max_purchase, requires_prior_investment, image, image_position, badge, tier, specs, is_active)
+VALUES
+('A', 'Product A', 'FanCode Premier League Cricket Tier', 'Cricket Premier League', 5200, 130, 150, 19500, 50, 1, 10, false, '/src/assets/images/fancode_cricket_card.jpg', 'object-center', 'POPULAR', 'Standard', '["Daily Payout ₹130", "150 Days Duration", "Instant ₹50 Bonus"]'::jsonb, true),
+('B', 'Product B', 'FanCode Formula 1 Velocity Grand Prix', 'Formula 1 Grand Prix', 2100, 500, 150, 75000, 100, 1, 10, false, '/src/assets/images/fancode_f1_card.jpg', 'object-center', 'BEST VALUE', 'Standard', '["Daily Payout ₹500", "150 Days Duration", "Instant ₹100 Bonus"]'::jsonb, true),
+('C', 'Product C', 'FanCode Champions League Striker League', 'Football Champions League', 4000, 950, 150, 142500, 250, 1, 10, false, '/src/assets/images/fancode_football_card.jpg', 'object-center', 'HIGH GROWTH', 'Standard', '["Daily Payout ₹950", "150 Days Duration", "Instant ₹250 Bonus"]'::jsonb, true),
+('D', 'Product D', 'FanCode NBA Slam Dunk Arena Championship', 'Basketball NBA Pro Arena', 8200, 2000, 150, 300000, 500, 1, 10, false, '/src/assets/images/fancode_basketball_card.jpg', 'object-center', 'SUPER TIER', 'Standard', '["Daily Payout ₹2,000", "150 Days Duration", "Instant ₹500 Bonus"]'::jsonb, true),
+('E', 'Product E', 'FanCode Grand Slam Tennis Masters', 'Tennis Grand Slam Masters', 15500, 3500, 150, 525000, 1200, 1, 10, true, '/src/assets/images/fancode_tennis_card.jpg', 'object-center', 'VIP ELITE', 'Elite', '["Requires Product A, B, C, or D", "Daily Payout ₹3,500", "Instant ₹1,200 Bonus"]'::jsonb, true),
+('F', 'Product F', 'FanCode World Badminton Super Series', 'Badminton World Tour Series', 35000, 8000, 150, 1200000, 3000, 1, 10, true, '/src/assets/images/fancode_badminton_card.jpg', 'object-center', 'EXECUTIVE ELITE', 'Elite', '["Requires Product A, B, C, or D", "Daily Payout ₹8,000", "Instant ₹3,000 Bonus"]'::jsonb, true),
+('G', 'Product G', 'FanCode Heavyweight Boxing Championship', 'Combat Heavyweight World Title', 75000, 16500, 150, 2475000, 5000, 1, 10, true, '/src/assets/images/fancode_boxing_card.jpg', 'object-center', 'APEX MASTERPIECE', 'Quantum Apex', '["Requires Product A, B, C, or D", "Daily Payout ₹16,500", "Instant ₹5,000 Bonus"]'::jsonb, true)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  robot_model = EXCLUDED.robot_model,
+  price = EXCLUDED.price,
+  daily_income = EXCLUDED.daily_income,
+  total_return = EXCLUDED.total_return,
+  bonus = EXCLUDED.bonus,
+  specs = EXCLUDED.specs;
+
+-- SEED INITIAL INVESTMENTS
+INSERT INTO user_investments (id, user_id, product_id, product_name, robot_model, quantity, unit_price, total_invested, daily_income, bonus_received, purchase_timestamp, purchase_date_formatted, days_elapsed, total_earned, status)
+VALUES
+('INV-A-01', 'User5294', 'A', 'Product A', 'Nao Core Micro Assistant', 1, 520, 520, 130, 50, EXTRACT(EPOCH FROM NOW() - INTERVAL '2 days') * 1000, TO_CHAR(NOW() - INTERVAL '2 days', 'YYYY-MM-DD'), 2, 260, 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED TEAM MEMBERS
+INSERT INTO team_members (id, user_id, phone, join_date, level, inviter_id, invite_count, recharge_amount, team_invested, commission_generated, status)
+VALUES
+('TM-101', 'User5294', '+91 98234 11029', '2026-10-02', 1, 'User5294 (You)', 4, 4000, 12500, 880, 'ACTIVE'),
+('TM-102', 'User5294', '+91 97112 88472', '2026-10-04', 1, 'User5294 (You)', 2, 2100, 4200, 462, 'ACTIVE'),
+('TM-103', 'User5294', '+91 88390 44910', '2026-10-06', 2, 'TM-101', 1, 1040, 520, 20.8, 'ACTIVE'),
+('TM-104', 'User5294', '+91 91456 22091', '2026-10-07', 3, 'TM-103', 0, 520, 0, 5.2, 'ACTIVE'),
+('TM-105', 'User5294', '+91 96541 77290', '2026-10-08', 1, 'User5294 (You)', 3, 8200, 6000, 1804, 'ACTIVE'),
+('TM-106', 'User5294', '+91 81230 99401', '2026-10-09', 2, 'TM-102', 0, 2100, 0, 42, 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED MEMBER PLANS
+INSERT INTO member_plan_holdings (id, member_id, plan_id, plan_name, robot_model, quantity, unit_price, total_invested, daily_yield, purchase_date, days_elapsed, duration_days, total_earned, status)
+VALUES
+('MP-101-A', 'TM-101', 'C', 'Product C', 'ASIMO-V Precision Service Biped', 1, 4000, 4000, 950, '2026-10-02', 8, 150, 7600, 'ACTIVE'),
+('MP-102-A', 'TM-102', 'B', 'Product B', 'Spot-X Quadruped Patrol Bot', 1, 2100, 2100, 500, '2026-10-04', 6, 150, 3000, 'ACTIVE'),
+('MP-103-A', 'TM-103', 'A', 'Product A', 'Nao Core Micro Assistant', 2, 520, 1040, 260, '2026-10-06', 4, 150, 1040, 'ACTIVE'),
+('MP-104-A', 'TM-104', 'A', 'Product A', 'Nao Core Micro Assistant', 1, 520, 520, 130, '2026-10-07', 3, 150, 390, 'ACTIVE'),
+('MP-105-A', 'TM-105', 'D', 'Product D', 'Atlas Prime AI Diagnostics Android', 1, 8200, 8200, 2000, '2026-10-08', 2, 150, 4000, 'ACTIVE'),
+('MP-106-A', 'TM-106', 'B', 'Product B', 'Spot-X Quadruped Patrol Bot', 1, 2100, 2100, 500, '2026-10-09', 1, 150, 500, 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;
+
+-- SEED INITIAL TRANSACTIONS
+INSERT INTO transactions (id, user_id, type, amount, status, timestamp, formatted_time, description, reference_id, fee, net_amount)
+VALUES
+('TXN-WTH-1001', 'User5294', 'WITHDRAWAL', -2100, 'PROCESSING', EXTRACT(EPOCH FROM NOW() - INTERVAL '2 hours') * 1000, TO_CHAR(NOW() - INTERVAL '2 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to HDFC Bank (A/C ...7264)', 'PO-88192019', 210, 1890),
+('TXN-WTH-1002', 'User5294', 'WITHDRAWAL', -520, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '6 hours') * 1000, TO_CHAR(NOW() - INTERVAL '6 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to HDFC Bank (A/C ...7264)', 'PO-88192018', 52, 468),
+('TXN-WTH-0901', 'User5294', 'WITHDRAWAL', -4000, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '28 hours') * 1000, TO_CHAR(NOW() - INTERVAL '28 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to ICICI Bank (A/C ...9102)', 'PO-77291048', 400, 3600),
+('TXN-WTH-0902', 'User5294', 'WITHDRAWAL', -1500, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '32 hours') * 1000, TO_CHAR(NOW() - INTERVAL '32 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to State Bank of India (A/C ...4410)', 'PO-77291049', 150, 1350),
+('TXN-RCG-001', 'User5294', 'RECHARGE', 4000, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '3 days') * 1000, TO_CHAR(NOW() - INTERVAL '3 days', 'YYYY-MM-DD HH:MI AM'), 'Wallet Recharge via UPI', 'UTR-849201827401', 0, 4000),
+('TXN-BNS-001', 'User5294', 'SIGNUP_BONUS', 100, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '3 days') * 1000, TO_CHAR(NOW() - INTERVAL '3 days', 'YYYY-MM-DD HH:MI AM'), 'New Member Welcome Bonus', 'SYS-WELCOME', 0, 100)
+ON CONFLICT (id) DO NOTHING;
+`;
+
+async function runMigration() {
+  try {
+    await client.connect();
+    console.log('Connected to Supabase PostgreSQL via Pooler successfully!');
+    
+    console.log('Creating database tables and security policies...');
+    await client.query(schemaSQL);
+    console.log('Tables and RLS policies created successfully!');
+
+    console.log('Seeding initial data...');
+    await client.query(seedSQL);
+    console.log('Seed data inserted successfully!');
+
+    // Notify PostgREST to reload schema
+    console.log('Reloading PostgREST schema cache...');
+    await client.query("NOTIFY pgrst, 'reload schema';");
+    console.log('PostgREST schema reloaded!');
+
+    // Verify row counts
+    const tables = [
+      'platform_settings', 
+      'investment_products', 
+      'user_profiles', 
+      'bank_accounts', 
+      'transactions', 
+      'user_investments', 
+      'team_members', 
+      'member_plan_holdings', 
+      'daily_withdrawal_logs', 
+      'admin_settings'
+    ];
+
+    console.log('\n--- VERIFICATION SUMMARY ---');
+    for (const t of tables) {
+      const res = await client.query('SELECT COUNT(*) FROM ' + t + ';');
+      console.log('Table [' + t + ']: ' + res.rows[0].count + ' rows');
+    }
+    console.log('--- ALL TABLES CREATED & READY ---\n');
+
+  } catch (err) {
+    console.error('Migration error:', err);
+    process.exit(1);
+  } finally {
+    await client.end();
+  }
+}
+
+runMigration();

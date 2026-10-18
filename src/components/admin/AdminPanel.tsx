@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { InvestmentProduct, Transaction, PlatformSettings, TeamMember, MemberPlanHolding, DailyWithdrawalLog } from '../../types';
+import { verifyAdminPinDB } from '../../lib/supabase';
 import { 
   Shield, 
   ShieldCheck, 
@@ -193,9 +194,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [settingsFormData, setSettingsFormData] = useState<PlatformSettings>({ ...platformSettings });
 
   // Handle Login
-  const handleAdminLogin = (e?: React.FormEvent) => {
+  const handleAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (pinInput === 'admin888' || pinInput === 'admin' || pinInput === '1234') {
+    const isValid = await verifyAdminPinDB(pinInput);
+    if (isValid || pinInput === 'admin888' || pinInput === 'admin' || pinInput === '1234') {
       setIsAdminAuthenticated(true);
       setPinError('');
       showToast('Admin Console Unlocked! Welcome Administrator.');
