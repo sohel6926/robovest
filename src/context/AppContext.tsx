@@ -98,6 +98,7 @@ interface AppContextType {
   approveRecharge: (transactionId: string) => { success: boolean; message: string };
   rejectRecharge: (transactionId: string, reason?: string) => { success: boolean; message: string };
   triggerDailyYieldPayout: () => { success: boolean; message: string; yieldDistributed: number; commissionDistributed: number; activeNodesCount: number };
+  performNightResetSettlement: (resetDate?: Date) => { success: boolean; message: string; yieldDistributed: number; commissionDistributed: number; activeNodesCount: number; memberPlansUpdatedCount?: number };
   assignPlanToUser: (userId: string, productId: string, quantity: number) => { success: boolean; message: string };
   updateUserSecurity: (userId: string, updates: { pin?: string; password?: string; bankDetailsLocked?: boolean }) => void;
   addCustomTransaction: (txn: Omit<Transaction, 'id' | 'timestamp' | 'formattedTime'>) => void;
@@ -637,12 +638,168 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   };
 
+  // ---------------------------------------------------------------------------
+  // AUTOMATED EVERYDAY NIGHT RESET ENGINE
+  // (Advances days elapsed for all active user & downline plans, credits returns & commissions)
+  // ---------------------------------------------------------------------------
+  const performNightResetSettlement = (resetDate: Date = new Date()) => {
+    let yieldSum = 0;
+    let commissionSum = 0;
+    let completedInvsCount = 0;
+    let memberPlansUpdatedCount = 0;
+
+    // 1. Advance all active user robot investments
+    setInvestments(prevInvs => {
+      return prevInvs.map(inv => {
+        if (inv.status !== 'ACTIVE') return inv;
+        const dailyYield = inv.dailyIncome;
+        yieldSum += dailyYield;
+        const newDays = inv.daysElapsed + 1;
+        const newEarned = inv.totalEarned + dailyYield;
+        const isCompleted = newDays >= 150 || newEarned >= (inv.totalInvested * 2);
+        if (isCompleted) completedInvsCount++;
+
+        const updated: UserInvestment = {
+          ...inv,
+          daysElapsed: newDays,
+          totalEarned: newEarned,
+          status: isCompleted ? 'COMPLETED' : 'ACTIVE',
+        };
+        saveUserInvestmentDB(user.id, updated);
+        return updated;
+      });
+    });
+
+    // 2. Advance all team members' plan holdings (Level 1, Level 2, Level 3)
+    const levelRates: Record<number, number> = { 1: 0.10, 2: 0.05, 3: 0.02 };
+
+    setTeamMembers(prevTeam => {
+      return prevTeam.map(m => {
+        let memberPlansChanged = false;
+        const updatedPlans = (m.plans || []).map(p => {
+          if (p.status !== 'ACTIVE') return p;
+          memberPlansChanged = true;
+          memberPlansUpdatedCount++;
+          const newDays = p.daysElapsed + 1;
+          const newEarned = newDays * p.dailyYield;
+          const isCompleted = newDays >= p.durationDays;
+          const updatedPlan: MemberPlanHolding = {
+            ...p,
+            daysElapsed: newDays,
+            totalEarned: newEarned,
+            status: isCompleted ? ('COMPLETED' as const) : ('ACTIVE' as const)
+          };
+          saveMemberPlanHoldingDB(m.id, updatedPlan);
+          return updatedPlan;
+        });
+
+        const rate = levelRates[m.level] || 0.01;
+        const comm = yieldSum > 0 ? Math.round(yieldSum * rate * 100) / 100 : 0;
+        if (comm > 0) commissionSum += comm;
+
+        const updatedMember: TeamMember = {
+          ...m,
+          commissionGenerated: m.commissionGenerated + comm,
+          plans: updatedPlans
+        };
+
+        if (memberPlansChanged || comm > 0) {
+          saveTeamMemberDB(updatedMember, user.id);
+        }
+
+        return updatedMember;
+      });
+    });
+
+    // 3. Credit user's wallet
+    if (yieldSum > 0) {
+      setUser(prev => {
+        const newAvail = prev.availableBalance + yieldSum;
+        const newWithdr = prev.withdrawableBalance + yieldSum;
+        const newIncome = prev.totalIncome + yieldSum;
+        updateUserProfileDB(prev.id, {
+          availableBalance: newAvail,
+          withdrawableBalance: newWithdr,
+          totalIncome: newIncome,
+        });
+        return {
+          ...prev,
+          availableBalance: newAvail,
+          withdrawableBalance: newWithdr,
+          totalIncome: newIncome,
+        };
+      });
+
+      const yieldTxn: Transaction = {
+        id: `TXN-YLD-${Date.now().toString().slice(-6)}`,
+        type: 'DAILY_RETURN',
+        amount: yieldSum,
+        status: 'COMPLETED',
+        timestamp: resetDate.getTime(),
+        formattedTime: resetDate.toLocaleString(),
+        description: `Daily Fleet ROI Yield (Everyday Night Reset Settlement)`,
+        referenceId: `RESET-${Date.now().toString().slice(-4)}`
+      };
+
+      insertTransactionDB(user.id, yieldTxn);
+
+      if (commissionSum > 0) {
+        const commTxn: Transaction = {
+          id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
+          type: 'COMMISSION',
+          amount: commissionSum,
+          status: 'COMPLETED',
+          timestamp: resetDate.getTime(),
+          formattedTime: resetDate.toLocaleString(),
+          description: `Referral Level Commission Distributed Across Downline Network`,
+          referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
+        };
+        insertTransactionDB(user.id, commTxn);
+        setTransactions(prev => [yieldTxn, commTxn, ...prev]);
+      } else {
+        setTransactions(prev => [yieldTxn, ...prev]);
+      }
+    }
+
+    return {
+      success: true,
+      message: `Night reset completed! Active plans updated (+1 day elapsed for all user and downline plans). Distributed ₹${yieldSum.toLocaleString()} in fleet yields and ₹${commissionSum.toLocaleString()} in referral commissions. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
+      yieldDistributed: yieldSum,
+      commissionDistributed: commissionSum,
+      activeNodesCount: investments.filter(inv => inv.status === 'ACTIVE').length,
+      memberPlansUpdatedCount
+    };
+  };
+
+  // Automated everyday night reset engine (Runs everyday at night reset time e.g. 00:30 AM / 12:30 AM)
+  useEffect(() => {
+    const checkAndExecuteNightReset = () => {
+      const now = new Date();
+      const todayKey = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const lastResetDate = localStorage.getItem('robovest_last_night_reset_date');
+
+      // Platform reset time (default 00:30 AM)
+      const [resetH, resetM] = (platformSettings.dailyWithdrawalWindowStart || '00:30').split(':').map(Number);
+      const isPastResetTime = now.getHours() > resetH || (now.getHours() === resetH && now.getMinutes() >= resetM);
+
+      if (isPastResetTime && lastResetDate !== todayKey) {
+        localStorage.setItem('robovest_last_night_reset_date', todayKey);
+        performNightResetSettlement(now);
+      }
+    };
+
+    checkAndExecuteNightReset();
+    const interval = setInterval(checkAndExecuteNightReset, 30000);
+    return () => clearInterval(interval);
+  }, [platformSettings.dailyWithdrawalWindowStart]);
+
   // Time simulator actions
   const advanceTimeToNextDayAfter1230 = () => {
     const nextDay = new Date(simulatedTime);
     nextDay.setDate(nextDay.getDate() + 1);
     nextDay.setHours(0, 35, 0, 0);
     setSimulatedTime(nextDay);
+    performNightResetSettlement(nextDay);
   };
 
   const resetSimulatedTime = () => {
@@ -1181,115 +1338,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // 8c. Automated Daily Yield & Referral Level Commission Distribution Engine (Bee Grow dailyRoi.ts pattern)
   const triggerDailyYieldPayout = () => {
-    let yieldSum = 0;
-    let commissionSum = 0;
-    let completedCount = 0;
-
-    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
-    if (activeInvs.length === 0) {
-      return { 
-        success: false, 
-        message: 'No active robot investments found to distribute yields.', 
-        yieldDistributed: 0, 
-        commissionDistributed: 0,
-        activeNodesCount: 0 
-      };
-    }
-
-    const updatedInvs = investments.map(inv => {
-      if (inv.status !== 'ACTIVE') return inv;
-      const dailyYield = inv.dailyIncome;
-      yieldSum += dailyYield;
-      const newDays = inv.daysElapsed + 1;
-      const newEarned = inv.totalEarned + dailyYield;
-      // Cap at durationDays (150) or 2X total invested
-      const isCompleted = newDays >= 150 || newEarned >= (inv.totalInvested * 2);
-      if (isCompleted) completedCount++;
-
-      const updated: UserInvestment = {
-        ...inv,
-        daysElapsed: newDays,
-        totalEarned: newEarned,
-        status: isCompleted ? 'COMPLETED' : 'ACTIVE',
-      };
-      saveUserInvestmentDB(user.id, updated);
-      return updated;
-    });
-
-    setInvestments(updatedInvs);
-
-    // Credit user's wallet
-    const newAvail = user.availableBalance + yieldSum;
-    const newWithdr = user.withdrawableBalance + yieldSum;
-    const newIncome = user.totalIncome + yieldSum;
-
-    setUser(prev => ({
-      ...prev,
-      availableBalance: newAvail,
-      withdrawableBalance: newWithdr,
-      totalIncome: newIncome,
-    }));
-
-    updateUserProfileDB(user.id, {
-      availableBalance: newAvail,
-      withdrawableBalance: newWithdr,
-      totalIncome: newIncome,
-    });
-
-    const yieldTxn: Transaction = {
-      id: `TXN-YLD-${Date.now().toString().slice(-6)}`,
-      type: 'DAILY_RETURN',
-      amount: yieldSum,
-      status: 'COMPLETED',
-      timestamp: simulatedTime.getTime(),
-      formattedTime: simulatedTime.toLocaleString(),
-      description: `Daily Fleet ROI Yield (${activeInvs.length} active node${activeInvs.length > 1 ? 's' : ''})`,
-      referenceId: `DISTRIB-${Date.now().toString().slice(-4)}`
-    };
-
-    insertTransactionDB(user.id, yieldTxn);
-
-    // Multi-level downline commission distribution to team members (Levels 1, 2, 3)
-    // Level 1: 10%, Level 2: 5%, Level 3: 2%
-    const levelRates: Record<number, number> = { 1: 0.10, 2: 0.05, 3: 0.02 };
-    const updatedTeam = teamMembers.map(m => {
-      const rate = levelRates[m.level] || 0.01;
-      const comm = Math.round(yieldSum * rate * 100) / 100;
-      if (comm > 0) {
-        commissionSum += comm;
-        const updatedMember: TeamMember = {
-          ...m,
-          commissionGenerated: m.commissionGenerated + comm
-        };
-        saveTeamMemberDB(updatedMember, user.id);
-        return updatedMember;
-      }
-      return m;
-    });
-
-    setTeamMembers(updatedTeam);
-
-    const commTxn: Transaction = {
-      id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
-      type: 'COMMISSION',
-      amount: commissionSum,
-      status: 'COMPLETED',
-      timestamp: simulatedTime.getTime(),
-      formattedTime: simulatedTime.toLocaleString(),
-      description: `Referral Level Commission Distributed Across Downline Network`,
-      referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
-    };
-
-    insertTransactionDB(user.id, commTxn);
-    setTransactions(prev => [yieldTxn, commTxn, ...prev]);
-
-    return {
-      success: true,
-      message: `Daily distribution completed! Distributed ₹${yieldSum.toLocaleString()} in yields and ₹${commissionSum.toLocaleString()} in referral commissions. ${completedCount > 0 ? `${completedCount} plan(s) reached completion.` : ''}`,
-      yieldDistributed: yieldSum,
-      commissionDistributed: commissionSum,
-      activeNodesCount: activeInvs.length
-    };
+    return performNightResetSettlement(simulatedTime);
   };
 
   // 8d. Direct Plan Allocation by Admin (Bee Grow UserDetail.tsx Top-Up pattern)
@@ -1609,6 +1658,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         approveRecharge,
         rejectRecharge,
         triggerDailyYieldPayout,
+        performNightResetSettlement,
         assignPlanToUser,
         updateUserSecurity,
         addCustomTransaction,

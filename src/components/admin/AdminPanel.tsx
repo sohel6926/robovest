@@ -233,11 +233,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [newPlanForMember, setNewPlanForMember] = useState<{
     planId: string;
     quantity: number;
-    daysElapsed: number;
   }>({
     planId: 'A',
     quantity: 1,
-    daysElapsed: 1,
   });
 
   // Daily Withdrawals Expanded Row State
@@ -389,17 +387,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     }
   };
 
-  // Add Plan to Selected Member
+  // Add Plan to Selected Member (Starts fresh at Day 0, advances automatically on everyday night reset)
   const handleAddPlanToMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMemberForPlans) return;
 
     const baseProduct = catalog.find(p => p.id === newPlanForMember.planId) || catalog[0];
     const qty = Number(newPlanForMember.quantity) || 1;
-    const days = Number(newPlanForMember.daysElapsed) || 1;
     const totalInvest = baseProduct.price * qty;
     const dailyIncome = baseProduct.dailyIncome * qty;
-    const earned = dailyIncome * days;
 
     const newHolding: MemberPlanHolding = {
       id: `MP-${Date.now().toString().slice(-5)}`,
@@ -410,10 +406,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       unitPrice: baseProduct.price,
       totalInvested: totalInvest,
       dailyYield: dailyIncome,
-      purchaseDate: new Date(Date.now() - 86400000 * days).toISOString().slice(0, 10),
-      daysElapsed: days,
+      purchaseDate: simulatedTime.toISOString().slice(0, 10),
+      daysElapsed: 0,
       durationDays: baseProduct.durationDays,
-      totalEarned: earned,
+      totalEarned: 0,
       status: 'ACTIVE'
     };
 
@@ -3247,258 +3243,215 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             </form>
           )}
 
-        </main>
-      </div>
+          </main>
+        </div>
 
-      {/* ================= MODAL 1: MEMBER PLANS INSPECTION & ASSIGNMENT (NEW) ================= */}
-      {selectedMemberForPlans && (
-        <div className="fixed inset-0 z-60 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh]">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white flex items-center justify-between shrink-0">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base font-black font-['Space_Grotesk'] tracking-wide">
-                    {selectedMemberForPlans.phone} · Holdings Breakdown
-                  </h3>
-                  <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black uppercase">
-                    Level {selectedMemberForPlans.level}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-300 mt-0.5">
-                  Member ID: {selectedMemberForPlans.id} · Invited by: {selectedMemberForPlans.inviterId || 'Direct'} · Downline Referrals: {selectedMemberForPlans.inviteCount} people
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedMemberForPlans(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+        {/* ================= MODAL 1: MEMBER PLANS INSPECTION & ASSIGNMENT (NEW) ================= */}
+      {selectedMemberForPlans && (() => {
+        const activeMember = teamMembers.find(m => m.id === selectedMemberForPlans.id) || selectedMemberForPlans;
 
-            {/* Content Body */}
-            <div className="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
-              
-              {/* Member Stats Ribbon */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+        return (
+          <div className="fixed inset-0 z-60 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+            <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh]">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white flex items-center justify-between shrink-0">
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Self Investment</span>
-                  <span className="font-black text-slate-900 font-mono text-sm">₹{selectedMemberForPlans.rechargeAmount.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Team Volume</span>
-                  <span className="font-black text-blue-600 font-mono text-sm">₹{selectedMemberForPlans.teamInvested.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Commission Generated</span>
-                  <span className="font-black text-emerald-600 font-mono text-sm">₹{selectedMemberForPlans.commissionGenerated.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Active Plan Units</span>
-                  <span className="font-black text-indigo-600 font-mono text-sm">
-                    {(selectedMemberForPlans.plans || []).reduce((s, p) => s + p.quantity, 0)} Units
-                  </span>
-                </div>
-              </div>
-
-              {/* Plans Table */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-black text-slate-900 text-sm font-['Space_Grotesk'] flex items-center gap-1.5">
-                    <Bot className="w-4 h-4 text-blue-600" />
-                    <span>Purchased Plans & Day Elapsed Progression</span>
-                  </h4>
-                  <button
-                    onClick={() => setIsAddingPlanToMember(true)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Assign New Plan</span>
-                  </button>
-                </div>
-
-                {(!selectedMemberForPlans.plans || selectedMemberForPlans.plans.length === 0) ? (
-                  <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center text-slate-400">
-                    No active plans for this member. Click "+ Assign New Plan" to grant an investment plan.
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black font-['Space_Grotesk'] tracking-wide">
+                      {activeMember.phone} · Holdings Breakdown
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black uppercase">
+                      Level {activeMember.level}
+                    </span>
                   </div>
-                ) : (
-                  <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-500 font-black text-[10px] uppercase border-b border-slate-200">
-                        <tr>
-                          <th className="p-3">Plan / Robot</th>
-                          <th className="p-3">Qty</th>
-                          <th className="p-3">Invested</th>
-                          <th className="p-3">Daily Yield</th>
-                          <th className="p-3">Days Active / Remaining</th>
-                          <th className="p-3">Earned So Far</th>
-                          <th className="p-3 text-right">Edit</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
-                        {selectedMemberForPlans.plans.map(p => {
-                          const remainingDays = Math.max(0, p.durationDays - p.daysElapsed);
-                          const progressPercent = Math.min(100, Math.round((p.daysElapsed / p.durationDays) * 100));
-
-                          return (
-                            <tr key={p.id} className="hover:bg-slate-50 transition">
-                              <td className="p-3 font-bold text-slate-900">
-                                <span className="block font-black">{p.planName}</span>
-                                <span className="text-[10px] text-slate-400">{p.robotModel}</span>
-                              </td>
-                              <td className="p-3 font-mono font-bold">
-                                {p.quantity} {p.quantity === 1 ? 'unit' : 'units'}
-                              </td>
-                              <td className="p-3 font-mono font-bold text-blue-600">
-                                ₹{p.totalInvested.toLocaleString()}
-                              </td>
-                              <td className="p-3 font-mono font-bold text-emerald-600">
-                                ₹{p.dailyYield.toLocaleString()}/day
-                              </td>
-                              <td className="p-3">
-                                <div className="space-y-1">
-                                  <div className="flex items-center justify-between text-[10px] font-mono">
-                                    <span className="font-bold text-emerald-700">Day {p.daysElapsed}</span>
-                                    <span className="text-slate-400">{remainingDays}d left</span>
-                                  </div>
-                                  <div className="w-32 bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                    <div 
-                                      className="bg-blue-600 h-full rounded-full transition-all"
-                                      style={{ width: `${progressPercent}%` }}
-                                    />
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="p-3 font-mono font-bold text-emerald-600">
-                                ₹{p.totalEarned.toLocaleString()}
-                              </td>
-                              <td className="p-3 text-right">
-                                <div className="flex items-center justify-end gap-1">
-                                  <button
-                                    onClick={() => {
-                                      const newDays = prompt(`Edit days elapsed for ${p.planName} (Current: ${p.daysElapsed}):`, p.daysElapsed.toString());
-                                      if (newDays !== null) {
-                                        const parsed = parseInt(newDays, 10);
-                                        if (!isNaN(parsed) && parsed >= 0) {
-                                          updateMemberPlan(selectedMemberForPlans.id, p.id, {
-                                            daysElapsed: parsed,
-                                            totalEarned: p.dailyYield * parsed
-                                          });
-                                          setSelectedMemberForPlans(prev => prev ? {
-                                            ...prev,
-                                            plans: (prev.plans || []).map(item => item.id === p.id ? {
-                                              ...item,
-                                              daysElapsed: parsed,
-                                              totalEarned: p.dailyYield * parsed
-                                            } : item)
-                                          } : null);
-                                          showToast('Days elapsed updated.');
-                                        }
-                                      }
-                                    }}
-                                    className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px]"
-                                  >
-                                    Adjust Days
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      if (window.confirm(`Remove plan ${p.planName} from member?`)) {
-                                        deleteMemberPlan(selectedMemberForPlans.id, p.id);
-                                        setSelectedMemberForPlans(prev => prev ? {
-                                          ...prev,
-                                          plans: (prev.plans || []).filter(item => item.id !== p.id),
-                                          rechargeAmount: prev.rechargeAmount - p.totalInvested
-                                        } : null);
-                                        showToast('Plan removed.');
-                                      }
-                                    }}
-                                    className="p-1 rounded text-rose-500 hover:bg-rose-50"
-                                    title="Delete plan"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Member ID: {activeMember.id} · Invited by: {activeMember.inviterId || 'Direct'} · Downline Referrals: {activeMember.inviteCount} people
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedMemberForPlans(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              {/* Assign New Plan Sub-Form */}
-              {isAddingPlanToMember && (
-                <form onSubmit={handleAddPlanToMember} className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <h5 className="font-black text-blue-950 text-xs font-['Space_Grotesk']">
-                      Grant & Assign Plan to {selectedMemberForPlans.phone}
-                    </h5>
+              {/* Content Body */}
+              <div className="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+                
+                {/* Member Stats Ribbon */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Self Investment</span>
+                    <span className="font-black text-slate-900 font-mono text-sm">₹{activeMember.rechargeAmount.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Team Volume</span>
+                    <span className="font-black text-blue-600 font-mono text-sm">₹{activeMember.teamInvested.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Commission Generated</span>
+                    <span className="font-black text-emerald-600 font-mono text-sm">₹{activeMember.commissionGenerated.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Active Plan Units</span>
+                    <span className="font-black text-indigo-600 font-mono text-sm">
+                      {(activeMember.plans || []).reduce((s, p) => s + p.quantity, 0)} Units
+                    </span>
+                  </div>
+                </div>
+
+                {/* Plans Table */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-black text-slate-900 text-sm font-['Space_Grotesk'] flex items-center gap-1.5">
+                      <Bot className="w-4 h-4 text-blue-600" />
+                      <span>Purchased Plans & Day Elapsed Progression</span>
+                    </h4>
                     <button
-                      type="button"
-                      onClick={() => setIsAddingPlanToMember(false)}
-                      className="text-slate-400 hover:text-slate-600 text-xs"
+                      onClick={() => setIsAddingPlanToMember(true)}
+                      className="flex items-center gap-1 px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs"
                     >
-                      Cancel
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Assign New Plan</span>
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(!activeMember.plans || activeMember.plans.length === 0) ? (
+                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center text-slate-400">
+                      No active plans for this member. Click "+ Assign New Plan" to grant an investment plan.
+                    </div>
+                  ) : (
                     <div>
-                      <label className="text-[10px] font-bold text-slate-600 block mb-1">Select Plan</label>
-                      <select
-                        value={newPlanForMember.planId}
-                        onChange={(e) => setNewPlanForMember({ ...newPlanForMember, planId: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-bold bg-white outline-hidden"
+                      <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 text-slate-500 font-black text-[10px] uppercase border-b border-slate-200">
+                            <tr>
+                              <th className="p-3">Plan / Robot</th>
+                              <th className="p-3">Qty</th>
+                              <th className="p-3">Invested</th>
+                              <th className="p-3">Daily Yield</th>
+                              <th className="p-3">Days Active / Remaining</th>
+                              <th className="p-3">Earned So Far</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 font-medium">
+                            {activeMember.plans.map(p => {
+                              const remainingDays = Math.max(0, p.durationDays - p.daysElapsed);
+                              const progressPercent = Math.min(100, Math.round((p.daysElapsed / p.durationDays) * 100));
+
+                              return (
+                                <tr key={p.id} className="hover:bg-slate-50 transition">
+                                  <td className="p-3 font-bold text-slate-900">
+                                    <span className="block font-black">{p.planName}</span>
+                                    <span className="text-[10px] text-slate-400">{p.robotModel}</span>
+                                  </td>
+                                  <td className="p-3 font-mono font-bold">
+                                    {p.quantity} {p.quantity === 1 ? 'unit' : 'units'}
+                                  </td>
+                                  <td className="p-3 font-mono font-bold text-blue-600">
+                                    ₹{p.totalInvested.toLocaleString()}
+                                  </td>
+                                  <td className="p-3 font-mono font-bold text-emerald-600">
+                                    ₹{p.dailyYield.toLocaleString()}/day
+                                  </td>
+                                  <td className="p-3">
+                                    <div className="space-y-1">
+                                      <div className="flex items-center justify-between text-[10px] font-mono">
+                                        <span className="font-bold text-emerald-700">Day {p.daysElapsed}</span>
+                                        <span className="text-slate-400">{remainingDays}d left</span>
+                                      </div>
+                                      <div className="w-32 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                                        <div 
+                                          className="bg-blue-600 h-full rounded-full transition-all"
+                                          style={{ width: `${progressPercent}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="p-3 font-mono font-bold text-emerald-600">
+                                    ₹{p.totalEarned.toLocaleString()}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Information Banner */}
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                          <span>Days passed and daily returns update automatically every day after the night reset time (00:30 AM).</span>
+                        </div>
+                        <span className="font-mono text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 font-bold text-slate-700">
+                          Auto Night Reset Active
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Assign New Plan Sub-Form */}
+                {isAddingPlanToMember && (
+                  <form onSubmit={handleAddPlanToMember} className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h5 className="font-black text-blue-950 text-xs font-['Space_Grotesk']">
+                        Grant & Assign Plan to {activeMember.phone}
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingPlanToMember(false)}
+                        className="text-slate-400 hover:text-slate-600 text-xs"
                       >
-                        {catalog.map(c => (
-                          <option key={c.id} value={c.id}>
-                            {c.name} - ₹{c.price.toLocaleString()} (₹{c.dailyIncome}/day)
-                          </option>
-                        ))}
-                      </select>
+                        Cancel
+                      </button>
                     </div>
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 block mb-1">Quantity (Units)</label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={10}
-                        value={newPlanForMember.quantity}
-                        onChange={(e) => setNewPlanForMember({ ...newPlanForMember, quantity: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold bg-white outline-hidden"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 block mb-1">Select Plan</label>
+                        <select
+                          value={newPlanForMember.planId}
+                          onChange={(e) => setNewPlanForMember({ ...newPlanForMember, planId: e.target.value })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-bold bg-white outline-hidden"
+                        >
+                          {catalog.map(c => (
+                            <option key={c.id} value={c.id}>
+                              {c.name} - ₹{c.price.toLocaleString()} (₹{c.dailyIncome}/day)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-600 block mb-1">Quantity (Units)</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={10}
+                          value={newPlanForMember.quantity}
+                          onChange={(e) => setNewPlanForMember({ ...newPlanForMember, quantity: Number(e.target.value) })}
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold bg-white outline-hidden"
+                        />
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-600 block mb-1">Days Elapsed (Already active)</label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={150}
-                        value={newPlanForMember.daysElapsed}
-                        onChange={(e) => setNewPlanForMember({ ...newPlanForMember, daysElapsed: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold bg-white outline-hidden"
-                      />
-                    </div>
-                  </div>
+                    <button
+                      type="submit"
+                      className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
+                    >
+                      Confirm & Grant Plan to Member
+                    </button>
+                  </form>
+                )}
 
-                  <button
-                    type="submit"
-                    className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
-                  >
-                    Confirm & Grant Plan to Member
-                  </button>
-                </form>
-              )}
-
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ================= MODAL 2: ADD TEAM MEMBER MODAL ================= */}
       {isAddMemberModalOpen && (
