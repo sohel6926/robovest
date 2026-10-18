@@ -328,7 +328,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       u.walletBalance,
       u.joined
     ]);
-    onExportCSV(`BeeGrow_Users_${dateFilter || 'All'}`, headers, rows);
+    onExportCSV(`FanCode_Users_${dateFilter || 'All'}`, headers, rows);
   };
 
   return (

@@ -255,7 +255,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
       it.status,
       it.utrReference || it.rejectReason || ''
     ]);
-    onExportCSV(`BeeGrow_Withdrawals_${activeFilter}`, headers, rows);
+    onExportCSV(`FanCode_Withdrawals_${activeFilter}`, headers, rows);
   };
 
   return (

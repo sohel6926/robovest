@@ -141,7 +141,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
       r.description,
       r.source
     ]);
-    onExportCSV('BeeGrow_Wallet_Transactions', headers, rows);
+    onExportCSV('FanCode_Wallet_Transactions', headers, rows);
   };
 
   return (

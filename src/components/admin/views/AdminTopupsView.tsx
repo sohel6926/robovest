@@ -41,7 +41,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
       t.description,
       t.proofReference || t.paymentReference || ''
     ]);
-    onExportCSV(`BeeGrow_Topups_${activeFilter}`, headers, rows);
+    onExportCSV(`FanCode_Topups_${activeFilter}`, headers, rows);
   };
 
   return (
