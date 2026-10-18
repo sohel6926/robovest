@@ -46,8 +46,16 @@ import {
   UserCheck,
   UserX,
   XCircle,
-  CornerDownRight
+  CornerDownRight,
+  LayoutGrid,
+  Bell,
+  Gift
 } from 'lucide-react';
+
+import { AdminDashboardView, CadreClaimItem } from './views/AdminDashboardView';
+import { AdminUserManagementView } from './views/AdminUserManagementView';
+import { AdminCadreRewardsView } from './views/AdminCadreRewardsView';
+import { AdminWalletsView } from './views/AdminWalletsView';
 
 import heroImage from '../../assets/images/hero_home_robot_1791407310783.jpg';
 import planAImage from '../../assets/images/plan_a_micro_nao.jpg';
@@ -116,8 +124,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
 
-  // Navigation Tab (Plans, Recharges, Withdrawals, Users, Orders, Network, Daily Logs, Settings)
-  const [activeTab, setActiveTab] = useState<'plans' | 'recharges' | 'withdrawals' | 'users' | 'orders' | 'network' | 'dailyWithdrawals' | 'settings'>('plans');
+  // Navigation Tab
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'users' | 'referrals' | 'cadres' | 'wallets' | 'withdrawals' | 'recharges' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
+  >('dashboard');
+
+  // Cadre Reward Claims State (from Bee Grow live admin console)
+  const [cadreClaims, setCadreClaims] = useState<CadreClaimItem[]>([
+    { id: 'cc-1', name: 'B SRAVANI', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
+    { id: 'cc-2', name: 'Vadarevu Sujatha', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
+    { id: 'cc-3', name: 'GUDLA NARESH', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
+    { id: 'cc-4', name: 'Rongali Anusha', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
+  ]);
+
+  const handleCreditCadreReward = (claimId: string) => {
+    setCadreClaims(prev => prev.map(c => {
+      if (c.id === claimId) {
+        adjustUserBalance(c.amount, `Cadre Milestone Reward: ${c.role} (${c.gift})`);
+        showToast(`₹${c.amount.toLocaleString()} credited successfully for ${c.name}!`);
+        return { ...c, isCredited: true };
+      }
+      return c;
+    }));
+  };
+
+  // Quick Balance Modal
+  const [isAddBalanceModalOpen, setIsAddBalanceModalOpen] = useState(false);
+  const [quickBalanceAmt, setQuickBalanceAmt] = useState('');
+  const [quickBalanceNote, setQuickBalanceNote] = useState('');
 
   // Toast
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -661,209 +695,246 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         </div>
       )}
 
-      {/* Top Header */}
-      <header className="bg-slate-950 text-white px-4 py-3 border-b border-slate-800 shrink-0 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/30">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-black text-base tracking-wider font-['Space_Grotesk']">
-                ROBO<span className="text-blue-400">VEST</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black uppercase tracking-wider">
-                ADMIN CONSOLE
-              </span>
-              <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                LIVE
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 -mt-0.5">
-              Full Master Control: Plans, Referrals, Member Holdings, Daily Withdrawals & Rules
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleLogoutAdmin}
-            title="Lock Admin Session"
-            className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition"
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Lock</span>
-          </button>
-          <button
-            onClick={onClose}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-600/30 transition active:scale-95"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Back to Live Website</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Workspace */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-slate-100">
+      {/* Top Header removed from top, moved into right pane */}
+      <div className="flex-1 flex overflow-hidden bg-slate-100">
         
-        {/* Navigation Sidebar */}
-        <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 flex md:flex-col overflow-x-auto md:overflow-y-auto">
-          {/* Quick Metrics */}
-          <div className="hidden md:block p-4 border-b border-slate-100 bg-slate-50">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2">
-              System Overview
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Catalog Plans</span>
-                <span className="font-black text-slate-900 text-base">{catalog.length}</span>
-              </div>
-              <div className="p-2 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Pending Top-Ups</span>
-                <span className={`font-black text-base ${pendingRecharges.length > 0 ? 'text-amber-600 font-bold animate-pulse' : 'text-slate-900'}`}>
-                  {pendingRecharges.length}
-                </span>
-              </div>
-              <div className="p-2 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Pending Payouts</span>
-                <span className={`font-black text-base ${pendingWithdrawals.length > 0 ? 'text-rose-600 font-bold animate-pulse' : 'text-slate-900'}`}>
-                  {pendingWithdrawals.length}
-                </span>
-              </div>
-              <div className="p-2 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-500 block">Active Nodes</span>
-                <span className="font-black text-emerald-600 text-base">{activeNodes.length}</span>
-              </div>
+        {/* Navigation Sidebar (Full Height, Deep Dark Navy #0B1536) */}
+        <aside className="w-64 bg-[#0B1536] text-white shrink-0 flex flex-col h-full overflow-y-auto border-r border-[#15234d] shadow-xl">
+          {/* Brand Logo & Admin Subtitle */}
+          <div className="p-5 border-b border-[#15234d]/70">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xl font-black text-[#70c028] tracking-tight font-['Space_Grotesk']">
+                BEE
+              </span>
+              <span className="text-xl font-black text-[#70c028]">
+                ↑
+              </span>
+              <span className="text-xl font-black text-white tracking-tight font-['Space_Grotesk']">
+                GROW
+              </span>
             </div>
+            <div className="flex items-center gap-1.5 mt-2">
+              <Shield className="w-3.5 h-3.5 text-[#70c028]" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#70c028]">
+                ADMIN PANEL
+              </span>
+            </div>
+            <span className="text-xs text-slate-400 block mt-0.5">
+              Bee Grow Admin
+            </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="p-2 md:p-3 flex md:flex-col gap-1 w-full shrink-0">
-            {/* 1. Plans */}
-            <button
-              onClick={() => setActiveTab('plans')}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'plans' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <Bot className="w-4 h-4 shrink-0" />
-              <span>Investment Plans ({catalog.length})</span>
-            </button>
+          {/* Nav Menu Groups */}
+          <nav className="p-3 space-y-4 flex-1">
+            {/* Group 1: DASHBOARD */}
+            <div className="space-y-1">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'dashboard'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <LayoutGrid className="w-4 h-4 shrink-0" />
+                <span>Dashboard</span>
+              </button>
+            </div>
 
-            {/* 2. Top-Up & Payment Verification (Bee Grow TopupManagement) */}
-            <button
-              onClick={() => setActiveTab('recharges')}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'recharges' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <ArrowDownToLine className="w-4 h-4 shrink-0" />
-                <span>Payment Verifications</span>
-              </div>
-              {pendingRecharges.length > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black animate-pulse">
-                  {pendingRecharges.length}
-                </span>
-              )}
-            </button>
-
-            {/* 3. Withdrawal Requests Queue (Bee Grow WithdrawalRequests) */}
-            <button
-              onClick={() => setActiveTab('withdrawals')}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'withdrawals' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <ArrowUpToLine className="w-4 h-4 shrink-0" />
-                <span>Withdrawal Requests</span>
-              </div>
-              {pendingWithdrawals.length > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
-                  {pendingWithdrawals.length}
-                </span>
-              )}
-            </button>
-
-            {/* 4. User 360 & Wallet Control (Bee Grow UserDetail) */}
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'users' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <User className="w-4 h-4 shrink-0" />
-              <span>User 360° Management</span>
-            </button>
-
-            {/* 5. Active Robots & Yield Engine (Bee Grow dailyRoi) */}
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'orders' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Zap className="w-4 h-4 shrink-0" />
-                <span>Nodes & Yield Engine</span>
-              </div>
-              <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">
-                {activeNodes.length} Active
+            {/* Group 2: MANAGEMENT */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1">
+                MANAGEMENT
               </span>
-            </button>
 
-            {/* 6. Referral Network & Member Plans */}
-            <button
-              onClick={() => setActiveTab('network')}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'network' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
+              {/* Users */}
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'users'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
                 <Users className="w-4 h-4 shrink-0" />
-                <span>Referral & Member Plans</span>
-              </div>
-              <span className="px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-800 text-[10px] font-black">
-                {teamMembers.length}
-              </span>
-            </button>
+                <span>Users</span>
+              </button>
 
-            {/* 7. Daily Withdrawal Logs */}
-            <button
-              onClick={() => setActiveTab('dailyWithdrawals')}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'dailyWithdrawals' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Calendar className="w-4 h-4 shrink-0" />
-                <span>Daily Withdrawal Logs</span>
-              </div>
-              <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">
-                {dailyWithdrawalLogs.length}d
-              </span>
-            </button>
+              {/* Referral Codes */}
+              <button
+                onClick={() => setActiveTab('referrals')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'referrals' || activeTab === 'network'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Gift className="w-4 h-4 shrink-0" />
+                <span>Referral Codes</span>
+              </button>
 
-            {/* 8. Settings */}
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                activeTab === 'settings' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <Sliders className="w-4 h-4 shrink-0" />
-              <span>Platform Rules & Settings</span>
-            </button>
+              {/* Cadre Rewards */}
+              <button
+                onClick={() => setActiveTab('cadres')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'cadres'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-4 h-4 shrink-0" />
+                  <span>Cadre Rewards</span>
+                </div>
+                {cadreClaims.filter(c => !c.isCredited).length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-purple-500 text-white text-[10px] font-black">
+                    {cadreClaims.filter(c => !c.isCredited).length}
+                  </span>
+                )}
+              </button>
+
+              {/* Wallets */}
+              <button
+                onClick={() => setActiveTab('wallets')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'wallets'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Wallet className="w-4 h-4 shrink-0" />
+                <span>Wallets</span>
+              </button>
+
+              {/* Withdrawals */}
+              <button
+                onClick={() => setActiveTab('withdrawals')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'withdrawals'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <ArrowDownToLine className="w-4 h-4 shrink-0" />
+                  <span>Withdrawals</span>
+                </div>
+                {pendingWithdrawals.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
+                    {pendingWithdrawals.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Top-up Requests */}
+              <button
+                onClick={() => setActiveTab('recharges')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'recharges'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <ArrowDownToLine className="w-4 h-4 shrink-0" />
+                  <span>Top-up Requests</span>
+                </div>
+                {pendingRecharges.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black animate-pulse">
+                    {pendingRecharges.length}
+                  </span>
+                )}
+              </button>
+
+              {/* KYC Requests */}
+              <button
+                onClick={() => setActiveTab('kyc')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'kyc'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>KYC Requests</span>
+              </button>
+
+              {/* Settings */}
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'settings'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Sliders className="w-4 h-4 shrink-0" />
+                <span>Settings</span>
+              </button>
+            </div>
+
+            {/* Group 3: CONTENT */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1">
+                CONTENT
+              </span>
+
+              {/* Plans */}
+              <button
+                onClick={() => setActiveTab('plans')}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'plans'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 shrink-0" />
+                <span>Plans ({catalog.length})</span>
+              </button>
+
+              {/* Nodes & Yield Engine */}
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'orders'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Zap className="w-4 h-4 shrink-0" />
+                  <span>Nodes & Yield Engine</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                  {activeNodes.length}
+                </span>
+              </button>
+
+              {/* Daily Withdrawal Logs */}
+              <button
+                onClick={() => setActiveTab('dailyWithdrawals')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'dailyWithdrawals'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-4 h-4 shrink-0" />
+                  <span>Daily Logs</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                  {dailyWithdrawalLogs.length}d
+                </span>
+              </button>
+            </div>
           </nav>
 
           {/* Time Simulator */}
-          <div className="hidden md:block mt-auto p-3 m-3 rounded-2xl bg-slate-900 text-white text-xs border border-slate-800">
+          <div className="mt-auto p-3 m-3 rounded-2xl bg-slate-900/90 text-white text-xs border border-slate-800">
             <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span className="font-bold flex items-center gap-1">
-                <Clock className="w-3 h-3 text-blue-400" />
+                <Clock className="w-3 h-3 text-[#70c028]" />
                 Simulated Clock
               </span>
               <button
@@ -871,13 +942,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   resetSimulatedTime();
                   showToast('Simulated time reset to real-time.');
                 }}
-                className="text-blue-400 hover:underline flex items-center gap-0.5"
+                className="text-[#70c028] hover:underline flex items-center gap-0.5 text-[10px]"
               >
                 <RefreshCw className="w-2.5 h-2.5" />
                 Reset
               </button>
             </div>
-            <div className="font-mono text-sm font-bold text-amber-300">
+            <div className="font-mono text-xs font-bold text-amber-300">
               {simulatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </div>
             <div className="text-[10px] text-slate-400">
@@ -888,18 +959,136 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 advanceTimeToNextDayAfter1230();
                 showToast('Fast forwarded to Next Day 12:35 AM.');
               }}
-              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition"
+              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-[10px] font-black transition"
             >
-              Advance to Next Day 12:35 AM
+              Advance Next Day 12:35 AM
             </button>
           </div>
         </aside>
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+        {/* Right Pane: Top Header + Main Content */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          {/* Top Navbar (Crisp White with Bell, Avatar & Back button) */}
+          <header className="bg-white border-b border-slate-200 px-6 py-3 shrink-0 flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900 font-['Space_Grotesk']">
+              Admin Panel
+            </h2>
+
+            <div className="flex items-center gap-4">
+              {/* Notification Bell */}
+              <div 
+                onClick={() => showToast('21 system notifications active.')}
+                className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
+                  21
+                </span>
+              </div>
+
+              {/* Avatar & Admin Name */}
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#70c028] text-slate-950 font-black text-xs flex items-center justify-center shadow-xs">
+                  B
+                </div>
+                <span className="text-xs font-bold text-slate-800 hidden sm:inline">
+                  Bee Grow Admin
+                </span>
+              </div>
+
+              {/* Lock & Back to Live Website */}
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+                <button
+                  onClick={handleLogoutAdmin}
+                  title="Lock Admin Session"
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                >
+                  <Lock className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onClose}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1536] hover:bg-[#16224f] text-white text-xs font-bold transition shadow-xs"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Back to Live Website</span>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Content Area */}
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100/70 space-y-6">
+            {/* TAB 0: DASHBOARD */}
+            {activeTab === 'dashboard' && (
+              <AdminDashboardView
+                onTriggerDailyROI={() => setIsYieldConfirmOpen(true)}
+                onNavigate={(tab) => setActiveTab(tab as any)}
+                onOpenAddBalanceModal={() => setIsAddBalanceModalOpen(true)}
+                pendingWithdrawalsCount={pendingWithdrawals.length}
+                pendingTopupsCount={pendingRecharges.length}
+                cadreClaims={cadreClaims}
+                onCreditCadreReward={handleCreditCadreReward}
+              />
+            )}
+
+            {/* TAB 1: USERS (Bee Grow UserManagement.tsx) */}
+            {activeTab === 'users' && (
+              <AdminUserManagementView
+                onInspectUser={() => setIsUser360Open(true)}
+                onOpenAddMoneyForUser={() => setIsAddBalanceModalOpen(true)}
+                onExportCSV={exportToCSV}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 2: CADRE REWARDS */}
+            {activeTab === 'cadres' && (
+              <AdminCadreRewardsView
+                cadreClaims={cadreClaims}
+                onCreditCadreReward={handleCreditCadreReward}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 3: WALLETS */}
+            {activeTab === 'wallets' && (
+              <AdminWalletsView
+                currentBalance={user.availableBalance}
+                onAdjustBalance={(amt, note) => {
+                  adjustUserBalance(amt, note);
+                  showToast(`Balance adjusted: ₹${amt.toLocaleString()}`);
+                }}
+                transactions={transactions}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 4: KYC REQUESTS */}
+            {activeTab === 'kyc' && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+                    KYC Requests
+                  </h1>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    Review and verify government identity documents, Aadhaar / PAN card submissions.
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-10 text-center space-y-3 shadow-xs">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-base">All KYC Submissions Cleared</h3>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    0 pending verification requests in the queue. New submissions will appear here for 1-click verification.
+                  </p>
+                </div>
+              </div>
+            )}
 
           {/* ================= SECTION 1: REFERRAL NETWORK & MULTI-TIER GENEALOGY HIERARCHY ================= */}
-          {activeTab === 'network' && (() => {
+          {(activeTab === 'network' || activeTab === 'referrals') && (() => {
             const allL1Commission = teamMembers.filter(m => m.level === 1).reduce((s, m) => s + m.commissionGenerated, 0);
             const allL2Commission = teamMembers.filter(m => m.level === 2).reduce((s, m) => s + m.commissionGenerated, 0);
             const allL3Commission = teamMembers.filter(m => m.level === 3).reduce((s, m) => s + m.commissionGenerated, 0);
@@ -3260,6 +3449,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
           </main>
         </div>
+      </div>
 
         {/* ================= MODAL 1: MEMBER PLANS INSPECTION & ASSIGNMENT (NEW) ================= */}
       {selectedMemberForPlans && (() => {
@@ -4531,6 +4721,94 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Add Balance Modal */}
+      {isAddBalanceModalOpen && (
+        <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-[#70c028]" />
+                <h3 className="font-bold text-base font-['Space_Grotesk']">Add Wallet Balance</h3>
+              </div>
+              <button
+                onClick={() => setIsAddBalanceModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Quick Credit Preset</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[500, 2100, 5000].map(amt => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setQuickBalanceAmt(String(amt))}
+                      className="py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition"
+                    >
+                      +₹{amt.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Custom Amount (₹) *</label>
+                <input
+                  type="number"
+                  placeholder="Enter amount (e.g. 1000)"
+                  value={quickBalanceAmt}
+                  onChange={(e) => setQuickBalanceAmt(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#70c028]"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Reason / Note</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Promotional Bonus or Recharge Adjustment"
+                  value={quickBalanceNote}
+                  onChange={(e) => setQuickBalanceNote(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs outline-none focus:border-[#70c028]"
+                />
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddBalanceModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const val = Number(quickBalanceAmt);
+                    if (!val || val <= 0) {
+                      showToast('Please enter an amount greater than 0', 'error');
+                      return;
+                    }
+                    adjustUserBalance(val, quickBalanceNote || 'Admin Wallet Credit');
+                    showToast(`₹${val.toLocaleString()} credited successfully!`);
+                    setIsAddBalanceModalOpen(false);
+                    setQuickBalanceAmt('');
+                    setQuickBalanceNote('');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-extrabold text-xs shadow-md shadow-[#70c028]/20 transition"
+                >
+                  Confirm Credit
+                </button>
+              </div>
             </div>
           </div>
         </div>
