@@ -489,7 +489,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Calculations for summary metrics
   const dailyWithdrawalLogs = getDailyWithdrawalLogs();
+  const pendingRecharges = transactions.filter(t => t.type === 'RECHARGE' && t.status === 'PROCESSING');
   const pendingWithdrawals = transactions.filter(t => t.type === 'WITHDRAWAL' && t.status === 'PROCESSING');
+  const activeNodes = investments.filter(i => i.status === 'ACTIVE');
   const allWithdrawalsSum = transactions
     .filter(t => t.type === 'WITHDRAWAL')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
