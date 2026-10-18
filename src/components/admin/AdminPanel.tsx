@@ -56,6 +56,9 @@ import { AdminDashboardView, CadreClaimItem } from './views/AdminDashboardView';
 import { AdminUserManagementView } from './views/AdminUserManagementView';
 import { AdminCadreRewardsView } from './views/AdminCadreRewardsView';
 import { AdminWalletsView } from './views/AdminWalletsView';
+import { AdminWithdrawalsView } from './views/AdminWithdrawalsView';
+import { AdminTopupsView } from './views/AdminTopupsView';
+import { AdminSettingsView } from './views/AdminSettingsView';
 
 import heroImage from '../../assets/images/hero_home_robot_1791407310783.jpg';
 import planAImage from '../../assets/images/plan_a_micro_nao.jpg';
@@ -152,6 +155,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [isAddBalanceModalOpen, setIsAddBalanceModalOpen] = useState(false);
   const [quickBalanceAmt, setQuickBalanceAmt] = useState('');
   const [quickBalanceNote, setQuickBalanceNote] = useState('');
+
+  // Notifications State (Bee Grow Screenshot 5)
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationsList = [
+    {
+      id: 'n-1',
+      icon: 'user',
+      text: 'Rowthu Bangarulaxmi (B1326654) has just registered.',
+      time: 'about 4 hours ago',
+      unread: true,
+    },
+    {
+      id: 'n-2',
+      icon: 'bell',
+      text: 'Congratulations! Your KYC has been verified successfully.',
+      time: 'about 7 hours ago',
+      unread: true,
+    },
+    {
+      id: 'n-3',
+      icon: 'bell',
+      text: 'Congratulations! Your KYC has been verified successfully.',
+      time: 'about 7 hours ago',
+      unread: true,
+    },
+    {
+      id: 'n-4',
+      icon: 'user',
+      text: 'Korada Ramya haritha (B7206777) has submitted their profile for KYC verification.',
+      time: 'about 8 hours ago',
+      unread: true,
+    },
+  ];
 
   // Toast
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -974,11 +1010,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               Admin Panel
             </h2>
 
-            <div className="flex items-center gap-4">
-              {/* Notification Bell */}
+            <div className="flex items-center gap-4 relative">
+              {/* Notification Bell with interactive dropdown (Screenshot 5) */}
               <div 
-                onClick={() => showToast('21 system notifications active.')}
-                className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition cursor-pointer"
+                onClick={() => setShowNotifications(prev => !prev)}
+                className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition cursor-pointer select-none"
                 title="Notifications"
               >
                 <Bell className="w-4 h-4" />
@@ -986,6 +1022,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   21
                 </span>
               </div>
+
+              {/* Notifications Dropdown (Bee Grow Screenshot 5) */}
+              {showNotifications && (
+                <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-60 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  <div className="p-3.5 border-b border-slate-100 flex items-center justify-between bg-white">
+                    <h3 className="font-bold text-sm text-slate-900 font-['Space_Grotesk']">
+                      Notifications
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-[#70c028] text-slate-950 font-black text-[10px]">
+                      50 new
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 max-h-[360px] overflow-y-auto">
+                    {notificationsList.map(n => (
+                      <div key={n.id} className="p-3 hover:bg-slate-50 transition flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 mt-0.5">
+                          {n.icon === 'user' ? <User className="w-4 h-4 text-slate-600" /> : <Bell className="w-4 h-4 text-slate-600" />}
+                        </div>
+                        <div className="flex-1 space-y-0.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-xs font-semibold text-slate-800 leading-snug">
+                              {n.text}
+                            </p>
+                            {n.unread && (
+                              <span className="w-2 h-2 rounded-full bg-[#70c028] shrink-0 mt-1" />
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-400 block font-medium">
+                            {n.time}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Avatar & Admin Name */}
               <div className="flex items-center gap-2">
@@ -1051,7 +1124,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               />
             )}
 
-            {/* TAB 3: WALLETS */}
+            {/* TAB 3: WALLETS (Bee Grow Wallet Management) */}
             {activeTab === 'wallets' && (
               <AdminWalletsView
                 currentBalance={user.availableBalance}
@@ -1059,12 +1132,59 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   adjustUserBalance(amt, note);
                   showToast(`Balance adjusted: ₹${amt.toLocaleString()}`);
                 }}
-                transactions={transactions}
+                onOpenAddMoneyModal={() => setIsAddBalanceModalOpen(true)}
+                onExportCSV={exportToCSV}
                 showToast={showToast}
               />
             )}
 
-            {/* TAB 4: KYC REQUESTS */}
+            {/* TAB 4: WITHDRAWALS (Bee Grow Withdrawal Requests) */}
+            {activeTab === 'withdrawals' && (
+              <AdminWithdrawalsView
+                onApproveLiveWithdrawal={(id, utr) => {
+                  approveWithdrawal(id, utr);
+                  showToast(`Withdrawal approved! UTR: ${utr}`);
+                }}
+                onRejectLiveWithdrawal={(id, reason) => {
+                  rejectWithdrawal(id, reason);
+                  showToast(`Withdrawal rejected: ${reason}`);
+                }}
+                pendingTransactions={transactions}
+                onExportCSV={exportToCSV}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 5: TOP-UP REQUESTS (Bee Grow Top-up Management) */}
+            {activeTab === 'recharges' && (
+              <AdminTopupsView
+                pendingTransactions={transactions}
+                onApproveRecharge={(id) => {
+                  approveRecharge(id);
+                  showToast('Top-up approved!');
+                }}
+                onRejectRecharge={(id, reason) => {
+                  rejectRecharge(id, reason);
+                  showToast(`Top-up rejected: ${reason}`);
+                }}
+                onExportCSV={exportToCSV}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 6: SETTINGS (Bee Grow Platform Settings) */}
+            {activeTab === 'settings' && (
+              <AdminSettingsView
+                settings={platformSettings}
+                onSaveSettings={(s) => {
+                  updatePlatformSettings(s);
+                  showToast('Settings saved!');
+                }}
+                showToast={showToast}
+              />
+            )}
+
+            {/* TAB 7: KYC REQUESTS */}
             {activeTab === 'kyc' && (
               <div className="space-y-6">
                 <div>

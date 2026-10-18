@@ -1,227 +1,314 @@
-import React, { useState } from 'react';
-import { Wallet, Plus, Minus, Search, ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Wallet, Search, Download, Plus, Clock, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Transaction } from '../../../types';
+
+export interface WalletRecordItem {
+  id: string;
+  serialNo: number;
+  date: string;
+  userName: string;
+  userId: string;
+  type: 'Credit' | 'Debit';
+  amount: number;
+  balanceAfter: number;
+  description: string;
+  source: 'Level Income' | 'Daily ROI' | 'Recharge' | 'Withdrawal' | 'Admin Bonus';
+}
+
+export const INITIAL_WALLET_RECORDS: WalletRecordItem[] = [
+  {
+    id: 'wr-1',
+    serialNo: 1,
+    date: '18/10/2026',
+    userName: 'IPPLI USHA RANI',
+    userId: 'B2181901',
+    type: 'Credit',
+    amount: 0.27,
+    balanceAfter: 45906.81,
+    description: 'Level 8 income credited',
+    source: 'Level Income',
+  },
+  {
+    id: 'wr-2',
+    serialNo: 2,
+    date: '18/10/2026',
+    userName: 'Vadarevu Sujatha',
+    userId: 'B3039084',
+    type: 'Credit',
+    amount: 0.27,
+    balanceAfter: 30342.17,
+    description: 'Level 7 income credited',
+    source: 'Level Income',
+  },
+  {
+    id: 'wr-3',
+    serialNo: 3,
+    date: '18/10/2026',
+    userName: 'GUDLA NARESH',
+    userId: 'B3434967',
+    type: 'Credit',
+    amount: 0.27,
+    balanceAfter: 30041.59,
+    description: 'Level 6 income credited',
+    source: 'Level Income',
+  },
+  {
+    id: 'wr-4',
+    serialNo: 4,
+    date: '18/10/2026',
+    userName: 'VADDI KAVYA',
+    userId: 'B3723445',
+    type: 'Credit',
+    amount: 0.53,
+    balanceAfter: 21439.95,
+    description: 'Level 5 income credited',
+    source: 'Level Income',
+  },
+  {
+    id: 'wr-5',
+    serialNo: 5,
+    date: '18/10/2026',
+    userName: 'MEESALA RAMU',
+    userId: 'B7638923',
+    type: 'Credit',
+    amount: 130.00,
+    balanceAfter: 5146.67,
+    description: 'Daily Node ROI credited',
+    source: 'Daily ROI',
+  },
+  {
+    id: 'wr-6',
+    serialNo: 6,
+    date: '17/10/2026',
+    userName: 'User5294',
+    userId: 'B5294001',
+    type: 'Credit',
+    amount: 520.00,
+    balanceAfter: 12450.00,
+    description: 'Top-up Verification Approved',
+    source: 'Recharge',
+  }
+];
 
 interface AdminWalletsViewProps {
   currentBalance: number;
   onAdjustBalance: (amount: number, reason: string) => void;
-  transactions: Transaction[];
+  onOpenAddMoneyModal: () => void;
+  onExportCSV: (filename: string, headers: string[], rows: (string | number)[][]) => void;
   showToast: (msg: string, type?: 'success' | 'error') => void;
 }
 
 export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
   currentBalance,
   onAdjustBalance,
-  transactions,
+  onOpenAddMoneyModal,
+  onExportCSV,
   showToast,
 }) => {
-  const [customAmount, setCustomAmount] = useState('');
-  const [reason, setReason] = useState('');
-  const [searchTxn, setSearchTxn] = useState('');
+  const [records, setRecords] = useState<WalletRecordItem[]>(INITIAL_WALLET_RECORDS);
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
 
-  const handleQuickAdjust = (amount: number, note: string) => {
-    onAdjustBalance(amount, note);
+  const filteredRecords = useMemo(() => {
+    return records.filter(rec => {
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        if (
+          !rec.userId.toLowerCase().includes(q) &&
+          !rec.userName.toLowerCase().includes(q) &&
+          !rec.description.toLowerCase().includes(q)
+        ) {
+          return false;
+        }
+      }
+      if (typeFilter && rec.type !== typeFilter) return false;
+      if (sourceFilter && rec.source !== sourceFilter) return false;
+      return true;
+    });
+  }, [records, search, typeFilter, sourceFilter]);
+
+  const handleExport = () => {
+    const headers = ['#', 'Date', 'User', 'User ID', 'Type', 'Amount', 'Balance After', 'Description', 'Source'];
+    const rows = filteredRecords.map(r => [
+      r.serialNo,
+      r.date,
+      r.userName,
+      r.userId,
+      r.type,
+      r.amount,
+      r.balanceAfter,
+      r.description,
+      r.source
+    ]);
+    onExportCSV('BeeGrow_Wallet_Transactions', headers, rows);
   };
-
-  const handleCustomSubmit = (isCredit: boolean) => {
-    const val = Number(customAmount);
-    if (!val || val <= 0) {
-      showToast('Please enter a valid amount greater than 0', 'error');
-      return;
-    }
-    const finalAmt = isCredit ? val : -val;
-    const finalReason = reason.trim() || (isCredit ? 'Manual Admin Credit' : 'Manual Admin Debit');
-    onAdjustBalance(finalAmt, finalReason);
-    setCustomAmount('');
-    setReason('');
-  };
-
-  const filteredTxns = transactions.filter(t => {
-    if (!searchTxn) return true;
-    const q = searchTxn.toLowerCase();
-    return (
-      t.id.toLowerCase().includes(q) ||
-      t.description.toLowerCase().includes(q) ||
-      t.type.toLowerCase().includes(q)
-    );
-  });
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
-          Wallets & Balances Ledger
+          Wallet Management
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Execute direct credits and debits to user accounts with instant transaction auditing.
+          View all wallet transactions and add money to user wallets.
         </p>
       </div>
 
-      {/* Balance Overview Card */}
+      {/* 3 Metric Cards at Top (matching Screenshot 4) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#0B1536] text-white rounded-2xl p-5 border border-[#1e293b] shadow-md space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="font-semibold uppercase tracking-wider">Active Pool Balance</span>
-            <Wallet className="w-5 h-5 text-[#70c028]" />
-          </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-white">
-            ₹ {currentBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-          <span className="text-[11px] text-emerald-400 block font-medium">
-            Live Master Account Balance
+        {/* Card 1: Total Transactions */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+          <span className="text-xs font-semibold text-slate-500 block">
+            Total Transactions
           </span>
+          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#0B1536]">
+            10000
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span className="font-semibold uppercase tracking-wider">Total Audited Transactions</span>
-            <Clock className="w-5 h-5 text-blue-500" />
-          </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-slate-900">
-            {transactions.length}
-          </div>
-          <span className="text-[11px] text-slate-400 block font-medium">
-            Historical System Ledger Records
+        {/* Card 2: Total Credited */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+          <span className="text-xs font-semibold text-slate-500 block">
+            Total Credited
           </span>
+          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#16a34a]">
+            ₹ 12,90,269.64
+          </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span className="font-semibold uppercase tracking-wider">Total System Withdrawn</span>
-            <ArrowUpRight className="w-5 h-5 text-amber-500" />
-          </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-slate-900">
-            ₹ 2,21,99,913.94
-          </div>
-          <span className="text-[11px] text-slate-400 block font-medium">
-            Verified External Bank Disbursals
+        {/* Card 3: Total Debited */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+          <span className="text-xs font-semibold text-slate-500 block">
+            Total Debited
           </span>
+          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#e11d48]">
+            ₹ 0
+          </div>
         </div>
       </div>
 
-      {/* Direct Adjustment Tool */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-          <Wallet className="w-5 h-5 text-emerald-600" />
-          <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
-            Direct Wallet Adjustment
-          </h3>
-        </div>
-
-        {/* 1-Click Buttons */}
-        <div>
-          <label className="text-xs font-bold text-slate-500 block mb-2">1-Click Quick Credits</label>
-          <div className="flex flex-wrap gap-2">
-            {[500, 2100, 5000, 10000].map(amt => (
-              <button
-                key={amt}
-                onClick={() => handleQuickAdjust(amt, `Admin Quick Credit +₹${amt}`)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs border border-emerald-200 transition"
-              >
-                +₹{amt.toLocaleString()} Credit
-              </button>
-            ))}
-            <button
-              onClick={() => handleQuickAdjust(-1000, 'Admin -₹1,000 Debit')}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition"
-            >
-              -₹1,000 Debit
-            </button>
-          </div>
-        </div>
-
-        {/* Custom Input */}
-        <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
-          <input
-            type="number"
-            placeholder="Custom amount (₹)"
-            value={customAmount}
-            onChange={(e) => setCustomAmount(e.target.value)}
-            className="w-full sm:w-60 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold outline-none focus:border-[#70c028]"
-          />
+      {/* Filter Row + Action Buttons (matching Screenshot 4) */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        {/* Search */}
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Reason or audit note (optional)"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="w-full sm:flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-none focus:border-[#70c028]"
+            placeholder="Filter by User ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:border-[#70c028]"
           />
-          <div className="flex gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => handleCustomSubmit(true)}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition"
-            >
-              + Add Credit
-            </button>
-            <button
-              onClick={() => handleCustomSubmit(false)}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition"
-            >
-              - Debit
-            </button>
-          </div>
+        </div>
+
+        {/* Type & Source Dropdowns */}
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#70c028]"
+          >
+            <option value="">All Types</option>
+            <option value="Credit">Credit</option>
+            <option value="Debit">Debit</option>
+          </select>
+
+          <select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#70c028]"
+          >
+            <option value="">All Sources</option>
+            <option value="Level Income">Level Income</option>
+            <option value="Daily ROI">Daily ROI</option>
+            <option value="Recharge">Recharge</option>
+            <option value="Withdrawal">Withdrawal</option>
+            <option value="Admin Bonus">Admin Bonus</option>
+          </select>
+
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold transition shadow-xs"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export Excel</span>
+          </button>
+
+          <button
+            onClick={onOpenAddMoneyModal}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-xs font-extrabold transition shadow-xs"
+          >
+            <Wallet className="w-3.5 h-3.5" />
+            <span>Add Money</span>
+          </button>
         </div>
       </div>
 
-      {/* Transaction History Audit Table */}
+      {/* The Table (matching Screenshot 4) */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
-            Wallet Transaction Ledger
-          </h3>
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search ledger..."
-              value={searchTxn}
-              onChange={(e) => setSearchTxn(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs outline-none focus:border-[#70c028]"
-            />
-          </div>
-        </div>
-
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wider text-[10px]">
-                <th className="px-4 py-3">Txn ID</th>
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">User</th>
                 <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Amount</th>
+                <th className="px-4 py-3">Balance</th>
                 <th className="px-4 py-3">Description</th>
-                <th className="px-4 py-3">Timestamp</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Amount</th>
+                <th className="px-4 py-3 text-right">Source</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-              {filteredTxns.length === 0 ? (
+              {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
-                    No transactions matching search.
+                  <td colSpan={8} className="py-12 text-center text-slate-400 font-medium">
+                    No transactions found matching criteria.
                   </td>
                 </tr>
               ) : (
-                filteredTxns.map(t => (
-                  <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-3 font-mono font-bold text-slate-900">{t.id}</td>
-                    <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold uppercase">
-                        {t.type}
+                filteredRecords.map(item => (
+                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-4 py-3.5 font-mono text-slate-400 font-bold">
+                      {item.serialNo}
+                    </td>
+                    <td className="px-4 py-3.5 font-mono text-slate-500 text-[11px]">
+                      {item.date}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className="font-bold text-[#70c028] block">
+                        {item.userName}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {item.userId}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-800">{t.description}</td>
-                    <td className="px-4 py-3 font-mono text-slate-400 text-[11px]">{t.formattedTime || t.timestamp}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        t.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                        item.type === 'Credit'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-rose-100 text-rose-700'
                       }`}>
-                        {t.status}
+                        {item.type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono font-bold">
-                      <span className={t.amount >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
-                        {t.amount >= 0 ? '+' : ''}₹{t.amount.toLocaleString()}
+                    <td className="px-4 py-3.5 font-mono font-bold">
+                      <span className={item.type === 'Credit' ? 'text-emerald-600' : 'text-rose-600'}>
+                        {item.type === 'Credit' ? '+' : '-'} ₹ {item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 font-mono font-bold text-slate-900">
+                      ₹ {item.balanceAfter.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-600">
+                      {item.description}
+                    </td>
+                    <td className="px-4 py-3.5 text-right">
+                      <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[10px]">
+                        {item.source}
                       </span>
                     </td>
                   </tr>
