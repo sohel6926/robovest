@@ -320,6 +320,48 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   platformAnnouncement: 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
 };
 
+// Helper function: calculate how many night resets (00:30 AM) have passed since purchase
+export function calculateDaysPassed(
+  purchaseTimestampOrDate: number | string,
+  currentTime: Date,
+  resetTimeStr: string = '00:30',
+  fallbackDays: number = 0
+): number {
+  if (!purchaseTimestampOrDate) return fallbackDays;
+
+  let pDate: Date;
+  if (typeof purchaseTimestampOrDate === 'number') {
+    pDate = new Date(purchaseTimestampOrDate);
+  } else {
+    pDate = new Date(purchaseTimestampOrDate);
+    if (isNaN(pDate.getTime())) {
+      const parts = String(purchaseTimestampOrDate).split('/');
+      if (parts.length === 3) {
+        pDate = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
+      }
+    }
+  }
+
+  if (isNaN(pDate.getTime())) return fallbackDays;
+
+  const [resetH, resetM] = (resetTimeStr || '00:30').split(':').map(Number);
+  if (currentTime.getTime() < pDate.getTime()) return 0;
+
+  let days = 0;
+  const cursor = new Date(pDate.getFullYear(), pDate.getMonth(), pDate.getDate(), resetH, resetM || 0, 0, 0);
+
+  if (pDate.getTime() >= cursor.getTime()) {
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  while (cursor.getTime() <= currentTime.getTime()) {
+    days++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return days;
+}
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'invite' | 'contact' | 'team' | 'profile'>('home');
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(true);
@@ -638,24 +680,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   };
 
+
+
   // ---------------------------------------------------------------------------
   // AUTOMATED EVERYDAY NIGHT RESET ENGINE
   // (Advances days elapsed for all active user & downline plans, credits returns & commissions)
   // ---------------------------------------------------------------------------
   const performNightResetSettlement = (resetDate: Date = new Date()) => {
-    let yieldSum = 0;
-    let commissionSum = 0;
     let completedInvsCount = 0;
     let memberPlansUpdatedCount = 0;
+
+    // Synchronous yield sum of all active user investments
+    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
+    const yieldSum = activeInvs.reduce((sum, inv) => sum + inv.dailyIncome, 0);
+    let commissionSum = 0;
 
     // 1. Advance all active user robot investments
     setInvestments(prevInvs => {
       return prevInvs.map(inv => {
         if (inv.status !== 'ACTIVE') return inv;
         const dailyYield = inv.dailyIncome;
-        yieldSum += dailyYield;
-        const newDays = inv.daysElapsed + 1;
-        const newEarned = inv.totalEarned + dailyYield;
+        const newDays = calculateDaysPassed(inv.purchaseTimestamp || inv.purchaseDateFormatted, resetDate, platformSettings.dailyWithdrawalWindowStart, inv.daysElapsed + 1);
+        const newEarned = newDays * dailyYield;
         const isCompleted = newDays >= 150 || newEarned >= (inv.totalInvested * 2);
         if (isCompleted) completedInvsCount++;
 
