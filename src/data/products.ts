@@ -10,6 +10,50 @@ import planGImage from '../assets/images/fancode_boxing_card.jpg';
 
 export const HERO_IMAGE = heroImage;
 
+export const PRODUCT_IMAGES_BY_ID: Record<string, string> = {
+  A: planAImage,
+  B: planBImage,
+  C: planCImage,
+  D: planDImage,
+  E: planEImage,
+  F: planFImage,
+  G: planGImage,
+};
+
+export function resolveProductImage(id?: string, rawImage?: string): string {
+  // If rawImage is already a fully valid external web URL or data URI, keep it
+  if (rawImage && (rawImage.startsWith('http://') || rawImage.startsWith('https://') || rawImage.startsWith('data:'))) {
+    return rawImage;
+  }
+  
+  // If rawImage starts with '/assets/' (compiled Vite asset) and doesn't mention '/src/', it's valid
+  if (rawImage && rawImage.startsWith('/assets/') && !rawImage.includes('/src/')) {
+    return rawImage;
+  }
+
+  // If id matches known product letters
+  if (id) {
+    const key = id.toUpperCase();
+    if (PRODUCT_IMAGES_BY_ID[key]) {
+      return PRODUCT_IMAGES_BY_ID[key];
+    }
+  }
+
+  // Fallback checks by image filename keywords
+  if (rawImage) {
+    const lower = rawImage.toLowerCase();
+    if (lower.includes('cricket')) return planAImage;
+    if (lower.includes('f1')) return planBImage;
+    if (lower.includes('football')) return planCImage;
+    if (lower.includes('basketball')) return planDImage;
+    if (lower.includes('tennis')) return planEImage;
+    if (lower.includes('badminton')) return planFImage;
+    if (lower.includes('boxing')) return planGImage;
+  }
+
+  return planAImage;
+}
+
 export const PRODUCTS_CATALOG: InvestmentProduct[] = [
   {
     id: 'A',

@@ -10,7 +10,7 @@ import {
   PlatformSettings,
   DailyWithdrawalLog
 } from '../types';
-import { PRODUCTS_CATALOG } from '../data/products';
+import { PRODUCTS_CATALOG, resolveProductImage } from '../data/products';
 import { 
   supabase,
   fetchPlatformSettings,
@@ -382,7 +382,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const saved = localStorage.getItem('fancode_catalog_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((p: InvestmentProduct) => ({
+            ...p,
+            image: resolveProductImage(p.id, p.image)
+          }));
+        }
       }
     } catch (e) {
       console.error('Failed to parse catalog from storage', e);
@@ -509,7 +514,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setPlatformSettings(remoteSettings);
         }
         if (remoteProducts && remoteProducts.length > 0) {
-          setCatalog(remoteProducts);
+          setCatalog(remoteProducts.map(p => ({
+            ...p,
+            image: resolveProductImage(p.id, p.image)
+          })));
         }
         if (remoteUserData) {
           setUser(remoteUserData.user);

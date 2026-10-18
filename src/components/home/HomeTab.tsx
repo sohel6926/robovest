@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { HERO_IMAGE } from '../../data/products';
+import { HERO_IMAGE, resolveProductImage } from '../../data/products';
 import { 
   Calendar, 
   Clock, 
@@ -131,8 +131,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               {/* Left Column: Image with FANCODE Overlay and Bonus Pill */}
               <div className="relative w-28 sm:w-36 self-stretch min-h-[200px] sm:min-h-[215px] rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100">
                 <img
-                  src={product.image}
+                  src={resolveProductImage(product.id, product.image)}
                   alt={product.name}
+                  onError={(e) => {
+                    const fallback = resolveProductImage(product.id);
+                    if ((e.currentTarget as HTMLImageElement).src !== fallback) {
+                      (e.currentTarget as HTMLImageElement).src = fallback;
+                    }
+                  }}
                   className={`w-full h-full object-cover ${product.imagePosition || 'object-center'}`}
                 />
                 

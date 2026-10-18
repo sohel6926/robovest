@@ -59,6 +59,7 @@ import { AdminWalletsView } from './views/AdminWalletsView';
 import { AdminWithdrawalsView } from './views/AdminWithdrawalsView';
 import { AdminTopupsView } from './views/AdminTopupsView';
 import { AdminSettingsView } from './views/AdminSettingsView';
+import { resolveProductImage } from '../../data/products';
 
 import heroImage from '../../assets/images/hero_home_robot_1791407310783.jpg';
 import planAImage from '../../assets/images/plan_a_micro_nao.jpg';
@@ -2286,11 +2287,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <div className="p-4 border-b border-slate-100 flex items-start gap-3">
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 relative">
                         <img
-                          src={plan.image}
+                          src={resolveProductImage(plan.id, plan.image)}
                           alt={plan.name}
                           className="w-full h-full object-cover object-top"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = planAImage;
+                            (e.target as HTMLImageElement).src = resolveProductImage(plan.id);
                           }}
                         />
                         <div className="absolute top-1 left-1 px-1.5 py-0.2 rounded bg-black/70 text-white text-[9px] font-black">

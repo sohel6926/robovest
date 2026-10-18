@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { resolveProductImage } from '../../data/products';
 import { X, Zap, Gift, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
 
 export const BuyModal: React.FC = () => {
@@ -67,8 +68,14 @@ export const BuyModal: React.FC = () => {
         <div className="flex items-center gap-3 pt-2">
           <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
             <img
-              src={product.image}
+              src={resolveProductImage(product.id, product.image)}
               alt={product.robotModel}
+              onError={(e) => {
+                const fallback = resolveProductImage(product.id);
+                if ((e.currentTarget as HTMLImageElement).src !== fallback) {
+                  (e.currentTarget as HTMLImageElement).src = fallback;
+                }
+              }}
               className={`w-full h-full object-cover ${product.imagePosition || 'object-center'}`}
             />
           </div>

@@ -7,9 +7,10 @@ import {
   Transaction, 
   UserInvestment, 
   TeamMember, 
-  MemberPlanHolding,
+  MemberPlanHolding, 
   DailyWithdrawalLog
 } from '../types';
+import { resolveProductImage } from '../data/products';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://khlwshpucfdkoefknxtp.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtobHdzaHB1Y2Zka29lZmtueHRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyODU4ODQsImV4cCI6MjEwNzg2MTg4NH0.KdgBFO9kxDd4EPmFq-u3gEhdfY-stgHwEpSDPkGLGXk';
@@ -109,7 +110,7 @@ export async function fetchInvestmentProducts(): Promise<InvestmentProduct[]> {
       minPurchase: Number(p.min_purchase),
       maxPurchase: Number(p.max_purchase),
       requiresPriorInvestment: Boolean(p.requires_prior_investment),
-      image: p.image,
+      image: resolveProductImage(p.id, p.image),
       imagePosition: p.image_position,
       badge: p.badge,
       tier: p.tier,
