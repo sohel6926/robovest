@@ -228,7 +228,12 @@ export async function fetchUserProfile(userId: string = 'User5294'): Promise<{ u
       totalRecharge: Number(userData.total_recharge),
       totalIncome: Number(userData.total_income),
       isLoggedIn: Boolean(userData.is_logged_in),
-      bankAccount
+      bankAccount,
+      pin: userData.pin || '1234',
+      bankDetailsLocked: Boolean(userData.bank_details_locked),
+      status: 'Active',
+      directBusiness: 12500,
+      totalBusiness: 24700
     };
 
     return { user, bank: bankAccount };
@@ -251,6 +256,8 @@ export async function updateUserProfileDB(userId: string, updates: Partial<UserP
     if (updates.totalRecharge !== undefined) payload.total_recharge = updates.totalRecharge;
     if (updates.totalIncome !== undefined) payload.total_income = updates.totalIncome;
     if (updates.isLoggedIn !== undefined) payload.is_logged_in = updates.isLoggedIn;
+    if (updates.pin !== undefined) payload.pin = updates.pin;
+    if (updates.bankDetailsLocked !== undefined) payload.bank_details_locked = updates.bankDetailsLocked;
 
     const { error } = await supabase
       .from('user_profiles')
@@ -324,7 +331,9 @@ export async function fetchTransactions(userId: string = 'User5294'): Promise<Tr
       description: t.description,
       referenceId: t.reference_id || undefined,
       fee: t.fee ? Number(t.fee) : undefined,
-      netAmount: t.net_amount ? Number(t.net_amount) : undefined
+      netAmount: t.net_amount ? Number(t.net_amount) : undefined,
+      adminNote: t.admin_note || undefined,
+      rejectionReason: t.rejection_reason || undefined
     }));
   } catch (e) {
     console.error('fetchTransactions exception:', e);
@@ -345,7 +354,9 @@ export async function insertTransactionDB(userId: string, txn: Transaction): Pro
       description: txn.description,
       reference_id: txn.referenceId || null,
       fee: txn.fee || 0,
-      net_amount: txn.netAmount || 0
+      net_amount: txn.netAmount || 0,
+      admin_note: txn.adminNote || null,
+      rejection_reason: txn.rejectionReason || null
     };
 
     const { error } = await supabase
@@ -363,10 +374,18 @@ export async function insertTransactionDB(userId: string, txn: Transaction): Pro
   }
 }
 
-export async function updateTransactionStatusDB(id: string, status: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'REJECTED', rejectionReason?: string): Promise<boolean> {
+export async function updateTransactionStatusDB(
+  id: string, 
+  status: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'REJECTED', 
+  rejectionReason?: string,
+  adminNote?: string,
+  referenceId?: string
+): Promise<boolean> {
   try {
     const payload: Record<string, any> = { status };
-    if (rejectionReason) payload.rejection_reason = rejectionReason;
+    if (rejectionReason !== undefined) payload.rejection_reason = rejectionReason;
+    if (adminNote !== undefined) payload.admin_note = adminNote;
+    if (referenceId !== undefined) payload.reference_id = referenceId;
 
     const { error } = await supabase
       .from('transactions')

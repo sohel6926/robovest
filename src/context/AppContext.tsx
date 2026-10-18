@@ -93,8 +93,13 @@ interface AppContextType {
   resetCatalogToDefault: () => void;
   updateUserProfile: (updated: Partial<UserProfile>) => void;
   adjustUserBalance: (amount: number, reason: string) => void;
-  approveWithdrawal: (transactionId: string) => { success: boolean; message: string };
+  approveWithdrawal: (transactionId: string, bankReference?: string, adminNote?: string) => { success: boolean; message: string };
   rejectWithdrawal: (transactionId: string, reason?: string) => { success: boolean; message: string };
+  approveRecharge: (transactionId: string) => { success: boolean; message: string };
+  rejectRecharge: (transactionId: string, reason?: string) => { success: boolean; message: string };
+  triggerDailyYieldPayout: () => { success: boolean; message: string; yieldDistributed: number; commissionDistributed: number; activeNodesCount: number };
+  assignPlanToUser: (userId: string, productId: string, quantity: number) => { success: boolean; message: string };
+  updateUserSecurity: (userId: string, updates: { pin?: string; password?: string; bankDetailsLocked?: boolean }) => void;
   addCustomTransaction: (txn: Omit<Transaction, 'id' | 'timestamp' | 'formattedTime'>) => void;
   cancelInvestment: (investmentId: string) => { success: boolean; message: string };
   platformSettings: PlatformSettings;
@@ -1027,25 +1032,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
-  // 7. Approve Withdrawal
-  const approveWithdrawal = (transactionId: string) => {
+  // 7. Approve Withdrawal (Bee Grow pattern: supports bank transfer reference & admin remarks)
+  const approveWithdrawal = (transactionId: string, bankReference?: string, adminNote?: string) => {
+    const txn = transactions.find(t => t.id === transactionId);
+    if (!txn || txn.type !== 'WITHDRAWAL') {
+      return { success: false, message: 'Withdrawal transaction not found.' };
+    }
+
+    const ref = bankReference || txn.referenceId || `PAY-${Math.floor(10000000 + Math.random() * 90000000)}`;
+    const note = adminNote || 'Approved and settled via NEFT/UPI';
+
     setTransactions(prev =>
       prev.map(t => {
-        if (t.id === transactionId && t.type === 'WITHDRAWAL') {
-          return { ...t, status: 'COMPLETED' };
+        if (t.id === transactionId) {
+          return { ...t, status: 'COMPLETED', referenceId: ref, adminNote: note };
         }
         return t;
       })
     );
 
     // Persist to Supabase
-    updateTransactionStatusDB(transactionId, 'COMPLETED');
+    updateTransactionStatusDB(transactionId, 'COMPLETED', undefined, note, ref);
 
-    return { success: true, message: 'Withdrawal approved and marked COMPLETED.' };
+    return { success: true, message: `Withdrawal ${transactionId} approved! Payment Reference: ${ref}` };
   };
 
-  // 8. Reject Withdrawal (Refunds money back to user)
-  const rejectWithdrawal = (transactionId: string, reason = 'Administrative review') => {
+  // 8. Reject Withdrawal (Bee Grow pattern: mandatory reason & atomic refund)
+  const rejectWithdrawal = (transactionId: string, reason = 'Administrative review: Details mismatch') => {
     const txn = transactions.find(t => t.id === transactionId);
     if (!txn || txn.type !== 'WITHDRAWAL') {
       return { success: false, message: 'Transaction not found.' };
@@ -1056,7 +1069,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTransactions(prev =>
       prev.map(t => {
         if (t.id === transactionId) {
-          return { ...t, status: 'PENDING', description: `${t.description} (REJECTED: ${reason})` };
+          return { 
+            ...t, 
+            status: 'REJECTED', 
+            rejectionReason: reason,
+            adminNote: reason,
+            description: `${t.description} (REJECTED: ${reason})` 
+          };
         }
         return t;
       })
@@ -1072,13 +1091,265 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
 
     // Persist to Supabase
-    updateTransactionStatusDB(transactionId, 'REJECTED', reason);
+    updateTransactionStatusDB(transactionId, 'REJECTED', reason, reason);
     updateUserProfileDB(user.id, {
       withdrawableBalance: newWithdr,
       availableBalance: newAvail,
     });
 
-    return { success: true, message: `Withdrawal rejected and ₹${refundAmount.toLocaleString()} refunded to user.` };
+    return { success: true, message: `Withdrawal rejected. Full gross amount of ₹${refundAmount.toLocaleString()} refunded to user's wallet.` };
+  };
+
+  // 8a. Approve Recharge (Bee Grow Top-up Management pattern)
+  const approveRecharge = (transactionId: string) => {
+    const txn = transactions.find(t => t.id === transactionId);
+    if (!txn || txn.type !== 'RECHARGE') {
+      return { success: false, message: 'Recharge transaction not found.' };
+    }
+
+    if (txn.status === 'COMPLETED') {
+      return { success: false, message: 'Recharge is already approved and completed.' };
+    }
+
+    const creditAmount = Math.abs(txn.amount);
+
+    setTransactions(prev =>
+      prev.map(t => {
+        if (t.id === transactionId) {
+          return { ...t, status: 'COMPLETED', adminNote: 'Verified & Credited by Admin' };
+        }
+        return t;
+      })
+    );
+
+    const newAvail = user.availableBalance + creditAmount;
+    const newTotalRecharge = user.totalRecharge + creditAmount;
+
+    setUser(prev => ({
+      ...prev,
+      availableBalance: newAvail,
+      totalRecharge: newTotalRecharge,
+    }));
+
+    // Persist to Supabase
+    updateTransactionStatusDB(transactionId, 'COMPLETED', undefined, 'Verified & Credited by Admin');
+    updateUserProfileDB(user.id, {
+      availableBalance: newAvail,
+      totalRecharge: newTotalRecharge,
+    });
+
+    return { success: true, message: `Recharge approved! ₹${creditAmount.toLocaleString()} credited to user account.` };
+  };
+
+  // 8b. Reject Recharge (Bee Grow Top-up Management pattern)
+  const rejectRecharge = (transactionId: string, reason = 'Invalid or duplicate UTR reference') => {
+    const txn = transactions.find(t => t.id === transactionId);
+    if (!txn || txn.type !== 'RECHARGE') {
+      return { success: false, message: 'Recharge transaction not found.' };
+    }
+
+    setTransactions(prev =>
+      prev.map(t => {
+        if (t.id === transactionId) {
+          return { ...t, status: 'REJECTED', rejectionReason: reason, adminNote: reason };
+        }
+        return t;
+      })
+    );
+
+    // If it was previously marked COMPLETED, deduct the balance
+    if (txn.status === 'COMPLETED') {
+      const deductAmount = Math.abs(txn.amount);
+      const newAvail = Math.max(0, user.availableBalance - deductAmount);
+      const newTotal = Math.max(0, user.totalRecharge - deductAmount);
+      setUser(prev => ({
+        ...prev,
+        availableBalance: newAvail,
+        totalRecharge: newTotal
+      }));
+      updateUserProfileDB(user.id, {
+        availableBalance: newAvail,
+        totalRecharge: newTotal
+      });
+    }
+
+    // Persist to Supabase
+    updateTransactionStatusDB(transactionId, 'REJECTED', reason, reason);
+
+    return { success: true, message: `Recharge request marked as REJECTED (${reason}).` };
+  };
+
+  // 8c. Automated Daily Yield & Referral Level Commission Distribution Engine (Bee Grow dailyRoi.ts pattern)
+  const triggerDailyYieldPayout = () => {
+    let yieldSum = 0;
+    let commissionSum = 0;
+    let completedCount = 0;
+
+    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
+    if (activeInvs.length === 0) {
+      return { 
+        success: false, 
+        message: 'No active robot investments found to distribute yields.', 
+        yieldDistributed: 0, 
+        commissionDistributed: 0,
+        activeNodesCount: 0 
+      };
+    }
+
+    const updatedInvs = investments.map(inv => {
+      if (inv.status !== 'ACTIVE') return inv;
+      const dailyYield = inv.dailyIncome;
+      yieldSum += dailyYield;
+      const newDays = inv.daysElapsed + 1;
+      const newEarned = inv.totalEarned + dailyYield;
+      // Cap at durationDays (150) or 2X total invested
+      const isCompleted = newDays >= 150 || newEarned >= (inv.totalInvested * 2);
+      if (isCompleted) completedCount++;
+
+      const updated: UserInvestment = {
+        ...inv,
+        daysElapsed: newDays,
+        totalEarned: newEarned,
+        status: isCompleted ? 'COMPLETED' : 'ACTIVE',
+      };
+      saveUserInvestmentDB(user.id, updated);
+      return updated;
+    });
+
+    setInvestments(updatedInvs);
+
+    // Credit user's wallet
+    const newAvail = user.availableBalance + yieldSum;
+    const newWithdr = user.withdrawableBalance + yieldSum;
+    const newIncome = user.totalIncome + yieldSum;
+
+    setUser(prev => ({
+      ...prev,
+      availableBalance: newAvail,
+      withdrawableBalance: newWithdr,
+      totalIncome: newIncome,
+    }));
+
+    updateUserProfileDB(user.id, {
+      availableBalance: newAvail,
+      withdrawableBalance: newWithdr,
+      totalIncome: newIncome,
+    });
+
+    const yieldTxn: Transaction = {
+      id: `TXN-YLD-${Date.now().toString().slice(-6)}`,
+      type: 'DAILY_RETURN',
+      amount: yieldSum,
+      status: 'COMPLETED',
+      timestamp: simulatedTime.getTime(),
+      formattedTime: simulatedTime.toLocaleString(),
+      description: `Daily Fleet ROI Yield (${activeInvs.length} active node${activeInvs.length > 1 ? 's' : ''})`,
+      referenceId: `DISTRIB-${Date.now().toString().slice(-4)}`
+    };
+
+    insertTransactionDB(user.id, yieldTxn);
+
+    // Multi-level downline commission distribution to team members (Levels 1, 2, 3)
+    // Level 1: 10%, Level 2: 5%, Level 3: 2%
+    const levelRates: Record<number, number> = { 1: 0.10, 2: 0.05, 3: 0.02 };
+    const updatedTeam = teamMembers.map(m => {
+      const rate = levelRates[m.level] || 0.01;
+      const comm = Math.round(yieldSum * rate * 100) / 100;
+      if (comm > 0) {
+        commissionSum += comm;
+        const updatedMember: TeamMember = {
+          ...m,
+          commissionGenerated: m.commissionGenerated + comm
+        };
+        saveTeamMemberDB(updatedMember, user.id);
+        return updatedMember;
+      }
+      return m;
+    });
+
+    setTeamMembers(updatedTeam);
+
+    const commTxn: Transaction = {
+      id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
+      type: 'COMMISSION',
+      amount: commissionSum,
+      status: 'COMPLETED',
+      timestamp: simulatedTime.getTime(),
+      formattedTime: simulatedTime.toLocaleString(),
+      description: `Referral Level Commission Distributed Across Downline Network`,
+      referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
+    };
+
+    insertTransactionDB(user.id, commTxn);
+    setTransactions(prev => [yieldTxn, commTxn, ...prev]);
+
+    return {
+      success: true,
+      message: `Daily distribution completed! Distributed ₹${yieldSum.toLocaleString()} in yields and ₹${commissionSum.toLocaleString()} in referral commissions. ${completedCount > 0 ? `${completedCount} plan(s) reached completion.` : ''}`,
+      yieldDistributed: yieldSum,
+      commissionDistributed: commissionSum,
+      activeNodesCount: activeInvs.length
+    };
+  };
+
+  // 8d. Direct Plan Allocation by Admin (Bee Grow UserDetail.tsx Top-Up pattern)
+  const assignPlanToUser = (userId: string, productId: string, quantity: number) => {
+    const product = catalog.find(p => p.id === productId);
+    if (!product) return { success: false, message: 'Invalid product selected.' };
+
+    const totalCost = product.price * quantity;
+    const totalDaily = product.dailyIncome * quantity;
+    const totalBonus = product.bonus * quantity;
+
+    const newInvestment: UserInvestment = {
+      id: `INV-ADM-${productId}-${Date.now().toString().slice(-6)}`,
+      productId,
+      productName: product.name,
+      robotModel: product.robotModel,
+      quantity,
+      unitPrice: product.price,
+      totalInvested: totalCost,
+      dailyIncome: totalDaily,
+      bonusReceived: totalBonus,
+      purchaseTimestamp: simulatedTime.getTime(),
+      purchaseDateFormatted: simulatedTime.toLocaleDateString(),
+      daysElapsed: 0,
+      totalEarned: 0,
+      status: 'ACTIVE',
+    };
+
+    setInvestments(prev => [newInvestment, ...prev]);
+    saveUserInvestmentDB(userId, newInvestment);
+
+    const adminAssignTxn: Transaction = {
+      id: `TXN-ADM-ASSIGN-${Date.now().toString().slice(-6)}`,
+      type: 'PRODUCT_BONUS',
+      amount: totalBonus,
+      status: 'COMPLETED',
+      timestamp: simulatedTime.getTime(),
+      formattedTime: simulatedTime.toLocaleString(),
+      description: `Admin Plan Allocation: ${quantity}x ${product.name} (${product.robotModel})`,
+      referenceId: newInvestment.id
+    };
+
+    setTransactions(prev => [adminAssignTxn, ...prev]);
+    insertTransactionDB(userId, adminAssignTxn);
+
+    return { success: true, message: `Successfully allocated ${quantity}x ${product.name} to user ${userId}!` };
+  };
+
+  // 8e. User Security & Bank Lock Controls (Bee Grow UserDetail.tsx pattern)
+  const updateUserSecurity = (userId: string, updates: { pin?: string; password?: string; bankDetailsLocked?: boolean }) => {
+    setUser(prev => ({
+      ...prev,
+      pin: updates.pin !== undefined ? updates.pin : prev.pin,
+      bankDetailsLocked: updates.bankDetailsLocked !== undefined ? updates.bankDetailsLocked : prev.bankDetailsLocked,
+    }));
+
+    updateUserProfileDB(userId, {
+      pin: updates.pin,
+      bankDetailsLocked: updates.bankDetailsLocked
+    });
   };
 
   // 9. Add Custom Transaction
@@ -1335,6 +1606,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         adjustUserBalance,
         approveWithdrawal,
         rejectWithdrawal,
+        approveRecharge,
+        rejectRecharge,
+        triggerDailyYieldPayout,
+        assignPlanToUser,
+        updateUserSecurity,
         addCustomTransaction,
         cancelInvestment,
         platformSettings,

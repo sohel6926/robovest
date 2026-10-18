@@ -53,13 +53,17 @@ export interface Transaction {
   id: string;
   type: 'RECHARGE' | 'WITHDRAWAL' | 'DAILY_RETURN' | 'SIGNUP_BONUS' | 'PRODUCT_BONUS' | 'COMMISSION';
   amount: number;
-  status: 'COMPLETED' | 'PENDING' | 'PROCESSING';
+  status: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'REJECTED';
   timestamp: number;
   formattedTime: string;
   description: string;
   referenceId?: string;
   fee?: number;
   netAmount?: number;
+  adminNote?: string;
+  rejectionReason?: string;
+  userId?: string;
+  userPhone?: string;
 }
 
 export interface BankAccount {
@@ -125,4 +129,10 @@ export interface UserProfile {
   totalIncome: number;
   isLoggedIn: boolean;
   bankAccount: BankAccount;
+  pin?: string;
+  bankDetailsLocked?: boolean;
+  inviterId?: string;
+  status?: 'Active' | 'InActive';
+  directBusiness?: number;
+  totalBusiness?: number;
 }

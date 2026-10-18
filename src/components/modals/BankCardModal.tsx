@@ -60,10 +60,20 @@ export const BankCardModal: React.FC = () => {
         </div>
 
         {/* Security badge */}
-        <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-[11px] text-blue-900 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
-          <span>Encrypted 256-bit automated payout routing</span>
-        </div>
+        {user.bankDetailsLocked ? (
+          <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block">Account Modification Locked</span>
+              <span className="text-[11px] text-amber-800">Your settlement banking details have been locked by the administrator for payout security. Please contact Customer Care to unlock.</span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-[11px] text-blue-900 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+            <span>Encrypted 256-bit automated payout routing</span>
+          </div>
+        )}
 
         {/* Form in Clean Slate Inputs */}
         <form onSubmit={handleSubmit} className="space-y-3 text-xs">
@@ -146,9 +156,14 @@ export const BankCardModal: React.FC = () => {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-md shadow-blue-500/20 active:scale-[0.98] transition-all"
+              disabled={user.bankDetailsLocked}
+              className={`w-full py-3.5 rounded-xl font-extrabold text-sm transition-all ${
+                user.bankDetailsLocked
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 active:scale-[0.98]'
+              }`}
             >
-              Save Bank Card Details
+              {user.bankDetailsLocked ? 'Bank Account Locked by Administrator' : 'Save Bank Card Details'}
             </button>
           </div>
         </form>
