@@ -14,7 +14,9 @@ import {
   PhoneCall,
   UserCheck,
   Award,
-  CreditCard
+  CreditCard,
+  QrCode,
+  ArrowRight
 } from 'lucide-react';
 
 export interface CadreClaimItem {
@@ -32,8 +34,8 @@ interface AdminDashboardViewProps {
   onOpenAddBalanceModal: () => void;
   pendingWithdrawalsCount: number;
   pendingTopupsCount: number;
-  cadreClaims: CadreClaimItem[];
-  onCreditCadreReward: (claimId: string) => void;
+  cadreClaims?: CadreClaimItem[];
+  onCreditCadreReward?: (claimId: string) => void;
   totalUsersCount?: number;
   totalWalletBalance?: number;
 }
@@ -44,12 +46,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   onOpenAddBalanceModal,
   pendingWithdrawalsCount,
   pendingTopupsCount,
-  cadreClaims,
-  onCreditCadreReward,
   totalUsersCount = 693,
   totalWalletBalance = 4897392.55,
 }) => {
-  const pendingCadresCount = cadreClaims.filter(c => !c.isCredited).length;
 
   return (
     <div className="space-y-6">
@@ -132,8 +131,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Row 2 of Metric Cards: Pending KYC & Pending Cadres */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Row 2 of Metric Cards: Pending KYC & Recharge Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
         {/* 5. Pending KYC */}
         <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -144,21 +143,30 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <div className="text-3xl font-black text-[#0B1536] font-['Space_Grotesk'] tracking-tight mt-1">
               0
             </div>
-            <span className="text-[11px] text-slate-400 block mt-1">0 new today</span>
+            <span className="text-[11px] text-slate-400 block mt-1">All submissions verified</span>
           </div>
         </div>
 
-        {/* 6. Pending Cadres */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-            <TrendingUp className="w-5 h-5" />
+        {/* 7. Recharge Details (UPI & QR) */}
+        <div 
+          onClick={() => onNavigate('rechargeGateway')}
+          className="bg-white rounded-2xl p-5 border border-orange-200/80 hover:border-orange-400 shadow-xs flex flex-col justify-between space-y-3 cursor-pointer transition group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#fe4600] flex items-center justify-center font-bold group-hover:scale-105 transition">
+              <QrCode className="w-5 h-5" />
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-orange-100 text-[#fe4600] text-[10px] font-bold">
+              Website Live
+            </span>
           </div>
           <div>
-            <span className="text-xs font-semibold text-slate-500 block">Pending Cadres</span>
-            <div className={`text-3xl font-black font-['Space_Grotesk'] tracking-tight mt-1 ${pendingCadresCount > 0 ? 'text-purple-600' : 'text-[#0B1536]'}`}>
-              {pendingCadresCount}
+            <span className="text-xs font-semibold text-slate-500 block">Recharge Details</span>
+            <div className="text-base font-bold text-slate-900 tracking-tight mt-1 flex items-center gap-1 group-hover:text-[#fe4600] transition">
+              <span>UPI & QR Config</span>
+              <ArrowRight className="w-4 h-4" />
             </div>
-            <span className="text-[11px] text-slate-400 block mt-1">Bonus/Gift claims</span>
+            <span className="text-[11px] text-slate-400 block mt-1">Set UPI ID, QR & Bank for users</span>
           </div>
         </div>
       </div>
@@ -287,55 +295,43 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Card 4: Pending Cadre Rewards */}
+          {/* Card 4: Quick Recharge Gateway Setup */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between min-h-[170px]">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                <TrendingUp className="w-4 h-4 text-purple-500" />
-                <span>Pending Cadre Rewards</span>
+                <QrCode className="w-4 h-4 text-[#fe4600]" />
+                <span>Recharge & Deposit Gateways</span>
               </div>
               <button
-                onClick={() => onNavigate('cadres')}
-                className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition"
+                onClick={() => onNavigate('rechargeGateway')}
+                className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition cursor-pointer"
               >
-                <span>View All</span>
+                <span>Configure</span>
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
 
-            <div className="divide-y divide-slate-100">
-              {cadreClaims.map((claim) => (
-                <div key={claim.id} className="py-2.5 flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-slate-900 block font-['Space_Grotesk']">
-                      {claim.name}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">
-                      {claim.role} <span className="text-purple-600 font-bold">• {claim.gift}</span>
-                    </span>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="font-mono font-bold text-slate-900 block text-xs">
-                      ₹ {claim.amount.toLocaleString()}
-                    </span>
-                    {claim.isCredited ? (
-                      <span className="text-[10px] text-emerald-600 font-bold">
-                        Credited ✓
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => onCreditCadreReward(claim.id)}
-                        className="text-[10px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-0.5 justify-end"
-                      >
-                        <span>Credit Wallet</span>
-                        <ExternalLink className="w-2.5 h-2.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2.5 py-2 text-xs">
+              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span className="text-slate-700 font-medium">Multiple UPI & QR Scanners</span>
+                <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[10px]">
+                  ● Live on Website
+                </span>
+              </div>
+              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span className="text-slate-700 font-medium">Direct Bank Transfer (IMPS/NEFT)</span>
+                <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-md text-[10px]">
+                  ● Active
+                </span>
+              </div>
             </div>
+
+            <button
+              onClick={() => onNavigate('rechargeGateway')}
+              className="w-full py-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#fe4600] font-bold text-xs transition text-center cursor-pointer"
+            >
+              Manage Multiple QR & Bank Accounts →
+            </button>
           </div>
         </div>
       </div>
@@ -385,6 +381,25 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
           </button>
 
+          {/* Tile: Recharge Gateway Details (UPI & QR) */}
+          <button
+            onClick={() => onNavigate('rechargeGateway')}
+            className="text-left bg-gradient-to-br from-[#ea580c] to-[#c2410c] hover:from-[#f97316] hover:to-[#ea580c] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px]"
+          >
+            <div className="flex items-center justify-between">
+              <QrCode className="w-5 h-5 text-orange-200" />
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">
+                WEBSITE
+              </span>
+            </div>
+            <div>
+              <span className="font-bold text-sm block">Recharge Details</span>
+              <span className="text-xs text-orange-100 block mt-0.5">
+                Set live UPI ID, QR & Bank info
+              </span>
+            </div>
+          </button>
+
           {/* Tile 4: Add Wallet Balance */}
           <button
             onClick={onOpenAddBalanceModal}
@@ -409,15 +424,15 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
           </button>
 
-          {/* Tile 6: Cadre Management */}
+          {/* Tile 6: Recharge Details */}
           <button
-            onClick={() => onNavigate('cadres')}
-            className="text-left bg-[#4f46e5] hover:bg-[#6366f1] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px]"
+            onClick={() => onNavigate('rechargeGateway')}
+            className="text-left bg-[#4f46e5] hover:bg-[#6366f1] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px] cursor-pointer"
           >
-            <Award className="w-5 h-5 text-blue-200" />
+            <QrCode className="w-5 h-5 text-indigo-200" />
             <div>
-              <span className="font-bold text-sm block">Cadre Management</span>
-              <span className="text-xs text-blue-200 block mt-0.5">{pendingCadresCount} pending rewards</span>
+              <span className="font-bold text-sm block">Recharge Details</span>
+              <span className="text-xs text-indigo-200 block mt-0.5">UPI & Bank Gateway setup</span>
             </div>
           </button>
 

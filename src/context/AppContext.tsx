@@ -318,6 +318,38 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   telegramSupportUrl: 'https://t.me/robovest_support',
   telegramChannelUrl: 'https://t.me/robovest_official',
   platformAnnouncement: 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
+  rechargeUpiId: 'robovest.payments@hdfcbank',
+  rechargePayeeName: 'FanCode Payments',
+  rechargeBankName: 'HDFC Bank',
+  rechargeQrImageUrl: '',
+  rechargeAccountHolder: 'Robovest Technologies Pvt Ltd',
+  rechargeAccountNumber: '50200084729103',
+  rechargeIfscCode: 'HDFC0000128',
+  rechargeInstructions: 'Scan using PhonePe, Google Pay, Paytm, or BHIM. After payment is successful, enter the 12-digit UTR transaction reference number below.',
+  rechargeQuickAmounts: [520, 1999, 2100, 5999, 8200, 17960],
+  rechargeGatewayActive: true,
+  rechargeQrList: [
+    {
+      id: 'qr-1',
+      label: 'Primary UPI (PhonePe / GPay / BHIM)',
+      upiId: 'robovest.payments@hdfcbank',
+      payeeName: 'FanCode Payments',
+      qrImageUrl: '',
+      isActive: true,
+    }
+  ],
+  rechargeBankList: [
+    {
+      id: 'bank-1',
+      bankName: 'HDFC Bank',
+      accountHolder: 'Robovest Technologies Pvt Ltd',
+      accountNumber: '50200084729103',
+      ifscCode: 'HDFC0000128',
+      accountType: 'Current Account',
+      branch: 'Indiranagar Branch',
+      isActive: true,
+    }
+  ],
 };
 
 // Helper function: calculate how many night resets (00:30 AM) have passed since purchase
@@ -1488,13 +1520,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // 11. Update Platform Settings
   const updatePlatformSettings = (settings: Partial<PlatformSettings>) => {
-    setPlatformSettings(prev => ({ ...prev, ...settings }));
+    setPlatformSettings(prev => {
+      const merged = { ...prev, ...settings };
+      try {
+        localStorage.setItem('robovest_settings', JSON.stringify(merged));
+      } catch (e) {
+        console.error('Failed to save settings to localStorage', e);
+      }
+      return merged;
+    });
     updatePlatformSettingsDB(settings);
   };
 
   // 12. Reset Settings
   const resetPlatformSettings = () => {
     setPlatformSettings(DEFAULT_SETTINGS);
+    try {
+      localStorage.setItem('robovest_settings', JSON.stringify(DEFAULT_SETTINGS));
+    } catch (e) {
+      console.error('Failed to reset settings to localStorage', e);
+    }
     updatePlatformSettingsDB(DEFAULT_SETTINGS);
   };
 

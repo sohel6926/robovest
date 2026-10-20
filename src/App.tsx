@@ -62,7 +62,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] sm:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] sm:from-slate-900 sm:via-[#0b0f19] sm:to-[#070a10] text-slate-900 font-['Plus_Jakarta_Sans'] antialiased selection:bg-blue-600 selection:text-white flex items-center justify-center sm:py-6 sm:px-4">
+    <div className="min-h-screen bg-[#0B0F19] sm:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] sm:from-slate-900 sm:via-[#0b0f19] sm:to-[#070a10] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white flex items-center justify-center sm:py-6 sm:px-4">
       {/* Background ambient decorative light orbs on desktop */}
       <div className="fixed top-10 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none hidden sm:block" />
       <div className="fixed bottom-10 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none hidden sm:block" />

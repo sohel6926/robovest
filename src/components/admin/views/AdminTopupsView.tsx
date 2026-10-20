@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, Download, ArrowDownToLine, Check, X, Eye, Image as ImageIcon } from 'lucide-react';
+import { Filter, Download, ArrowDownToLine, Check, X, Eye, Image as ImageIcon, QrCode } from 'lucide-react';
 import { Transaction } from '../../../types';
 
 interface AdminTopupsViewProps {
@@ -8,6 +8,7 @@ interface AdminTopupsViewProps {
   onRejectRecharge?: (txnId: string, reason: string) => void;
   onExportCSV: (filename: string, headers: string[], rows: (string | number)[][]) => void;
   showToast: (msg: string, type?: 'success' | 'error') => void;
+  onNavigate?: (tab: string) => void;
 }
 
 export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
@@ -16,6 +17,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
   onRejectRecharge,
   onExportCSV,
   showToast,
+  onNavigate,
 }) => {
   const [activeFilter, setActiveFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL'>('PENDING');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -48,13 +50,24 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
-            Top-up Management
-          </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Approve or reject user reinvestment requests.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+              Top-up Management
+            </h1>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Approve or reject user reinvestment requests.
+            </p>
+          </div>
+          {onNavigate && (
+            <button
+              onClick={() => onNavigate('rechargeGateway')}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-sm transition active:scale-95"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Configure Recharge Details (UPI & QR)</span>
+            </button>
+          )}
         </div>
 
         {/* Filter Pills + Export Button (matching Screenshot 2) */}

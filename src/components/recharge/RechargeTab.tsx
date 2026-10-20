@@ -1,30 +1,67 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, Check, QrCode, Copy, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Check, QrCode, Copy, CheckCircle2, Building2, AlertTriangle, Info } from 'lucide-react';
 
 interface RechargeTabProps {
   onBack: () => void;
   onSwitchToWithdraw: () => void;
 }
 
-const PRESET_AMOUNTS = [
-  { amount: 520, popular: false },
-  { amount: 1999, popular: false },
-  { amount: 2100, popular: false },
-  { amount: 4000, popular: true },
-  { amount: 8200, popular: false },
-  { amount: 15500, popular: false },
-  { amount: 35000, popular: false },
-  { amount: 75000, popular: false },
-];
-
 export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWithdraw }) => {
   const { user, rechargeWallet, platformSettings } = useApp();
-  const [selectedAmount, setSelectedAmount] = useState<number>(platformSettings?.minRecharge || 520);
-  const [customInput, setCustomInput] = useState<string>((platformSettings?.minRecharge || 520).toString());
+
+  // Dynamic values configured from Admin Panel
+  const minRec = platformSettings?.minRecharge || 520;
+  const instructions = platformSettings?.rechargeInstructions;
+  const quickAmounts = platformSettings?.rechargeQuickAmounts && platformSettings.rechargeQuickAmounts.length > 0
+    ? platformSettings.rechargeQuickAmounts
+    : [520, 1999, 2100, 4000, 8200, 15500, 35000, 75000];
+  const isGatewayActive = platformSettings?.rechargeGatewayActive !== false;
+
+  // Active QR codes from Admin
+  const activeQrList = (platformSettings?.rechargeQrList || []).filter(q => q.isActive);
+  const effectiveQrList = activeQrList.length > 0 ? activeQrList : [
+    {
+      id: 'default-qr',
+      label: 'Primary UPI Gateway',
+      upiId: platformSettings?.rechargeUpiId || 'robovest.payments@hdfcbank',
+      payeeName: platformSettings?.rechargePayeeName || 'FanCode Payments',
+      qrImageUrl: platformSettings?.rechargeQrImageUrl || '',
+      isActive: true,
+    }
+  ];
+
+  // Active Bank Accounts from Admin
+  const activeBankList = (platformSettings?.rechargeBankList || []).filter(b => b.isActive);
+  const effectiveBankList = activeBankList.length > 0 ? activeBankList : (
+    platformSettings?.rechargeAccountNumber ? [
+      {
+        id: 'default-bank',
+        bankName: platformSettings?.rechargeBankName || 'HDFC Bank',
+        accountHolder: platformSettings?.rechargeAccountHolder || 'Robovest Technologies Pvt Ltd',
+        accountNumber: platformSettings?.rechargeAccountNumber || '50200084729103',
+        ifscCode: platformSettings?.rechargeIfscCode || 'HDFC0000128',
+        accountType: 'Current Account',
+        branch: '',
+        isActive: true,
+      }
+    ] : []
+  );
+
+  const [selectedQrId, setSelectedQrId] = useState<string>(effectiveQrList[0]?.id || 'default-qr');
+  const [selectedBankId, setSelectedBankId] = useState<string>(effectiveBankList[0]?.id || 'default-bank');
+
+  const currentQr = effectiveQrList.find(q => q.id === selectedQrId) || effectiveQrList[0];
+  const currentBank = effectiveBankList.find(b => b.id === selectedBankId) || effectiveBankList[0];
+
+  const [selectedAmount, setSelectedAmount] = useState<number>(minRec);
+  const [customInput, setCustomInput] = useState<string>(minRec.toString());
   const [showPaymentSheet, setShowPaymentSheet] = useState<boolean>(false);
+  const [paymentTab, setPaymentTab] = useState<'upi' | 'bank'>('upi');
   const [utrNumber, setUtrNumber] = useState<string>('827192039182');
   const [copiedUpi, setCopiedUpi] = useState<boolean>(false);
+  const [copiedAccount, setCopiedAccount] = useState<boolean>(false);
+  const [copiedIfsc, setCopiedIfsc] = useState<boolean>(false);
   const [paymentSuccessMsg, setPaymentSuccessMsg] = useState<string | null>(null);
 
   const handlePresetClick = (val: number) => {
@@ -44,7 +81,10 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const handleContinue = () => {
-    const minRec = platformSettings?.minRecharge || 520;
+    if (!isGatewayActive) {
+      alert('The recharge gateway is temporarily offline for scheduled system maintenance. Please try again later.');
+      return;
+    }
     if (selectedAmount < minRec) {
       alert(`Minimum recharge amount is ₹${minRec.toLocaleString()}.`);
       return;
@@ -53,6 +93,10 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const handleConfirmPayment = () => {
+    if (!utrNumber.trim() || utrNumber.trim().length < 6) {
+      alert('Please enter a valid 12-digit UTR or Transaction Reference Number.');
+      return;
+    }
     const result = rechargeWallet(selectedAmount, utrNumber);
     if (result.success) {
       setPaymentSuccessMsg(result.message);
@@ -67,13 +111,30 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const copyUpi = () => {
-    navigator.clipboard.writeText('robovest.payments@hdfcbank');
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
+    if (currentQr?.upiId) {
+      navigator.clipboard.writeText(currentQr.upiId);
+      setCopiedUpi(true);
+      setTimeout(() => setCopiedUpi(false), 2000);
+    }
   };
 
+  const copyBankDetail = (text: string, type: 'acc' | 'ifsc') => {
+    navigator.clipboard.writeText(text);
+    if (type === 'acc') {
+      setCopiedAccount(true);
+      setTimeout(() => setCopiedAccount(false), 2000);
+    } else {
+      setCopiedIfsc(true);
+      setTimeout(() => setCopiedIfsc(false), 2000);
+    }
+  };
+
+  // Generate dynamic QR Code for the specific selected UPI ID and amount
+  const upiDeepLink = `upi://pay?pa=${encodeURIComponent(currentQr?.upiId || '')}&pn=${encodeURIComponent(currentQr?.payeeName || 'FanCode')}&am=${selectedAmount}&cu=INR`;
+  const displayQrSrc = currentQr?.qrImageUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiDeepLink)}`;
+
   return (
-    <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900">
+    <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900 font-sans">
       {/* Top Header */}
       <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200/90 shadow-sm">
         <button
@@ -92,7 +153,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
           <div className="text-[11px] font-bold text-blue-100 tracking-wider uppercase mb-1">
             WALLET BALANCE
           </div>
-          <div className="text-4xl font-black text-white tracking-tight tabular-nums font-['Space_Grotesk']">
+          <div className="text-4xl font-extrabold text-white tracking-tight tabular-nums">
             ₹{user.availableBalance.toLocaleString()}
           </div>
         </div>
@@ -112,6 +173,19 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
           </button>
         </div>
       </div>
+
+      {/* Gateway Offline Warning */}
+      {!isGatewayActive && (
+        <div className="m-4 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold block">Gateway Under Maintenance</span>
+            <p className="text-[11px] text-amber-800 mt-0.5">
+              Online UPI recharge is currently undergoing scheduled server upgrades. Please check back shortly.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Enter Amount Card */}
       <div className="p-4 space-y-4">
@@ -144,12 +218,12 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
           </div>
 
           <div className="text-[11px] text-slate-500 flex items-center gap-1">
-            <span className="text-blue-600 font-bold">ℹ</span> Minimum recharge ₹520
+            <span className="text-blue-600 font-bold">ℹ</span> Minimum recharge ₹{minRec.toLocaleString()}
           </div>
 
-          {/* Quick Amount Grid */}
+          {/* Quick Amount Grid dynamically rendered from admin config */}
           <div className="grid grid-cols-3 gap-2.5 pt-2">
-            {PRESET_AMOUNTS.map(({ amount, popular }) => {
+            {quickAmounts.map((amount) => {
               const isSelected = selectedAmount === amount;
               return (
                 <button
@@ -161,11 +235,6 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
                       : 'bg-slate-50 text-slate-800 border-slate-200 hover:border-blue-400 hover:bg-white'
                   }`}
                 >
-                  {popular && (
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1.5 py-0.2 rounded-full bg-blue-700 text-white text-[9px] font-black uppercase tracking-wider">
-                      Popular
-                    </span>
-                  )}
                   ₹{amount.toLocaleString()}
                 </button>
               );
@@ -185,25 +254,25 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
               <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 text-[11px]">
                 1
               </span>
-              <span>Minimum deposit amount is ₹520.</span>
+              <span>Minimum deposit amount is ₹{minRec.toLocaleString()}.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 text-[11px]">
                 2
               </span>
-              <span>Pay and submit within the given time window.</span>
+              <span>Scan QR code or copy the UPI ID to complete payment in any UPI app.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 text-[11px]">
                 3
               </span>
-              <span>Your balance is credited automatically once payment is confirmed.</span>
+              <span>Copy the 12-digit UTR / Reference number from receipt and submit.</span>
             </div>
             <div className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 text-[11px]">
                 4
               </span>
-              <span>For any payment issue, contact customer support.</span>
+              <span>Your balance is credited automatically once transaction reference is confirmed.</span>
             </div>
           </div>
         </div>
@@ -211,13 +280,18 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
         {/* Continue Button */}
         <button
           onClick={handleContinue}
-          className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-base shadow-lg shadow-blue-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+          disabled={!isGatewayActive}
+          className={`w-full py-3.5 rounded-xl font-extrabold text-base transition-all flex items-center justify-center gap-2 ${
+            isGatewayActive
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
+              : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+          }`}
         >
-          <span>Continue ₹{selectedAmount.toLocaleString()}</span>
+          {isGatewayActive ? 'Continue to Pay' : 'Gateway Offline'}
         </button>
       </div>
 
-      {/* Simulated UPI & Instant Payment Drawer in Crisp White */}
+      {/* Simulated UPI & Instant Payment Drawer in Crisp White (Live data from Admin Panel) */}
       {showPaymentSheet && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center p-0 animate-in fade-in">
           <div className="w-full max-w-md bg-white border-t border-slate-200 rounded-t-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -234,25 +308,165 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
               </div>
             </div>
 
-            {/* QR Simulation Card */}
-            <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200 text-center space-y-3">
-              <div className="w-40 h-40 mx-auto bg-white p-2 rounded-xl flex items-center justify-center shadow-xs border border-slate-200">
-                <QrCode className="w-36 h-36 text-slate-900" />
-              </div>
-              <p className="text-[11px] text-slate-500">Scan using PhonePe, Google Pay, Paytm, or BHIM</p>
-
-              {/* UPI ID Copy */}
-              <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
-                <span className="text-slate-800 font-mono font-medium">robovest.payments@hdfcbank</span>
+            {/* Optional Tab Toggle if Bank Details are provided */}
+            {effectiveBankList.length > 0 && (
+              <div className="flex rounded-xl bg-slate-100 p-0.5 text-xs font-bold border border-slate-200">
                 <button
-                  onClick={copyUpi}
-                  className="flex items-center gap-1 text-blue-600 font-bold hover:text-blue-700"
+                  type="button"
+                  onClick={() => setPaymentTab('upi')}
+                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                    paymentTab === 'upi' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
                 >
-                  {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                  UPI & QR Code {effectiveQrList.length > 1 ? `(${effectiveQrList.length})` : ''}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentTab('bank')}
+                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                    paymentTab === 'bank' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Direct Bank Transfer {effectiveBankList.length > 1 ? `(${effectiveBankList.length})` : ''}
                 </button>
               </div>
-            </div>
+            )}
+
+            {paymentTab === 'upi' ? (
+              /* QR Simulation Card with Live Admin Details */
+              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 text-center space-y-3">
+                {/* Multi-QR Option Pills (if more than 1 active QR code exists) */}
+                {effectiveQrList.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar justify-center">
+                    {effectiveQrList.map((q, idx) => (
+                      <button
+                        key={q.id}
+                        type="button"
+                        onClick={() => setSelectedQrId(q.id)}
+                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition shrink-0 cursor-pointer ${
+                          currentQr?.id === q.id
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {q.label || `Scanner ${idx + 1}`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="w-40 h-40 mx-auto bg-white p-2 rounded-xl flex items-center justify-center shadow-xs border border-slate-200 overflow-hidden">
+                  {displayQrSrc ? (
+                    <img
+                      src={displayQrSrc}
+                      alt="UPI QR Code"
+                      className="w-36 h-36 object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <QrCode className="w-36 h-36 text-slate-900" />
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {instructions || 'Scan using PhonePe, Google Pay, Paytm, or BHIM'}
+                </p>
+
+                {/* Live UPI ID with Instant Copy */}
+                <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
+                  <span className="text-slate-800 font-mono font-bold truncate mr-2">
+                    {currentQr?.upiId || 'No UPI ID configured'}
+                  </span>
+                  <button
+                    onClick={copyUpi}
+                    className="flex items-center gap-1 text-blue-600 font-bold hover:text-blue-700 shrink-0 cursor-pointer"
+                  >
+                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+
+                {currentQr?.payeeName && (
+                  <div className="text-[11px] text-slate-500">
+                    Payee: <span className="font-semibold text-slate-800">{currentQr.payeeName}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Bank Transfer Details */
+              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
+                {/* Multi-Bank Option Pills (if more than 1 active bank account exists) */}
+                {effectiveBankList.length > 1 && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar justify-start">
+                    {effectiveBankList.map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => setSelectedBankId(b.id)}
+                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition shrink-0 cursor-pointer ${
+                          currentBank?.id === b.id
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {b.bankName}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-purple-600" />
+                    <span className="font-bold text-slate-900">{currentBank?.bankName || 'Direct Bank IMPS / NEFT'}</span>
+                  </div>
+                  {currentBank?.accountType && (
+                    <span className="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
+                      {currentBank.accountType}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-500 text-[11px]">Account Holder:</span>
+                  <span className="font-bold text-slate-900">{currentBank?.accountHolder}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
+                  <span className="text-slate-500 text-[11px]">Account Number:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-slate-900">{currentBank?.accountNumber}</span>
+                    <button
+                      onClick={() => copyBankDetail(currentBank?.accountNumber || '', 'acc')}
+                      className="text-blue-600 text-[11px] font-bold cursor-pointer"
+                    >
+                      {copiedAccount ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
+                  <span className="text-slate-500 text-[11px]">IFSC Code:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-blue-600">{currentBank?.ifscCode}</span>
+                    <button
+                      onClick={() => copyBankDetail(currentBank?.ifscCode || '', 'ifsc')}
+                      className="text-blue-600 text-[11px] font-bold cursor-pointer"
+                    >
+                      {copiedIfsc ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+
+                {currentBank?.branch && (
+                  <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
+                    <span className="text-slate-500 text-[11px]">Branch:</span>
+                    <span className="text-slate-700 font-medium">{currentBank.branch}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* UTR Input Form */}
             <div className="space-y-2">
@@ -286,7 +500,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
               </button>
               <button
                 onClick={handleConfirmPayment}
-                className="flex-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20"
+                className="flex-2 py-3 rounded-xl bg-[#fe4600] hover:bg-[#ea3f00] text-white font-extrabold text-xs shadow-md shadow-orange-500/20 active:scale-95 transition"
               >
                 Confirm Payment & Submit UTR
               </button>

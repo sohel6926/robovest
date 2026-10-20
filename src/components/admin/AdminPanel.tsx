@@ -49,16 +49,17 @@ import {
   CornerDownRight,
   LayoutGrid,
   Bell,
-  Gift
+  Gift,
+  QrCode
 } from 'lucide-react';
 
 import { AdminDashboardView, CadreClaimItem } from './views/AdminDashboardView';
 import { AdminUserManagementView } from './views/AdminUserManagementView';
-import { AdminCadreRewardsView } from './views/AdminCadreRewardsView';
 import { AdminWalletsView } from './views/AdminWalletsView';
 import { AdminWithdrawalsView } from './views/AdminWithdrawalsView';
 import { AdminTopupsView } from './views/AdminTopupsView';
 import { AdminSettingsView } from './views/AdminSettingsView';
+import { AdminRechargeDetailsView } from './views/AdminRechargeDetailsView';
 import { resolveProductImage } from '../../data/products';
 
 import heroImage from '../../assets/images/hero_home_robot_1791407310783.jpg';
@@ -130,7 +131,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Navigation Tab
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'users' | 'referrals' | 'cadres' | 'wallets' | 'withdrawals' | 'recharges' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
+    'dashboard' | 'users' | 'referrals' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
   >('dashboard');
 
   // Cadre Reward Claims State (from Bee Grow live admin console)
@@ -316,21 +317,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [balanceAmount, setBalanceAmount] = useState<string>('');
   const [balanceReason, setBalanceReason] = useState<string>('');
   const [userFormData, setUserFormData] = useState({
-    phone: user.phone,
-    inviteCode: user.inviteCode,
-    vipLevel: user.vipLevel,
-    pin: user.pin || '1234',
-    bankDetailsLocked: user.bankDetailsLocked || false,
-    availableBalance: user.availableBalance,
-    withdrawableBalance: user.withdrawableBalance,
-    totalRecharge: user.totalRecharge,
-    totalIncome: user.totalIncome,
-    accountHolder: user.bankAccount.accountHolder,
-    accountNumber: user.bankAccount.accountNumber,
-    ifscCode: user.bankAccount.ifscCode,
-    bankName: user.bankAccount.bankName,
-    upiId: user.bankAccount.upiId || '',
-    isBound: user.bankAccount.isBound,
+    phone: user?.phone || '',
+    inviteCode: user?.inviteCode || '',
+    vipLevel: user?.vipLevel || 1,
+    pin: user?.pin || '1234',
+    bankDetailsLocked: user?.bankDetailsLocked || false,
+    availableBalance: user?.availableBalance || 0,
+    withdrawableBalance: user?.withdrawableBalance || 0,
+    totalRecharge: user?.totalRecharge || 0,
+    totalIncome: user?.totalIncome || 0,
+    accountHolder: user?.bankAccount?.accountHolder || '',
+    accountNumber: user?.bankAccount?.accountNumber || '',
+    ifscCode: user?.bankAccount?.ifscCode || '',
+    bankName: user?.bankAccount?.bankName || '',
+    upiId: user?.bankAccount?.upiId || '',
+    isBound: user?.bankAccount?.isBound || false,
   });
 
   // Settings State
@@ -557,21 +558,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     showToast('Platform settings and withdrawal rules updated!');
   };
 
-  // Calculations for summary metrics
-  const dailyWithdrawalLogs = getDailyWithdrawalLogs();
-  const pendingRecharges = transactions.filter(t => t.type === 'RECHARGE' && t.status === 'PROCESSING');
-  const pendingWithdrawals = transactions.filter(t => t.type === 'WITHDRAWAL' && t.status === 'PROCESSING');
-  const activeNodes = investments.filter(i => i.status === 'ACTIVE');
-  const allWithdrawalsSum = transactions
+  // Calculations for summary metrics with defensive array guards
+  const dailyWithdrawalLogs = typeof getDailyWithdrawalLogs === 'function' ? (getDailyWithdrawalLogs() || []) : [];
+  const pendingRecharges = (transactions || []).filter(t => t.type === 'RECHARGE' && t.status === 'PROCESSING');
+  const pendingWithdrawals = (transactions || []).filter(t => t.type === 'WITHDRAWAL' && t.status === 'PROCESSING');
+  const activeNodes = (investments || []).filter(i => i.status === 'ACTIVE');
+  const allWithdrawalsSum = (transactions || [])
     .filter(t => t.type === 'WITHDRAWAL')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const allFeesSum = transactions
+  const allFeesSum = (transactions || [])
     .filter(t => t.type === 'WITHDRAWAL')
     .reduce((sum, t) => sum + (t.fee || 0), 0);
-  const totalNetworkInvestment = teamMembers.reduce((sum, m) => sum + m.rechargeAmount, 0);
+  const totalNetworkInvestment = (teamMembers || []).reduce((sum, m) => sum + (m.rechargeAmount || 0), 0);
 
   // Filtered members list
-  const filteredMembers = teamMembers.filter(m => {
+  const filteredMembers = (teamMembers || []).filter(m => {
     const matchesSearch = 
       m.phone.toLowerCase().includes(networkSearch.toLowerCase()) ||
       m.id.toLowerCase().includes(networkSearch.toLowerCase()) ||
@@ -718,16 +719,36 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   // ================= 2. FULL AUTHORIZED ADMIN PANEL =================
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex flex-col overflow-hidden text-slate-900">
-      {/* Toast Notification */}
+      {/* High-Visibility Toast Notification (Top-Center, Above All Modals & Headers) */}
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-60 animate-in slide-in-from-top-4 fade-in duration-200">
-          <div className={`px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-sm font-bold border ${
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[99999] max-w-md w-full px-4 pointer-events-none animate-in slide-in-from-top-6 fade-in duration-200">
+          <div className={`pointer-events-auto px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 text-sm font-bold border backdrop-blur-md ${
             toastMessage.type === 'success' 
-              ? 'bg-emerald-600 text-white border-emerald-500' 
-              : 'bg-rose-600 text-white border-rose-500'
+              ? 'bg-slate-900 text-white border-emerald-500/80 shadow-emerald-950/30 ring-1 ring-emerald-500/50' 
+              : 'bg-slate-900 text-white border-rose-500 shadow-rose-950/40 ring-2 ring-rose-500/80'
           }`}>
-            {toastMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-            <span>{toastMessage.text}</span>
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                toastMessage.type === 'success' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+              }`}>
+                {toastMessage.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+              </div>
+              <div>
+                <p className={`text-xs font-bold leading-tight ${
+                  toastMessage.type === 'success' ? 'text-emerald-300' : 'text-rose-300'
+                }`}>
+                  {toastMessage.type === 'success' ? 'Success' : 'Notice'}
+                </p>
+                <p className="text-xs text-white font-medium">{toastMessage.text}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="text-slate-400 hover:text-white p-1 rounded-lg transition shrink-0 cursor-pointer"
+              title="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -799,7 +820,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <span>Users</span>
               </button>
 
-              {/* Referral Codes */}
+              {/* Referrals */}
               <button
                 onClick={() => setActiveTab('referrals')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
@@ -809,27 +830,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 }`}
               >
                 <Gift className="w-4 h-4 shrink-0" />
-                <span>Referral Codes</span>
-              </button>
-
-              {/* Cadre Rewards */}
-              <button
-                onClick={() => setActiveTab('cadres')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                  activeTab === 'cadres'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-4 h-4 shrink-0" />
-                  <span>Cadre Rewards</span>
-                </div>
-                {cadreClaims.filter(c => !c.isCredited).length > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-purple-500 text-white text-[10px] font-black">
-                    {cadreClaims.filter(c => !c.isCredited).length}
-                  </span>
-                )}
+                <span>Referrals</span>
               </button>
 
               {/* Wallets */}
@@ -883,6 +884,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     {pendingRecharges.length}
                   </span>
                 )}
+              </button>
+
+              {/* Recharge Details / UPI Gateway (Admin page for website recharge settings) */}
+              <button
+                onClick={() => setActiveTab('rechargeGateway')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'rechargeGateway'
+                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <QrCode className="w-4 h-4 shrink-0" />
+                  <span>Recharge Details</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold">
+                  UPI & QR
+                </span>
               </button>
 
               {/* KYC Requests */}
@@ -1118,15 +1137,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               />
             )}
 
-            {/* TAB 2: CADRE REWARDS */}
-            {activeTab === 'cadres' && (
-              <AdminCadreRewardsView
-                cadreClaims={cadreClaims}
-                onCreditCadreReward={handleCreditCadreReward}
-                showToast={showToast}
-              />
-            )}
-
             {/* TAB 3: WALLETS (Bee Grow Wallet Management) */}
             {activeTab === 'wallets' && (
               <AdminWalletsView
@@ -1171,6 +1181,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   showToast(`Top-up rejected: ${reason}`);
                 }}
                 onExportCSV={exportToCSV}
+                showToast={showToast}
+                onNavigate={(tab) => setActiveTab(tab as any)}
+              />
+            )}
+
+            {/* TAB: RECHARGE GATEWAY & UPI DETAILS (For entering website recharge details) */}
+            {activeTab === 'rechargeGateway' && (
+              <AdminRechargeDetailsView
+                settings={platformSettings}
+                onSaveSettings={(s) => {
+                  updatePlatformSettings(s);
+                  showToast('Recharge details updated and live on website!');
+                }}
                 showToast={showToast}
               />
             )}

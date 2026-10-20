@@ -29,6 +29,42 @@ export interface PlatformSettings {
   telegramSupportUrl: string;
   telegramChannelUrl: string;
   platformAnnouncement: string;
+
+  // Recharge / Deposit Gateway Configuration
+  rechargeUpiId?: string;
+  rechargePayeeName?: string;
+  rechargeBankName?: string;
+  rechargeQrImageUrl?: string;
+  rechargeAccountHolder?: string;
+  rechargeAccountNumber?: string;
+  rechargeIfscCode?: string;
+  rechargeInstructions?: string;
+  rechargeQuickAmounts?: number[];
+  rechargeGatewayActive?: boolean;
+
+  // Multiple QR Codes & Multiple Bank Accounts
+  rechargeQrList?: AdminRechargeQrCode[];
+  rechargeBankList?: AdminRechargeBankAccount[];
+}
+
+export interface AdminRechargeQrCode {
+  id: string;
+  label: string; // e.g. "UPI Option 1 (PhonePe / GPay)", "Scanner 2 (Paytm / BHIM)"
+  upiId: string;
+  payeeName: string;
+  qrImageUrl?: string; // Optional custom uploaded QR image
+  isActive: boolean;
+}
+
+export interface AdminRechargeBankAccount {
+  id: string;
+  bankName: string;
+  accountHolder: string;
+  accountNumber: string;
+  ifscCode: string;
+  accountType?: string; // "Current Account" | "Savings Account"
+  branch?: string;
+  isActive: boolean;
 }
 
 export interface UserInvestment {

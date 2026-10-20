@@ -43,7 +43,19 @@ export async function fetchPlatformSettings(): Promise<PlatformSettings | null> 
       enforceNextDayWithdrawalLock: Boolean(data.enforce_next_day_withdrawal_lock),
       telegramSupportUrl: data.telegram_support_url,
       telegramChannelUrl: data.telegram_channel_url,
-      platformAnnouncement: data.platform_announcement
+      platformAnnouncement: data.platform_announcement,
+      rechargeUpiId: data.recharge_upi_id || 'robovest.payments@hdfcbank',
+      rechargePayeeName: data.recharge_payee_name || 'FanCode Payments',
+      rechargeBankName: data.recharge_bank_name || 'HDFC Bank',
+      rechargeQrImageUrl: data.recharge_qr_image_url || '',
+      rechargeAccountHolder: data.recharge_account_holder || '',
+      rechargeAccountNumber: data.recharge_account_number || '',
+      rechargeIfscCode: data.recharge_ifsc_code || '',
+      rechargeInstructions: data.recharge_instructions || '',
+      rechargeQuickAmounts: data.recharge_quick_amounts || [520, 1999, 2100, 5999, 8200, 17960],
+      rechargeGatewayActive: data.recharge_gateway_active !== undefined ? Boolean(data.recharge_gateway_active) : true,
+      rechargeQrList: data.recharge_qr_list || undefined,
+      rechargeBankList: data.recharge_bank_list || undefined,
     };
   } catch (e) {
     console.error('fetchPlatformSettings exception:', e);
@@ -65,10 +77,29 @@ export async function updatePlatformSettingsDB(settings: Partial<PlatformSetting
     if (settings.telegramSupportUrl !== undefined) payload.telegram_support_url = settings.telegramSupportUrl;
     if (settings.telegramChannelUrl !== undefined) payload.telegram_channel_url = settings.telegramChannelUrl;
     if (settings.platformAnnouncement !== undefined) payload.platform_announcement = settings.platformAnnouncement;
+    if (settings.rechargeUpiId !== undefined) payload.recharge_upi_id = settings.rechargeUpiId;
+    if (settings.rechargePayeeName !== undefined) payload.recharge_payee_name = settings.rechargePayeeName;
+    if (settings.rechargeBankName !== undefined) payload.recharge_bank_name = settings.rechargeBankName;
+    if (settings.rechargeQrImageUrl !== undefined) payload.recharge_qr_image_url = settings.rechargeQrImageUrl;
+    if (settings.rechargeAccountHolder !== undefined) payload.recharge_account_holder = settings.rechargeAccountHolder;
+    if (settings.rechargeAccountNumber !== undefined) payload.recharge_account_number = settings.rechargeAccountNumber;
+    if (settings.rechargeIfscCode !== undefined) payload.recharge_ifsc_code = settings.rechargeIfscCode;
+    if (settings.rechargeInstructions !== undefined) payload.recharge_instructions = settings.rechargeInstructions;
+    if (settings.rechargeQuickAmounts !== undefined) payload.recharge_quick_amounts = settings.rechargeQuickAmounts;
+    if (settings.rechargeGatewayActive !== undefined) payload.recharge_gateway_active = settings.rechargeGatewayActive;
+    if (settings.rechargeQrList !== undefined) payload.recharge_qr_list = settings.rechargeQrList;
+    if (settings.rechargeBankList !== undefined) payload.recharge_bank_list = settings.rechargeBankList;
 
-    const { error } = await supabase
+    let { error } = await supabase
       .from('platform_settings')
       .upsert({ id: 'default', ...payload });
+
+    if (error && (error.message?.includes('recharge_qr_list') || error.message?.includes('recharge_bank_list'))) {
+      delete payload.recharge_qr_list;
+      delete payload.recharge_bank_list;
+      const retry = await supabase.from('platform_settings').upsert({ id: 'default', ...payload });
+      error = retry.error;
+    }
 
     if (error) {
       console.error('Error updating platform settings:', error.message);
