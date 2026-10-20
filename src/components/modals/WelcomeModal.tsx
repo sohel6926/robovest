@@ -14,12 +14,12 @@ import {
 } from 'lucide-react';
 
 export const WelcomeModal: React.FC = () => {
-  const { showWelcomeModal, setShowWelcomeModal, setShowCustomerCare, catalog } = useApp();
+  const { showWelcomeModal, setShowWelcomeModal, setShowCustomerCare, catalog, platformSettings } = useApp();
 
   if (!showWelcomeModal) return null;
 
-  const plan1 = catalog.find(p => p.id === 'A');
-  const plan2 = catalog.find(p => p.id === 'B');
+  const plan1 = catalog[0] || catalog.find(p => p.id === 'A');
+  const plan2 = catalog[1] || catalog.find(p => p.id === 'B');
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-300">
@@ -99,7 +99,7 @@ export const WelcomeModal: React.FC = () => {
                     Min Recharge
                   </span>
                   <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-orange-50 border border-orange-200/80 text-[#FF4A00] font-black text-xs shadow-xs">
-                    ₹520
+                    ₹{(platformSettings?.minRecharge || 520).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -114,7 +114,7 @@ export const WelcomeModal: React.FC = () => {
                     Min Withdrawal
                   </span>
                   <div className="mt-0.5 inline-block px-2.5 py-0.5 rounded-md bg-orange-50 border border-orange-200/80 text-[#FF4A00] font-black text-xs shadow-xs">
-                    ₹150
+                    ₹{(platformSettings?.minWithdrawal || 150).toLocaleString()}
                   </div>
                 </div>
               </div>

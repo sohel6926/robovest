@@ -119,7 +119,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
       {/* 4. Products Catalog List */}
       <div className="space-y-3.5 px-3 mt-3.5">
-        {catalog.map((product) => {
+        {catalog.filter(p => p.isActive !== false).map((product) => {
           const ownedCount = getProductOwnedCount(product.id);
           const isProductA = product.id === 'A';
 

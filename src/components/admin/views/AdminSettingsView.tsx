@@ -31,8 +31,8 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
     'Friday',
     'Saturday',
   ]);
-  const [withdrawalStart, setWithdrawalStart] = useState('06:00');
-  const [withdrawalEnd, setWithdrawalEnd] = useState('13:00');
+  const [withdrawalStart, setWithdrawalStart] = useState(settings?.dailyWithdrawalWindowStart || '00:30');
+  const [withdrawalEnd, setWithdrawalEnd] = useState(settings?.dailyWithdrawalWindowEnd || '17:00');
 
   const [topupDays, setTopupDays] = useState<string[]>([
     'Monday',
@@ -46,7 +46,15 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
   const [topupStart, setTopupStart] = useState('00:00');
   const [topupEnd, setTopupEnd] = useState('23:59');
 
-  const [tdsPercent, setTdsPercent] = useState<number>(5);
+  const [tdsPercent, setTdsPercent] = useState<number>(settings?.withdrawalFeePercent || 10);
+
+  React.useEffect(() => {
+    if (settings) {
+      if (settings.dailyWithdrawalWindowStart) setWithdrawalStart(settings.dailyWithdrawalWindowStart);
+      if (settings.dailyWithdrawalWindowEnd) setWithdrawalEnd(settings.dailyWithdrawalWindowEnd);
+      if (settings.withdrawalFeePercent !== undefined) setTdsPercent(settings.withdrawalFeePercent);
+    }
+  }, [settings]);
 
   const toggleWithdrawalDay = (day: string) => {
     setWithdrawalDays(prev => 

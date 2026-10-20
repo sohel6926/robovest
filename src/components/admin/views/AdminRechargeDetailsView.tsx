@@ -89,6 +89,49 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
       'Scan using PhonePe, Google Pay, Paytm, or BHIM. After payment is successful, enter the 12-digit UTR transaction reference number below.'
   );
 
+  React.useEffect(() => {
+    if (settings) {
+      if (settings.rechargeGatewayActive !== undefined) {
+        setGatewayActive(settings.rechargeGatewayActive);
+      }
+      if (settings.rechargeQrList && settings.rechargeQrList.length > 0) {
+        setQrList(settings.rechargeQrList);
+      } else if (settings.rechargeUpiId) {
+        setQrList([{
+          id: 'qr-1',
+          label: 'Primary UPI Gateway (PhonePe / GPay / BHIM)',
+          upiId: settings.rechargeUpiId,
+          payeeName: settings.rechargePayeeName || 'FanCode Payments',
+          qrImageUrl: settings.rechargeQrImageUrl || '',
+          isActive: true,
+        }]);
+      }
+      if (settings.rechargeBankList && settings.rechargeBankList.length > 0) {
+        setBankList(settings.rechargeBankList);
+      } else if (settings.rechargeAccountNumber) {
+        setBankList([{
+          id: 'bank-1',
+          bankName: settings.rechargeBankName || 'HDFC Bank',
+          accountHolder: settings.rechargeAccountHolder || 'Robovest Technologies Pvt Ltd',
+          accountNumber: settings.rechargeAccountNumber,
+          ifscCode: settings.rechargeIfscCode || 'HDFC0000128',
+          accountType: 'Current Account',
+          branch: 'Indiranagar Branch',
+          isActive: true,
+        }]);
+      }
+      if (settings.minRecharge !== undefined) {
+        setMinRecharge(settings.minRecharge);
+      }
+      if (settings.rechargeQuickAmounts && settings.rechargeQuickAmounts.length > 0) {
+        setQuickAmounts(settings.rechargeQuickAmounts.join(', '));
+      }
+      if (settings.rechargeInstructions !== undefined) {
+        setInstructions(settings.rechargeInstructions);
+      }
+    }
+  }, [settings]);
+
   // Modal / Form state for Add / Edit QR Code
   const [editingQrId, setEditingQrId] = useState<string | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState<boolean>(false);
