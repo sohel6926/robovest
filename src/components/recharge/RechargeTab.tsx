@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, Check, QrCode, Copy, CheckCircle2, Building2, AlertTriangle, Info } from 'lucide-react';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { PaymentPage } from './PaymentPage';
 
 interface RechargeTabProps {
   onBack: () => void;
@@ -56,13 +57,16 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
 
   const [selectedAmount, setSelectedAmount] = useState<number>(minRec);
   const [customInput, setCustomInput] = useState<string>(minRec.toString());
-  const [showPaymentSheet, setShowPaymentSheet] = useState<boolean>(false);
-  const [paymentTab, setPaymentTab] = useState<'upi' | 'bank'>('upi');
-  const [utrNumber, setUtrNumber] = useState<string>('827192039182');
-  const [copiedUpi, setCopiedUpi] = useState<boolean>(false);
-  const [copiedAccount, setCopiedAccount] = useState<boolean>(false);
-  const [copiedIfsc, setCopiedIfsc] = useState<boolean>(false);
+  const [showPaymentPage, setShowPaymentPage] = useState<boolean>(false);
+  const [utrNumber, setUtrNumber] = useState<string>('');
   const [paymentSuccessMsg, setPaymentSuccessMsg] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (minRec) {
+      setSelectedAmount(prev => (prev === 520 || prev < minRec ? minRec : prev));
+      setCustomInput(prev => (prev === '520' || Number(prev) < minRec ? minRec.toString() : prev));
+    }
+  }, [minRec]);
 
   const handlePresetClick = (val: number) => {
     setSelectedAmount(val);
@@ -89,7 +93,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
       alert(`Minimum recharge amount is ₹${minRec.toLocaleString()}.`);
       return;
     }
-    setShowPaymentSheet(true);
+    setShowPaymentPage(true);
   };
 
   const handleConfirmPayment = () => {
@@ -102,7 +106,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
       setPaymentSuccessMsg(result.message);
       setTimeout(() => {
         setPaymentSuccessMsg(null);
-        setShowPaymentSheet(false);
+        setShowPaymentPage(false);
         onBack();
       }, 1500);
     } else {
@@ -110,28 +114,24 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
     }
   };
 
-  const copyUpi = () => {
-    if (currentQr?.upiId) {
-      navigator.clipboard.writeText(currentQr.upiId);
-      setCopiedUpi(true);
-      setTimeout(() => setCopiedUpi(false), 2000);
-    }
-  };
 
-  const copyBankDetail = (text: string, type: 'acc' | 'ifsc') => {
-    navigator.clipboard.writeText(text);
-    if (type === 'acc') {
-      setCopiedAccount(true);
-      setTimeout(() => setCopiedAccount(false), 2000);
-    } else {
-      setCopiedIfsc(true);
-      setTimeout(() => setCopiedIfsc(false), 2000);
-    }
-  };
 
-  // Generate dynamic QR Code for the specific selected UPI ID and amount
-  const upiDeepLink = `upi://pay?pa=${encodeURIComponent(currentQr?.upiId || '')}&pn=${encodeURIComponent(currentQr?.payeeName || 'FanCode')}&am=${selectedAmount}&cu=INR`;
-  const displayQrSrc = currentQr?.qrImageUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiDeepLink)}`;
+  // If user clicked Continue to Pay, render the full payment page
+  if (showPaymentPage) {
+    return (
+      <PaymentPage
+        amount={selectedAmount}
+        qrList={effectiveQrList}
+        bankList={effectiveBankList}
+        instructions={instructions}
+        utrNumber={utrNumber}
+        onUtrChange={setUtrNumber}
+        onConfirm={handleConfirmPayment}
+        onBack={() => setShowPaymentPage(false)}
+        successMsg={paymentSuccessMsg}
+      />
+    );
+  }
 
   return (
     <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900 font-sans">
@@ -291,223 +291,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
         </button>
       </div>
 
-      {/* Simulated UPI & Instant Payment Drawer in Crisp White (Live data from Admin Panel) */}
-      {showPaymentSheet && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end justify-center p-0 animate-in fade-in">
-          <div className="w-full max-w-md bg-white border-t border-slate-200 rounded-t-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="w-12 h-1.5 rounded-full bg-slate-200 mx-auto" />
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Instant UPI Gateway</h3>
-                <p className="text-xs text-slate-500">Scan QR or Pay via any UPI App</p>
-              </div>
-              <div className="text-right">
-                <span className="text-xs text-slate-500">Amount</span>
-                <p className="text-lg font-black text-blue-600">₹{selectedAmount.toLocaleString()}</p>
-              </div>
-            </div>
-
-            {/* Optional Tab Toggle if Bank Details are provided */}
-            {effectiveBankList.length > 0 && (
-              <div className="flex rounded-xl bg-slate-100 p-0.5 text-xs font-bold border border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setPaymentTab('upi')}
-                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
-                    paymentTab === 'upi' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  UPI & QR Code {effectiveQrList.length > 1 ? `(${effectiveQrList.length})` : ''}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentTab('bank')}
-                  className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
-                    paymentTab === 'bank' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Direct Bank Transfer {effectiveBankList.length > 1 ? `(${effectiveBankList.length})` : ''}
-                </button>
-              </div>
-            )}
-
-            {paymentTab === 'upi' ? (
-              /* QR Simulation Card with Live Admin Details */
-              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 text-center space-y-3">
-                {/* Multi-QR Option Pills (if more than 1 active QR code exists) */}
-                {effectiveQrList.length > 1 && (
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar justify-center">
-                    {effectiveQrList.map((q, idx) => (
-                      <button
-                        key={q.id}
-                        type="button"
-                        onClick={() => setSelectedQrId(q.id)}
-                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition shrink-0 cursor-pointer ${
-                          currentQr?.id === q.id
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        {q.label || `Scanner ${idx + 1}`}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="w-40 h-40 mx-auto bg-white p-2 rounded-xl flex items-center justify-center shadow-xs border border-slate-200 overflow-hidden">
-                  {displayQrSrc ? (
-                    <img
-                      src={displayQrSrc}
-                      alt="UPI QR Code"
-                      className="w-36 h-36 object-contain"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <QrCode className="w-36 h-36 text-slate-900" />
-                  )}
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  {instructions || 'Scan using PhonePe, Google Pay, Paytm, or BHIM'}
-                </p>
-
-                {/* Live UPI ID with Instant Copy */}
-                <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
-                  <span className="text-slate-800 font-mono font-bold truncate mr-2">
-                    {currentQr?.upiId || 'No UPI ID configured'}
-                  </span>
-                  <button
-                    onClick={copyUpi}
-                    className="flex items-center gap-1 text-blue-600 font-bold hover:text-blue-700 shrink-0 cursor-pointer"
-                  >
-                    {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </div>
-
-                {currentQr?.payeeName && (
-                  <div className="text-[11px] text-slate-500">
-                    Payee: <span className="font-semibold text-slate-800">{currentQr.payeeName}</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* Bank Transfer Details */
-              <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                {/* Multi-Bank Option Pills (if more than 1 active bank account exists) */}
-                {effectiveBankList.length > 1 && (
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar justify-start">
-                    {effectiveBankList.map((b) => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setSelectedBankId(b.id)}
-                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition shrink-0 cursor-pointer ${
-                          currentBank?.id === b.id
-                            ? 'bg-purple-600 text-white shadow-xs'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        {b.bankName}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-purple-600" />
-                    <span className="font-bold text-slate-900">{currentBank?.bankName || 'Direct Bank IMPS / NEFT'}</span>
-                  </div>
-                  {currentBank?.accountType && (
-                    <span className="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
-                      {currentBank.accountType}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-slate-500 text-[11px]">Account Holder:</span>
-                  <span className="font-bold text-slate-900">{currentBank?.accountHolder}</span>
-                </div>
-
-                <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
-                  <span className="text-slate-500 text-[11px]">Account Number:</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-slate-900">{currentBank?.accountNumber}</span>
-                    <button
-                      onClick={() => copyBankDetail(currentBank?.accountNumber || '', 'acc')}
-                      className="text-blue-600 text-[11px] font-bold cursor-pointer"
-                    >
-                      {copiedAccount ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
-                  <span className="text-slate-500 text-[11px]">IFSC Code:</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-blue-600">{currentBank?.ifscCode}</span>
-                    <button
-                      onClick={() => copyBankDetail(currentBank?.ifscCode || '', 'ifsc')}
-                      className="text-blue-600 text-[11px] font-bold cursor-pointer"
-                    >
-                      {copiedIfsc ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-                </div>
-
-                {currentBank?.branch && (
-                  <div className="flex justify-between items-center py-1 border-t border-slate-200/60">
-                    <span className="text-slate-500 text-[11px]">Branch:</span>
-                    <span className="text-slate-700 font-medium">{currentBank.branch}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* UTR Input Form */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
-                <span>12-Digit UTR / Transaction Reference</span>
-                <span className="text-[10px] text-blue-600 font-medium">Pre-generated for test</span>
-              </label>
-              <input
-                type="text"
-                value={utrNumber}
-                onChange={(e) => setUtrNumber(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-mono text-slate-900 focus:outline-none focus:border-blue-600"
-                placeholder="Enter 12-digit UTR"
-              />
-            </div>
-
-            {paymentSuccessMsg && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{paymentSuccessMsg}</span>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={() => setShowPaymentSheet(false)}
-                className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmPayment}
-                className="flex-2 py-3 rounded-xl bg-[#fe4600] hover:bg-[#ea3f00] text-white font-extrabold text-xs shadow-md shadow-orange-500/20 active:scale-95 transition"
-              >
-                Confirm Payment & Submit UTR
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
