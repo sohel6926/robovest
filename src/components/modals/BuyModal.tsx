@@ -11,7 +11,8 @@ export const BuyModal: React.FC = () => {
     user, 
     canInvestInProduct, 
     getProductOwnedCount,
-    setShowOrdersModal
+    setShowOrdersModal,
+    navigateToRecharge,
   } = useApp();
 
   const [quantity, setQuantity] = useState<number>(1);
@@ -206,11 +207,11 @@ export const BuyModal: React.FC = () => {
           <button
             onClick={() => {
               setShowBuyModal(null);
-              alert('Please recharge your wallet balance first.');
+              navigateToRecharge();
             }}
-            className="w-full py-3.5 rounded-2xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition"
+            className="w-full py-3.5 rounded-2xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition flex items-center justify-center gap-2"
           >
-            Insufficient Balance (Recharge Needed)
+            Insufficient Balance — Recharge
           </button>
         ) : (
           <button

@@ -34,6 +34,7 @@ const AppContent: React.FC = () => {
     setShowCustomerCare,
     showAdminPanel,
     setShowAdminPanel,
+    setNavigateToRechargeFn,
   } = useApp();
 
   const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>('none');
@@ -52,6 +53,12 @@ const AppContent: React.FC = () => {
   const handleOpenRecharge = () => {
     setCurrentSubView('recharge');
   };
+
+  // Register with context so any component (e.g. BuyModal) can trigger recharge navigation
+  React.useEffect(() => {
+    setNavigateToRechargeFn(handleOpenRecharge);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleOpenWithdraw = () => {
     setCurrentSubView('withdraw');

@@ -118,6 +118,8 @@ interface AppContextType {
 
   // DAILY WITHDRAWAL LOGS
   getDailyWithdrawalLogs: () => DailyWithdrawalLog[];
+  navigateToRecharge: () => void;
+  setNavigateToRechargeFn: (fn: () => void) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -396,6 +398,9 @@ export function calculateDaysPassed(
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'invite' | 'contact' | 'team' | 'profile'>('home');
+  const navigateToRechargeRef = React.useRef<() => void>(() => {});
+  const navigateToRecharge = () => navigateToRechargeRef.current();
+  const setNavigateToRechargeFn = (fn: () => void) => { navigateToRechargeRef.current = fn; };
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(true);
   const [showBuyModal, setShowBuyModal] = useState<InvestmentProduct | null>(null);
   const [showCustomerCare, setShowCustomerCare] = useState<boolean>(false);
@@ -543,13 +548,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (!isMounted) return;
 
         if (remoteSettings) {
-          setPlatformSettings(remoteSettings);
+          setPlatformSettings(prev => ({
+            ...prev,
+            ...remoteSettings,
+            rechargeQrList: (remoteSettings.rechargeQrList && remoteSettings.rechargeQrList.length > 0)
+              ? remoteSettings.rechargeQrList
+              : (prev.rechargeQrList && prev.rechargeQrList.length > 0 ? prev.rechargeQrList : DEFAULT_SETTINGS.rechargeQrList),
+            rechargeBankList: (remoteSettings.rechargeBankList && remoteSettings.rechargeBankList.length > 0)
+              ? remoteSettings.rechargeBankList
+              : (prev.rechargeBankList && prev.rechargeBankList.length > 0 ? prev.rechargeBankList : DEFAULT_SETTINGS.rechargeBankList),
+          }));
         }
         if (remoteProducts && remoteProducts.length > 0) {
-          setCatalog(remoteProducts.map(p => ({
+          const resolved = remoteProducts.map(p => ({
             ...p,
             image: resolveProductImage(p.id, p.image)
-          })));
+          }));
+          setCatalog(resolved);
+          try {
+            localStorage.setItem('fancode_catalog_v3', JSON.stringify(resolved));
+          } catch (e) {
+            console.error('Failed to sync catalog to localStorage', e);
+          }
         }
         if (remoteUserData) {
           setUser(remoteUserData.user);
@@ -1165,25 +1185,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addPlan = (plan: InvestmentProduct) => {
     const id = plan.id ? plan.id.trim().toUpperCase() : `PLAN-${Date.now().toString().slice(-4)}`;
     
-    if (catalog.some(p => p.id === id)) {
+    if (catalog.some(p => p.id.toUpperCase() === id.toUpperCase())) {
       return { success: false, message: `A plan with ID "${id}" already exists. Please choose a different ID.` };
     }
 
     const newPlan: InvestmentProduct = {
       ...plan,
       id,
+      name: plan.name || `Plan ${id}`,
+      tagline: plan.tagline || plan.name || '',
+      robotModel: plan.robotModel || plan.name || '',
       durationDays: Number(plan.durationDays) || 150,
       price: Number(plan.price) || 500,
       dailyIncome: Number(plan.dailyIncome) || 100,
       bonus: Number(plan.bonus) || 0,
-      totalReturn: Number(plan.totalReturn) || (Number(plan.dailyIncome) * Number(plan.durationDays)),
+      totalReturn: Number(plan.totalReturn) || ((Number(plan.dailyIncome) || 100) * (Number(plan.durationDays) || 150)),
       minPurchase: Number(plan.minPurchase) || 1,
       maxPurchase: Number(plan.maxPurchase) || 10,
+      requiresPriorInvestment: Boolean(plan.requiresPriorInvestment),
       specs: Array.isArray(plan.specs) && plan.specs.length > 0 ? plan.specs : ['High ROI Yield', 'Autonomous Fleet Node'],
       isActive: plan.isActive !== undefined ? plan.isActive : true,
+      image: plan.image || '',
+      imagePosition: plan.imagePosition || 'object-center',
+      tier: plan.tier || 'STANDARD',
     };
 
-    setCatalog(prev => [...prev, newPlan]);
+    const newCatalog = [...catalog, newPlan];
+    setCatalog(newCatalog);
+    try {
+      localStorage.setItem('fancode_catalog_v3', JSON.stringify(newCatalog));
+    } catch (e) {
+      console.error('Failed to save catalog to localStorage', e);
+    }
 
     // Persist to Supabase
     saveInvestmentProductDB(newPlan);
@@ -1193,36 +1226,60 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // 2. Update Plan
   const updatePlan = (id: string, updatedPlan: Partial<InvestmentProduct>) => {
-    const exists = catalog.some(p => p.id === id);
-    if (!exists) return { success: false, message: 'Plan not found.' };
+    const existingIndex = catalog.findIndex(p => p.id.toUpperCase() === id.toUpperCase());
+    if (existingIndex === -1) return { success: false, message: `Plan "${id}" not found.` };
 
-    let updatedInstance: InvestmentProduct | null = null;
+    const currentPlan = catalog[existingIndex];
+    const dailyIncomeVal = updatedPlan.dailyIncome !== undefined ? Number(updatedPlan.dailyIncome) : currentPlan.dailyIncome;
+    const durationDaysVal = updatedPlan.durationDays !== undefined ? Number(updatedPlan.durationDays) : currentPlan.durationDays;
 
-    setCatalog(prev =>
-      prev.map(p => {
-        if (p.id !== id) return p;
-        const merged = { ...p, ...updatedPlan };
-        if (updatedPlan.dailyIncome || updatedPlan.durationDays) {
-          if (!updatedPlan.totalReturn) {
-            merged.totalReturn = (Number(merged.dailyIncome) || 0) * (Number(merged.durationDays) || 150);
-          }
-        }
-        updatedInstance = merged;
-        return merged;
-      })
-    );
+    const merged: InvestmentProduct = {
+      ...currentPlan,
+      ...updatedPlan,
+      id: currentPlan.id,
+      name: updatedPlan.name || currentPlan.name,
+      tagline: updatedPlan.tagline || currentPlan.tagline || currentPlan.name,
+      robotModel: updatedPlan.robotModel || currentPlan.robotModel || currentPlan.name,
+      price: updatedPlan.price !== undefined ? Number(updatedPlan.price) : currentPlan.price,
+      dailyIncome: dailyIncomeVal,
+      durationDays: durationDaysVal,
+      bonus: updatedPlan.bonus !== undefined ? Number(updatedPlan.bonus) : currentPlan.bonus,
+      totalReturn: updatedPlan.totalReturn !== undefined ? Number(updatedPlan.totalReturn) : (dailyIncomeVal * durationDaysVal),
+      minPurchase: updatedPlan.minPurchase !== undefined ? Number(updatedPlan.minPurchase) : currentPlan.minPurchase,
+      maxPurchase: updatedPlan.maxPurchase !== undefined ? Number(updatedPlan.maxPurchase) : currentPlan.maxPurchase,
+      requiresPriorInvestment: updatedPlan.requiresPriorInvestment !== undefined ? Boolean(updatedPlan.requiresPriorInvestment) : Boolean(currentPlan.requiresPriorInvestment),
+      isActive: updatedPlan.isActive !== undefined ? Boolean(updatedPlan.isActive) : (currentPlan.isActive !== false),
+      specs: Array.isArray(updatedPlan.specs) && updatedPlan.specs.length > 0 ? updatedPlan.specs : currentPlan.specs,
+      image: updatedPlan.image || currentPlan.image,
+      imagePosition: updatedPlan.imagePosition || currentPlan.imagePosition || 'object-center',
+      tier: updatedPlan.tier || currentPlan.tier || 'STANDARD',
+    };
 
-    // Persist to Supabase
-    if (updatedInstance) {
-      saveInvestmentProductDB(updatedInstance);
+    const newCatalog = [...catalog];
+    newCatalog[existingIndex] = merged;
+
+    setCatalog(newCatalog);
+    try {
+      localStorage.setItem('fancode_catalog_v3', JSON.stringify(newCatalog));
+    } catch (e) {
+      console.error('Failed to save catalog to localStorage', e);
     }
 
-    return { success: true, message: `Plan "${id}" updated successfully!` };
+    // Persist to Supabase
+    saveInvestmentProductDB(merged);
+
+    return { success: true, message: `Plan "${merged.name}" (${merged.id}) updated successfully!` };
   };
 
   // 3. Delete Plan
   const deletePlan = (id: string) => {
-    setCatalog(prev => prev.filter(p => p.id !== id));
+    const newCatalog = catalog.filter(p => p.id.toUpperCase() !== id.toUpperCase());
+    setCatalog(newCatalog);
+    try {
+      localStorage.setItem('fancode_catalog_v3', JSON.stringify(newCatalog));
+    } catch (e) {
+      console.error('Failed to save catalog to localStorage', e);
+    }
 
     // Persist to Supabase
     deleteInvestmentProductDB(id);
@@ -1233,6 +1290,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // 4. Reset Catalog to Default
   const resetCatalogToDefault = () => {
     setCatalog(PRODUCTS_CATALOG);
+    try {
+      localStorage.setItem('fancode_catalog_v3', JSON.stringify(PRODUCTS_CATALOG));
+    } catch (e) {
+      console.error('Failed to save catalog to localStorage', e);
+    }
     PRODUCTS_CATALOG.forEach(p => saveInvestmentProductDB(p));
   };
 
@@ -1773,6 +1835,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         deleteMemberPlan,
         resetTeamToDefault,
         getDailyWithdrawalLogs,
+        navigateToRecharge,
+        setNavigateToRechargeFn,
       }}
     >
       {children}
