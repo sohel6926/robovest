@@ -532,7 +532,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => {
     try {
       const saved = localStorage.getItem('fancode_settings') || localStorage.getItem('robovest_settings');
-      if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.telegramChannelUrl) {
+          parsed.telegramChannelUrl = String(parsed.telegramChannelUrl).replace(/robovest/gi, 'fancode');
+        }
+        if (parsed.telegramSupportUrl) {
+          parsed.telegramSupportUrl = String(parsed.telegramSupportUrl).replace(/robovest/gi, 'fancode');
+        }
+        if (parsed.rechargeUpiId) {
+          parsed.rechargeUpiId = String(parsed.rechargeUpiId).replace(/robovest/gi, 'fancode');
+        }
+        if (parsed.platformAnnouncement) {
+          parsed.platformAnnouncement = String(parsed.platformAnnouncement).replace(/robovest/gi, 'fancode');
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      }
     } catch (e) {
       console.error('Failed to parse settings from storage', e);
     }
@@ -647,6 +662,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setPlatformSettings(prev => ({
             ...prev,
             ...remoteSettings,
+            telegramChannelUrl: remoteSettings.telegramChannelUrl ? remoteSettings.telegramChannelUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_official',
+            telegramSupportUrl: remoteSettings.telegramSupportUrl ? remoteSettings.telegramSupportUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_support',
             rechargeQrList: (remoteSettings.rechargeQrList && remoteSettings.rechargeQrList.length > 0)
               ? remoteSettings.rechargeQrList
               : (prev.rechargeQrList && prev.rechargeQrList.length > 0 ? prev.rechargeQrList : DEFAULT_SETTINGS.rechargeQrList),

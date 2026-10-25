@@ -335,7 +335,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   });
 
   // Settings State
-  const [settingsFormData, setSettingsFormData] = useState<PlatformSettings>({ ...platformSettings });
+  const [settingsFormData, setSettingsFormData] = useState<PlatformSettings>(() => ({
+    ...platformSettings,
+    telegramChannelUrl: platformSettings.telegramChannelUrl ? platformSettings.telegramChannelUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_official',
+    telegramSupportUrl: platformSettings.telegramSupportUrl ? platformSettings.telegramSupportUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_support',
+  }));
+
+  useEffect(() => {
+    if (platformSettings) {
+      setSettingsFormData(prev => ({
+        ...prev,
+        ...platformSettings,
+        telegramChannelUrl: platformSettings.telegramChannelUrl ? platformSettings.telegramChannelUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_official',
+        telegramSupportUrl: platformSettings.telegramSupportUrl ? platformSettings.telegramSupportUrl.replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_support',
+      }));
+    }
+  }, [platformSettings]);
 
   // Handle Login
   const handleAdminLogin = async (e?: React.FormEvent) => {

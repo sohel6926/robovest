@@ -41,20 +41,22 @@ export async function fetchPlatformSettings(): Promise<PlatformSettings | null> 
       dailyWithdrawalWindowStart: data.daily_withdrawal_window_start,
       dailyWithdrawalWindowEnd: data.daily_withdrawal_window_end,
       enforceNextDayWithdrawalLock: Boolean(data.enforce_next_day_withdrawal_lock),
-      telegramSupportUrl: data.telegram_support_url,
-      telegramChannelUrl: data.telegram_channel_url,
-      platformAnnouncement: data.platform_announcement,
-      rechargeUpiId: data.recharge_upi_id || 'fancode.payments@hdfcbank',
+      telegramSupportUrl: data.telegram_support_url ? String(data.telegram_support_url).replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_support',
+      telegramChannelUrl: data.telegram_channel_url ? String(data.telegram_channel_url).replace(/robovest/gi, 'fancode') : 'https://t.me/fancode_official',
+      platformAnnouncement: data.platform_announcement ? String(data.platform_announcement).replace(/robovest/gi, 'FanCode') : 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
+      rechargeUpiId: (data.recharge_upi_id || 'fancode.payments@hdfcbank').replace(/robovest/gi, 'fancode'),
       rechargePayeeName: data.recharge_payee_name || 'FanCode Payments',
       rechargeBankName: data.recharge_bank_name || 'HDFC Bank',
       rechargeQrImageUrl: data.recharge_qr_image_url || '',
-      rechargeAccountHolder: data.recharge_account_holder || '',
+      rechargeAccountHolder: data.recharge_account_holder ? String(data.recharge_account_holder).replace(/robovest/gi, 'FanCode') : '',
       rechargeAccountNumber: data.recharge_account_number || '',
       rechargeIfscCode: data.recharge_ifsc_code || '',
       rechargeInstructions: data.recharge_instructions || '',
       rechargeQuickAmounts: data.recharge_quick_amounts || [520, 1999, 2100, 5999, 8200, 17960],
       rechargeGatewayActive: data.recharge_gateway_active !== undefined ? Boolean(data.recharge_gateway_active) : true,
-      rechargeQrList: (Array.isArray(data.recharge_qr_list) && data.recharge_qr_list.length > 0) ? data.recharge_qr_list : undefined,
+      rechargeQrList: (Array.isArray(data.recharge_qr_list) && data.recharge_qr_list.length > 0)
+        ? data.recharge_qr_list.map((q: any) => ({ ...q, upiId: (q.upiId || '').replace(/robovest/gi, 'fancode') }))
+        : undefined,
       rechargeBankList: (Array.isArray(data.recharge_bank_list) && data.recharge_bank_list.length > 0) ? data.recharge_bank_list : undefined,
     };
   } catch (e) {
