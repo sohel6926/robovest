@@ -1257,31 +1257,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
               {/* 4 Summary Stat Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Requested (Gross)</span>
-                  <span className="text-xl font-black text-slate-900 font-sans">₹{allWithdrawalsSum.toLocaleString()}</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                  <span className="text-xs font-semibold text-slate-500 block">Total Requested (Gross)</span>
+                  <div className="text-2xl font-black text-slate-900 font-sans tracking-tight mt-1">
+                    ₹ {allWithdrawalsSum.toLocaleString('en-IN')}
+                  </div>
+                  <span className="text-[11px] text-slate-400 block mt-1 font-sans">All-time gross volume</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">10% Platform Fees Retained</span>
-                  <span className="text-xl font-black text-blue-600 font-sans">₹{allFeesSum.toLocaleString()}</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                  <span className="text-xs font-semibold text-slate-500 block">10% Platform Fees Retained</span>
+                  <div className="text-2xl font-black text-[#FF4A00] font-sans tracking-tight mt-1">
+                    ₹ {allFeesSum.toLocaleString('en-IN')}
+                  </div>
+                  <span className="text-[11px] text-slate-400 block mt-1 font-sans">Platform revenue</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Net Money Disbursed</span>
-                  <span className="text-xl font-black text-emerald-600 font-sans">₹{(allWithdrawalsSum - allFeesSum).toLocaleString()}</span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                  <span className="text-xs font-semibold text-slate-500 block">Net Money Disbursed</span>
+                  <div className="text-2xl font-black text-emerald-600 font-sans tracking-tight mt-1">
+                    ₹ {(allWithdrawalsSum - allFeesSum).toLocaleString('en-IN')}
+                  </div>
+                  <span className="text-[11px] text-slate-400 block mt-1 font-sans">Disbursed to bank</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Pending Review</span>
-                  <span className={`text-xl font-black font-sans ${pendingWithdrawals.length > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                    ₹{pendingWithdrawals.reduce((s, t) => s + Math.abs(t.amount), 0).toLocaleString()} ({pendingWithdrawals.length})
-                  </span>
+                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                  <span className="text-xs font-semibold text-slate-500 block">Pending Review</span>
+                  <div className={`text-2xl font-black font-sans tracking-tight mt-1 ${pendingWithdrawals.length > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                    ₹ {pendingWithdrawals.reduce((s, t) => s + Math.abs(t.amount), 0).toLocaleString('en-IN')} ({pendingWithdrawals.length})
+                  </div>
+                  <span className="text-[11px] text-slate-400 block mt-1 font-sans">Awaiting approval</span>
                 </div>
               </div>
 
               {/* Day-By-Day Table */}
               <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-black">
+                  <table className="w-full text-left text-xs font-sans">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-black font-sans">
                       <tr>
                         <th className="p-3.5">Date</th>
                         <th className="p-3.5">Withdrawal Requests</th>
@@ -1301,40 +1311,40 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             <tr className="hover:bg-slate-50/70 transition">
                               <td className="p-3.5 font-bold font-sans text-slate-900">
                                 <div className="flex items-center gap-1.5">
-                                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                                  <Calendar className="w-3.5 h-3.5 text-[#FF4A00]" />
                                   <span>{log.formattedDate}</span>
                                 </div>
                                 <span className="text-[10px] text-slate-400 block font-normal">{log.date}</span>
                               </td>
                               <td className="p-3.5 font-bold font-sans">
-                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px]">
+                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px] font-semibold">
                                   {log.totalRequests} {log.totalRequests === 1 ? 'request' : 'requests'}
                                 </span>
                               </td>
-                              <td className="p-3.5 font-black font-sans text-slate-900 text-sm">
-                                ₹{log.totalRequested.toLocaleString()}
+                              <td className="p-3.5 font-black font-sans text-slate-900 text-sm tracking-tight">
+                                ₹ {log.totalRequested.toLocaleString('en-IN')}
                               </td>
-                              <td className="p-3.5 font-sans text-blue-600 font-bold">
-                                ₹{log.totalFees.toLocaleString()}
+                              <td className="p-3.5 font-sans text-[#FF4A00] font-bold text-sm tracking-tight">
+                                ₹ {log.totalFees.toLocaleString('en-IN')}
                               </td>
-                              <td className="p-3.5 font-sans text-emerald-600 font-black text-sm">
-                                ₹{log.totalNet.toLocaleString()}
+                              <td className="p-3.5 font-sans text-emerald-600 font-black text-sm tracking-tight">
+                                ₹ {log.totalNet.toLocaleString('en-IN')}
                               </td>
                               <td className="p-3.5">
                                 <div className="flex items-center gap-1.5 text-[11px] font-sans">
                                   {log.completedAmount > 0 && (
-                                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                      Done: ₹{log.completedAmount.toLocaleString()}
+                                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold tracking-tight">
+                                      Done: ₹ {log.completedAmount.toLocaleString('en-IN')}
                                     </span>
                                   )}
                                   {log.processingAmount > 0 && (
-                                    <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
-                                      Pending: ₹{log.processingAmount.toLocaleString()}
+                                    <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 animate-pulse font-semibold tracking-tight">
+                                      Pending: ₹ {log.processingAmount.toLocaleString('en-IN')}
                                     </span>
                                   )}
                                   {log.rejectedAmount > 0 && (
-                                    <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
-                                      Rejected: ₹{log.rejectedAmount.toLocaleString()}
+                                    <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 font-semibold tracking-tight">
+                                      Rejected: ₹ {log.rejectedAmount.toLocaleString('en-IN')}
                                     </span>
                                   )}
                                 </div>
@@ -1513,34 +1523,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         </div>
                         <p className="text-xs text-slate-500 truncate mt-0.5">{plan.robotModel}</p>
                         
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-base font-black text-blue-600 font-sans">
-                            ₹{plan.price.toLocaleString()}
+                        <div className="flex items-baseline gap-1.5 mt-1.5">
+                          <span className="text-lg font-black text-[#FF4A00] font-sans tracking-tight">
+                            ₹ {plan.price.toLocaleString('en-IN')}
                           </span>
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs font-semibold text-slate-400 font-sans">
                             /{plan.durationDays} Days
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-4 space-y-2 text-xs bg-slate-50/50">
+                    <div className="p-4 space-y-2 text-xs bg-slate-50/50 font-sans">
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-500">Daily Revenue:</span>
-                        <span className="font-black text-emerald-600 font-sans">
-                          ₹{plan.dailyIncome.toLocaleString()} / day
+                        <span className="text-xs font-semibold text-slate-500 font-sans">Daily Revenue:</span>
+                        <span className="font-black text-emerald-600 font-sans tracking-tight">
+                          ₹ {plan.dailyIncome.toLocaleString('en-IN')} / day
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-500">Total Return:</span>
-                        <span className="font-black text-blue-600 font-sans">
-                          ₹{(plan.totalReturn || plan.dailyIncome * plan.durationDays).toLocaleString()}
+                        <span className="text-xs font-semibold text-slate-500 font-sans">Total Return:</span>
+                        <span className="font-black text-[#FF4A00] font-sans tracking-tight">
+                          ₹ {(plan.totalReturn || plan.dailyIncome * plan.durationDays).toLocaleString('en-IN')}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-500">Instant Bonus:</span>
-                        <span className="font-bold text-amber-600 font-sans">
-                          ₹{plan.bonus.toLocaleString()}
+                        <span className="text-xs font-semibold text-slate-500 font-sans">Instant Bonus:</span>
+                        <span className="font-bold text-amber-600 font-sans tracking-tight">
+                          ₹ {plan.bonus.toLocaleString('en-IN')}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -2489,28 +2499,28 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </div>
 
                   {/* 4 Engine Metrics */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Active Robot Nodes</span>
-                      <span className="font-black text-lg text-white font-sans">{activeNodes.length} Units</span>
-                      <span className="text-[10px] text-slate-400 block">Cap: Duration check active</span>
+                      <span className="text-xs font-semibold text-slate-400 block font-sans">Active Robot Nodes</span>
+                      <div className="font-black text-2xl text-white font-sans tracking-tight mt-1">{activeNodes.length} Units</div>
+                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Cap: Duration check active</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Expected Node Yield</span>
-                      <span className="font-black text-lg text-emerald-400 font-sans">₹{totalDailyExpectedYield.toLocaleString()}</span>
-                      <span className="text-[10px] text-slate-400 block">Direct into user wallet</span>
+                      <span className="text-xs font-semibold text-slate-400 block font-sans">Expected Node Yield</span>
+                      <div className="font-black text-2xl text-emerald-400 font-sans tracking-tight mt-1">₹ {totalDailyExpectedYield.toLocaleString('en-IN')}</div>
+                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Direct into user wallet</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Downline Referral Comm.</span>
-                      <span className="font-black text-lg text-blue-400 font-sans">₹{totalEstimatedCommissions.toLocaleString()}</span>
-                      <span className="text-[10px] text-slate-400 block">L1 10% · L2 5% · L3 2%</span>
+                      <span className="text-xs font-semibold text-slate-400 block font-sans">Downline Referral Comm.</span>
+                      <div className="font-black text-2xl text-[#FF4A00] font-sans tracking-tight mt-1">₹ {totalEstimatedCommissions.toLocaleString('en-IN')}</div>
+                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">L1 10% · L2 5% · L3 2%</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Payout Volume</span>
-                      <span className="font-black text-lg text-amber-400 font-sans">
-                        ₹{(totalDailyExpectedYield + totalEstimatedCommissions).toLocaleString()}
-                      </span>
-                      <span className="text-[10px] text-slate-400 block">Simulated Time Synced</span>
+                      <span className="text-xs font-semibold text-slate-400 block font-sans">Total Payout Volume</span>
+                      <div className="font-black text-2xl text-amber-400 font-sans tracking-tight mt-1">
+                        ₹ {(totalDailyExpectedYield + totalEstimatedCommissions).toLocaleString('en-IN')}
+                      </div>
+                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Simulated Time Synced</span>
                     </div>
                   </div>
                 </div>
@@ -2521,17 +2531,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <h2 className="text-lg font-black text-slate-900 font-sans">
                       Active FanCode Plan Orders
                     </h2>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 font-sans">
                       Currently deployed plans generating daily revenue for User5294.
                     </p>
                   </div>
-                  <span className="px-3 py-1 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200">
+                  <span className="px-3 py-1 rounded-xl bg-orange-50 text-[#FF4A00] font-bold text-xs border border-orange-200 font-sans">
                     {investments.length} Active Contracts
                   </span>
                 </div>
 
                 {investments.length === 0 ? (
-                <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs">
+                <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs font-sans">
                   No active plan investments yet. User can purchase units from the catalog.
                 </div>
               ) : (
@@ -2551,14 +2561,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-black text-slate-900 text-sm font-sans">{inv.productName}</span>
-                              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px]">
+                              <span className="font-black text-slate-900 text-sm font-sans tracking-tight">{inv.productName}</span>
+                              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px] font-sans">
                                 Qty: {inv.quantity}
                               </span>
                             </div>
-                            <p className="text-xs text-slate-500 mt-0.5">{inv.robotModel}</p>
+                            <p className="text-xs text-slate-500 mt-0.5 font-sans">{inv.robotModel}</p>
                           </div>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black font-sans ${
                             inv.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
                           }`}>
                             {inv.status}
@@ -2567,16 +2577,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                         <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl text-xs font-sans">
                           <div>
-                            <span className="text-[10px] text-slate-400 block">Invested</span>
-                            <span className="font-bold text-slate-800">₹{inv.totalInvested.toLocaleString()}</span>
+                            <span className="text-xs font-semibold text-slate-500 block font-sans">Invested</span>
+                            <span className="font-black text-base text-slate-900 tracking-tight font-sans block mt-0.5">₹ {inv.totalInvested.toLocaleString('en-IN')}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-400 block">Daily Yield</span>
-                            <span className="font-bold text-emerald-600">₹{inv.dailyIncome.toLocaleString()}</span>
+                            <span className="text-xs font-semibold text-slate-500 block font-sans">Daily Yield</span>
+                            <span className="font-black text-base text-emerald-600 tracking-tight font-sans block mt-0.5">₹ {inv.dailyIncome.toLocaleString('en-IN')}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-400 block">Bonus Given</span>
-                            <span className="font-bold text-blue-600">₹{inv.bonusReceived.toLocaleString()}</span>
+                            <span className="text-xs font-semibold text-slate-500 block font-sans">Bonus Given</span>
+                            <span className="font-black text-base text-[#FF4A00] tracking-tight font-sans block mt-0.5">₹ {inv.bonusReceived.toLocaleString('en-IN')}</span>
                           </div>
                         </div>
 
@@ -2659,89 +2669,89 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                  <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 font-sans">
                     <Coins className="w-4 h-4 text-blue-600" />
                     <span>Deposit & Withdrawal Thresholds</span>
                   </h3>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                    <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                       Minimum Recharge Amount (₹)
                     </label>
                     <input
                       type="number"
                       value={settingsFormData.minRecharge}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, minRecharge: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-sans font-black text-slate-900 tracking-tight outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-[10px] text-slate-400 mt-0.5 block">Standard rule default: ₹520</span>
+                    <span className="text-[11px] text-slate-400 mt-1 block font-medium">Standard rule default: ₹ 520</span>
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                    <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                       Minimum Withdrawal Amount (₹)
                     </label>
                     <input
                       type="number"
                       value={settingsFormData.minWithdrawal}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, minWithdrawal: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-sans font-black text-slate-900 tracking-tight outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-[10px] text-slate-400 mt-0.5 block">Standard rule default: ₹150</span>
+                    <span className="text-[11px] text-slate-400 mt-1 block font-medium">Standard rule default: ₹ 150</span>
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                    <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                       Withdrawal Processing Fee Percentage (%)
                     </label>
                     <input
                       type="number"
                       value={settingsFormData.withdrawalFeePercent}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, withdrawalFeePercent: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-sans font-black text-slate-900 tracking-tight outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-[10px] text-slate-400 mt-0.5 block">Standard deduction: 10% fee</span>
+                    <span className="text-[11px] text-slate-400 mt-1 block font-medium">Standard deduction: 10% fee</span>
                   </div>
                 </div>
 
                 <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                  <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 font-sans">
                     <Clock className="w-4 h-4 text-blue-600" />
                     <span>Time Window & Investment Lock Rules</span>
                   </h3>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                         Daily Window Start (HH:MM)
                       </label>
                       <input
                         type="text"
                         value={settingsFormData.dailyWithdrawalWindowStart}
                         onChange={(e) => setSettingsFormData({ ...settingsFormData, dailyWithdrawalWindowStart: e.target.value })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-sans font-black text-slate-900 tracking-tight outline-hidden focus:ring-2 focus:ring-blue-500"
                       />
-                      <span className="text-[10px] text-slate-400 mt-0.5 block">Default: 00:30 (12:30 AM)</span>
+                      <span className="text-[11px] text-slate-400 mt-1 block font-medium">Default: 00:30 (12:30 AM)</span>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-700 block mb-1">
+                      <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                         Daily Window End (HH:MM)
                       </label>
                       <input
                         type="text"
                         value={settingsFormData.dailyWithdrawalWindowEnd}
                         onChange={(e) => setSettingsFormData({ ...settingsFormData, dailyWithdrawalWindowEnd: e.target.value })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-sans font-black text-slate-900 tracking-tight outline-hidden focus:ring-2 focus:ring-blue-500"
                       />
-                      <span className="text-[10px] text-slate-400 mt-0.5 block">Default: 17:00 (5:00 PM)</span>
+                      <span className="text-[11px] text-slate-400 mt-1 block font-medium">Default: 17:00 (5:00 PM)</span>
                     </div>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-slate-800 block">
+                        <span className="text-xs font-bold text-slate-800 block font-sans">
                           Enforce Next-Day 12:30 AM Investment Lock
                         </span>
                         <p className="text-[11px] text-slate-500">
@@ -2758,14 +2768,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                    <label className="text-xs font-semibold text-slate-500 block mb-1 font-sans">
                       Telegram Channel Link
                     </label>
                     <input
                       type="text"
                       value={settingsFormData.telegramChannelUrl}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, telegramChannelUrl: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-sans font-bold text-slate-800 outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
