@@ -323,7 +323,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             onClick={() => setActiveFilter('ALL')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'ALL'
-                ? 'bg-[#70c028] text-slate-950 font-extrabold'
+                ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
@@ -333,7 +333,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             onClick={() => setActiveFilter('PENDING')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'PENDING'
-                ? 'bg-[#70c028] text-slate-950 font-extrabold'
+                ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
                 : 'bg-[#F1F5F9] text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -343,7 +343,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             onClick={() => setActiveFilter('REJECTED')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'REJECTED'
-                ? 'bg-[#70c028] text-slate-950 font-extrabold'
+                ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
                 : 'bg-[#F1F5F9] text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -353,7 +353,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             onClick={() => setActiveFilter('PROCESSED')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'PROCESSED'
-                ? 'bg-[#70c028] text-slate-950 font-extrabold'
+                ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
                 : 'bg-[#F1F5F9] text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -530,7 +530,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                   placeholder="e.g. UTR2026101908291"
                   value={utrInput}
                   onChange={(e) => setUtrInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 

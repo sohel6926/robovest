@@ -392,7 +392,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           {/* Tile 4: Add Wallet Balance */}
           <button
             onClick={onOpenAddBalanceModal}
-            className="text-left bg-[#65a30d] hover:bg-[#84cc16] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px]"
+            className="text-left bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px]"
           >
             <Wallet className="w-5 h-5 text-emerald-100" />
             <div>

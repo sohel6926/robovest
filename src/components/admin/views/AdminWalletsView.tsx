@@ -199,7 +199,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             placeholder="Filter by User ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:border-[#70c028]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
           />
         </div>
 
@@ -208,7 +208,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#70c028]"
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#FF4A00]"
           >
             <option value="">All Types</option>
             <option value="Credit">Credit</option>
@@ -218,7 +218,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#70c028]"
+            className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#FF4A00]"
           >
             <option value="">All Sources</option>
             <option value="Level Income">Level Income</option>
@@ -238,7 +238,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
 
           <button
             onClick={onOpenAddMoneyModal}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-xs font-extrabold transition shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#FF4A00] hover:bg-[#E04000] text-white text-xs font-extrabold transition shadow-md shadow-[#FF4A00]/25"
           >
             <Wallet className="w-3.5 h-3.5" />
             <span>Add Money</span>
@@ -279,7 +279,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
                       {item.date}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="font-bold text-[#70c028] block">
+                      <span className="font-bold text-slate-900 block">
                         {item.userName}
                       </span>
                       <span className="text-[10px] font-mono text-slate-400">

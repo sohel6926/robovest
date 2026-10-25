@@ -466,7 +466,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
           <button
             onClick={handleMasterSave}
             type="button"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-extrabold text-xs shadow-md shadow-[#70c028]/25 transition active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF4A00] hover:bg-[#E04000] text-white font-extrabold text-xs shadow-md shadow-[#FF4A00]/25 transition active:scale-95 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Save & Apply Changes</span>

@@ -132,7 +132,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Navigation Tab
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'users' | 'referrals' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
+    'dashboard' | 'users' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'dailyWithdrawals'
   >('dashboard');
   const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
 
@@ -716,7 +716,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // ================= 2. FULL AUTHORIZED ADMIN PANEL =================
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex flex-col overflow-hidden text-slate-900">
+    <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex flex-col overflow-hidden text-slate-900 font-sans antialiased selection:bg-[#FF4A00]/20 selection:text-[#FF4A00]">
       {/* High-Visibility Toast Notification (Top-Center, Above All Modals & Headers) */}
       {toastMessage && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[99999] max-w-md w-full px-4 pointer-events-none animate-in slide-in-from-top-6 fade-in duration-200">
@@ -790,8 +790,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('dashboard')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'dashboard'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <LayoutGrid className="w-4 h-4 shrink-0" />
@@ -813,25 +813,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'users'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Users className="w-4 h-4 shrink-0" />
                 <span>Users</span>
-              </button>
-
-              {/* Referrals */}
-              <button
-                onClick={() => setActiveTab('referrals')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                  activeTab === 'referrals' || activeTab === 'network'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <Gift className="w-4 h-4 shrink-0" />
-                <span>Referrals</span>
               </button>
 
               {/* Wallets */}
@@ -839,8 +826,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('wallets')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'wallets'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Wallet className="w-4 h-4 shrink-0" />
@@ -852,8 +839,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('withdrawals')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'withdrawals'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -872,8 +859,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('recharges')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'recharges'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -887,13 +874,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 )}
               </button>
 
-              {/* Recharge Details / UPI Gateway (Admin page for website recharge settings) */}
+              {/* Recharge Details / UPI Gateway */}
               <button
                 onClick={() => setActiveTab('rechargeGateway')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'rechargeGateway'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -910,8 +897,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('kyc')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'kyc'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <ShieldCheck className="w-4 h-4 shrink-0" />
@@ -923,8 +910,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('settings')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'settings'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Sliders className="w-4 h-4 shrink-0" />
@@ -943,8 +930,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('plans')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'plans'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <TrendingUp className="w-4 h-4 shrink-0" />
@@ -956,8 +943,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('orders')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'orders'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -974,8 +961,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onClick={() => setActiveTab('dailyWithdrawals')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'dailyWithdrawals'
-                    ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -993,7 +980,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
           <div className="mt-auto p-3 m-3 rounded-2xl bg-slate-900/90 text-white text-xs border border-slate-800">
             <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span className="font-bold flex items-center gap-1">
-                <Clock className="w-3 h-3 text-[#70c028]" />
+                <Clock className="w-3 h-3 text-[#FF4A00]" />
                 Simulated Clock
               </span>
               <button
@@ -1001,7 +988,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   resetSimulatedTime();
                   showToast('Simulated time reset to real-time.');
                 }}
-                className="text-[#70c028] hover:underline flex items-center gap-0.5 text-[10px]"
+                className="text-[#FF4A00] hover:text-[#FF6E14] hover:underline flex items-center gap-0.5 text-[10px]"
               >
                 <RefreshCw className="w-2.5 h-2.5" />
                 Reset
@@ -1018,7 +1005,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 advanceTimeToNextDayAfter1230();
                 showToast('Fast forwarded to Next Day 12:35 AM.');
               }}
-              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-[10px] font-black transition"
+              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-[#FF4A00] hover:bg-[#E04000] text-white text-[10px] font-bold transition shadow-xs"
             >
               Advance Next Day 12:35 AM
             </button>
@@ -1053,7 +1040,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <h3 className="font-bold text-sm text-slate-900 font-sans">
                       Notifications
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-[#70c028] text-slate-950 font-black text-[10px]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#FF4A00] text-white font-bold text-[10px]">
                       50 new
                     </span>
                   </div>
@@ -1070,7 +1057,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                               {n.text}
                             </p>
                             {n.unread && (
-                              <span className="w-2 h-2 rounded-full bg-[#70c028] shrink-0 mt-1" />
+                              <span className="w-2 h-2 rounded-full bg-[#FF4A00] shrink-0 mt-1" />
                             )}
                           </div>
                           <span className="text-[10px] text-slate-400 block font-medium">
@@ -1247,828 +1234,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 </div>
               </div>
             )}
-
-          {/* ================= SECTION 1: REFERRAL NETWORK & MULTI-TIER GENEALOGY HIERARCHY ================= */}
-          {(activeTab === 'network' || activeTab === 'referrals') && (() => {
-            const allL1Commission = teamMembers.filter(m => m.level === 1).reduce((s, m) => s + m.commissionGenerated, 0);
-            const allL2Commission = teamMembers.filter(m => m.level === 2).reduce((s, m) => s + m.commissionGenerated, 0);
-            const allL3Commission = teamMembers.filter(m => m.level === 3).reduce((s, m) => s + m.commissionGenerated, 0);
-            const allCommissionsSum = allL1Commission + allL2Commission + allL3Commission;
-            const rootStats = getDownlineStats('ROOT');
-            const totalActiveUnits = teamMembers.reduce((s, m) => s + (m.plans?.reduce((pSum, p) => pSum + p.quantity, 0) || 0), 0);
-
-            // Handler to open Add Member modal pre-filled for a specific inviter
-            const handleAddDownlineMember = (inviterId: string, level: 1 | 2 | 3) => {
-              setNewMemberForm({
-                id: `TM-${Math.floor(100 + Math.random() * 900)}`,
-                phone: '+91 98',
-                joinDate: new Date().toISOString().slice(0, 10),
-                level: level,
-                inviterId: inviterId,
-                inviteCount: 0,
-                rechargeAmount: 1000,
-                teamInvested: 0,
-                commissionGenerated: level === 1 ? 220 : level === 2 ? 20 : 10,
-                status: 'ACTIVE',
-                plans: []
-              });
-              setIsAddMemberModalOpen(true);
-            };
-
-            return (
-              <div className="space-y-4">
-                {/* Header Card */}
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                  <div>
-                    <h2 className="text-lg font-black text-slate-900 font-sans flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-600" />
-                      <span>Referral Network & Downline Commission Hierarchy</span>
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      When you invite members they are your Level 1 (22%). If they invite someone, they are your Level 2 (2%), and Level 3 (1%). Click Drop Down on any row to expand their downlines in their own lines.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Search */}
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Search phone, ID or inviter..."
-                        value={networkSearch}
-                        onChange={(e) => setNetworkSearch(e.target.value)}
-                        className="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 outline-hidden w-44"
-                      />
-                    </div>
-
-                    {/* View Mode Toggle: Tree vs Flat */}
-                    <div className="flex rounded-xl bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
-                      <button
-                        onClick={() => setNetworkViewMode('TREE')}
-                        className={`px-2.5 py-1 rounded-lg transition text-[11px] ${
-                          networkViewMode === 'TREE'
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Genealogy Tree
-                      </button>
-                      <button
-                        onClick={() => setNetworkViewMode('FLAT')}
-                        className={`px-2.5 py-1 rounded-lg transition text-[11px] ${
-                          networkViewMode === 'FLAT'
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Flat List
-                      </button>
-                    </div>
-
-                    {/* Level Filter */}
-                    <div className="flex rounded-xl bg-slate-100 p-0.5 border border-slate-200 text-xs font-bold">
-                      {(['ALL', 1, 2, 3] as const).map(lvl => (
-                        <button
-                          key={lvl}
-                          onClick={() => setNetworkLevelFilter(lvl)}
-                          className={`px-2 py-1 rounded-lg transition text-[11px] ${
-                            networkLevelFilter === lvl 
-                              ? 'bg-blue-600 text-white shadow-xs' 
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          {lvl === 'ALL' ? 'All' : `L${lvl}`}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Expand All / Collapse All Tree Buttons */}
-                    {networkViewMode === 'TREE' && (
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={expandAllDownlines}
-                          title="Expand all downlines in tree"
-                          className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition"
-                        >
-                          Expand All
-                        </button>
-                        <button
-                          onClick={collapseAllDownlines}
-                          title="Collapse all downlines to single summary lines"
-                          className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold transition"
-                        >
-                          Collapse All
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Add Member Button */}
-                    <button
-                      onClick={() => handleAddDownlineMember('User5294 (You)', 1)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition active:scale-95"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>+ Add Member</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (window.confirm('Reset network members to default sample dataset?')) {
-                          resetTeamToDefault();
-                          showToast('Team members reset.');
-                        }
-                      }}
-                      title="Reset to default team"
-                      className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Summary Stats Row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Network Members</span>
-                    <span className="text-xl font-black text-slate-900 font-sans">{teamMembers.length} Members</span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">3 Tier Multi-Level Team</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Team Investment</span>
-                    <span className="text-xl font-black text-blue-600 font-sans">₹{totalNetworkInvestment.toLocaleString()}</span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Across all downline levels</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Commission Earned</span>
-                    <span className="text-xl font-black text-emerald-600 font-sans">
-                      +₹{allCommissionsSum.toLocaleString()}
-                    </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
-                      L1: ₹{allL1Commission.toLocaleString()} · L2: ₹{allL2Commission.toLocaleString()} · L3: ₹{allL3Commission.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Active Robot Fleet</span>
-                    <span className="text-xl font-black text-indigo-600 font-sans">
-                      {totalActiveUnits} Units
-                    </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Generating daily ROI</span>
-                  </div>
-                </div>
-
-                {/* Hierarchical Referral Tree Table */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-black">
-                        <tr>
-                          <th className="p-3.5">Member Hierarchy / Phone</th>
-                          <th className="p-3.5">Tier Level</th>
-                          <th className="p-3.5">Invited By</th>
-                          <th className="p-3.5">Downline Breakdown (L1, L2, L3)</th>
-                          <th className="p-3.5">Total Invested</th>
-                          <th className="p-3.5">Commission to You</th>
-                          <th className="p-3.5">Plans Bought & Days Active</th>
-                          <th className="p-3.5 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
-
-                        {/* ================= 1. ROOT ROW: YOU / THE FIRST PERSON ================= */}
-                        {(networkLevelFilter === 'ALL' || networkLevelFilter === 1) && !networkSearch && networkViewMode === 'TREE' && (
-                          <tr className="bg-gradient-to-r from-amber-50/50 via-blue-50/30 to-amber-50/50 border-b-2 border-amber-200/60 transition">
-                            {/* Root Identity */}
-                            <td className="p-3.5">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xs shadow-sm">
-                                  👑
-                                </div>
-                                <div>
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono font-black text-slate-900 text-sm">{user.phone}</span>
-                                    <span className="px-1.5 py-0.2 rounded-md bg-amber-200/70 text-amber-900 text-[10px] font-black">
-                                      YOU
-                                    </span>
-                                  </div>
-                                  <span className="text-[10px] text-slate-500 font-mono">
-                                    ID: User5294 (You) · Invite Code: {user.inviteCode} · VIP{user.vipLevel}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Level Badge */}
-                            <td className="p-3.5">
-                              <span className="px-2.5 py-1 rounded-full font-black text-[10px] uppercase bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
-                                👑 Root Sponsor (Head)
-                              </span>
-                            </td>
-
-                            {/* Inviter */}
-                            <td className="p-3.5 font-mono text-[11px] text-slate-500 font-semibold">
-                              Platform Direct
-                            </td>
-
-                            {/* Single-Line Breakdown with Drop Down Button */}
-                            <td className="p-3.5">
-                              <div className="flex items-center gap-1.5">
-                                <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-black" title="Level 1 Direct Referrals (22% Commission)">
-                                  L1: {rootStats.l1Count}
-                                </span>
-                                <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-black" title="Level 2 Indirect Referrals (2% Commission)">
-                                  L2: {rootStats.l2Count}
-                                </span>
-                                <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-black" title="Level 3 Downline Referrals (1% Commission)">
-                                  L3: {rootStats.l3Count}
-                                </span>
-
-                                <button
-                                  onClick={() => toggleDownlineExpand('ROOT')}
-                                  className={`ml-1 px-2.5 py-1 rounded-lg text-[11px] font-black shadow-xs flex items-center gap-1 transition ${
-                                    expandedDownlineIds.includes('ROOT')
-                                      ? 'bg-blue-600 text-white'
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                                  }`}
-                                >
-                                  {expandedDownlineIds.includes('ROOT') ? (
-                                    <ChevronDown className="w-3.5 h-3.5" />
-                                  ) : (
-                                    <ChevronRight className="w-3.5 h-3.5" />
-                                  )}
-                                  <span>{expandedDownlineIds.includes('ROOT') ? 'Hide Downlines' : `Drop Down (${rootStats.totalCount})`}</span>
-                                </button>
-                              </div>
-                            </td>
-
-                            {/* Personal Investment */}
-                            <td className="p-3.5">
-                              <span className="font-black text-slate-900 font-mono text-sm block">
-                                ₹{user.totalRecharge.toLocaleString()}
-                              </span>
-                              <span className="text-[10px] text-emerald-600 font-bold">
-                                Status: Active
-                              </span>
-                            </td>
-
-                            {/* Commission to You */}
-                            <td className="p-3.5">
-                              <span className="font-black font-mono text-emerald-600 text-sm block">
-                                +₹{allCommissionsSum.toLocaleString()}
-                              </span>
-                              <span className="text-[10px] text-slate-400">Total from all 3 levels</span>
-                            </td>
-
-                            {/* Plans Bought */}
-                            <td className="p-3.5">
-                              <span className="font-bold text-slate-800 text-[11px] block">
-                                Personal Fleet ({investments.length} Active Nodes)
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono">
-                                Total Available: ₹{user.availableBalance.toLocaleString()}
-                              </span>
-                            </td>
-
-                            {/* Actions */}
-                            <td className="p-3.5 text-right">
-                              <button
-                                onClick={() => handleAddDownlineMember('User5294 (You)', 1)}
-                                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-xs active:scale-95 transition flex items-center gap-1 ml-auto"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>+ Add Level 1</span>
-                              </button>
-                            </td>
-                          </tr>
-                        )}
-
-                        {/* ================= 2. HIERARCHICAL TREE VIEW ROWS ================= */}
-                        {networkViewMode === 'TREE' && !networkSearch && networkLevelFilter === 'ALL' ? (
-                          expandedDownlineIds.includes('ROOT') && rootStats.l1Members.map((m1) => {
-                            const m1Stats = getDownlineStats(m1.id);
-                            const isM1Expanded = expandedDownlineIds.includes(m1.id);
-
-                            return (
-                              <React.Fragment key={m1.id}>
-                                {/* LEVEL 1 MEMBER ROW (Their Own Line) */}
-                                <tr className="hover:bg-amber-50/30 transition bg-white">
-                                  {/* Member Identity with L1 Tree Branch */}
-                                  <td className="p-3.5 pl-6">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-5 h-5 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-[10px] shrink-0 border border-amber-200">
-                                        1
-                                      </div>
-                                      <div>
-                                        <div className="flex items-center gap-1.5">
-                                          <span className="font-mono font-bold text-slate-900 text-xs">{m1.phone}</span>
-                                        </div>
-                                        <span className="text-[10px] text-slate-400 font-mono block">
-                                          ID: {m1.id} · Joined {m1.joinDate}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </td>
-
-                                  {/* Tier Level */}
-                                  <td className="p-3.5">
-                                    <span className="px-2 py-0.5 rounded-full font-black text-[10px] uppercase bg-amber-100 text-amber-800 border border-amber-200">
-                                      Level 1 (22%)
-                                    </span>
-                                  </td>
-
-                                  {/* Invited By */}
-                                  <td className="p-3.5 text-slate-700 font-mono text-[11px]">
-                                    User5294 (You)
-                                  </td>
-
-                                  {/* Single-Line Breakdown with Drop Down Button */}
-                                  <td className="p-3.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold" title="Their direct invites (Level 2 to you)">
-                                        L2: {m1Stats.l1Count}
-                                      </span>
-                                      <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold" title="Their indirect invites (Level 3 to you)">
-                                        L3: {m1Stats.l2Count}
-                                      </span>
-
-                                      {m1Stats.totalCount > 0 ? (
-                                        <button
-                                          onClick={() => toggleDownlineExpand(m1.id)}
-                                          className={`ml-1 px-2 py-0.5 rounded-md text-[10px] font-black flex items-center gap-1 transition ${
-                                            isM1Expanded
-                                              ? 'bg-blue-600 text-white'
-                                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                                          }`}
-                                        >
-                                          {isM1Expanded ? (
-                                            <ChevronDown className="w-3 h-3" />
-                                          ) : (
-                                            <ChevronRight className="w-3 h-3" />
-                                          )}
-                                          <span>{isM1Expanded ? 'Hide' : `Drop Down (${m1Stats.totalCount})`}</span>
-                                        </button>
-                                      ) : (
-                                        <span className="text-[10px] text-slate-400 italic ml-1">0 Downlines</span>
-                                      )}
-                                    </div>
-                                  </td>
-
-                                  {/* Total Invested */}
-                                  <td className="p-3.5">
-                                    <span className="font-black text-blue-600 font-mono text-sm block">
-                                      ₹{m1.rechargeAmount.toLocaleString()}
-                                    </span>
-                                    <span className="text-[10px] text-emerald-600 font-bold">
-                                      Status: {m1.status}
-                                    </span>
-                                  </td>
-
-                                  {/* Commission to You */}
-                                  <td className="p-3.5">
-                                    <span className="font-bold font-mono text-emerald-600 text-xs block">
-                                      +₹{m1.commissionGenerated.toLocaleString()}
-                                    </span>
-                                    <span className="text-[10px] text-slate-400 font-mono">22% Direct</span>
-                                  </td>
-
-                                  {/* Plans Bought & Days Active */}
-                                  <td className="p-3.5 max-w-xs">
-                                    {(!m1.plans || m1.plans.length === 0) ? (
-                                      <span className="text-slate-400 text-[11px] italic">No active plans</span>
-                                    ) : (
-                                      <div className="flex flex-wrap gap-1">
-                                        {m1.plans.map(p => (
-                                          <div 
-                                            key={p.id}
-                                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 border border-slate-200 text-[10px] font-mono"
-                                          >
-                                            <span className="font-bold text-blue-700">{p.planName}</span>
-                                            <span className="text-slate-400">({p.quantity}u)</span>
-                                            <span className="text-emerald-700 font-black">Day {p.daysElapsed}/{p.durationDays}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </td>
-
-                                  {/* Actions */}
-                                  <td className="p-3.5 text-right">
-                                    <div className="flex items-center justify-end gap-1.5">
-                                      <button
-                                        onClick={() => setSelectedMemberForPlans(m1)}
-                                        className="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition flex items-center gap-1"
-                                      >
-                                        <Eye className="w-3 h-3" />
-                                        <span>Plans</span>
-                                      </button>
-                                      <button
-                                        onClick={() => handleAddDownlineMember(m1.id, 2)}
-                                        title={`Add direct referral under ${m1.phone}`}
-                                        className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition flex items-center gap-0.5"
-                                      >
-                                        <Plus className="w-3 h-3" />
-                                        <span>Add L2</span>
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          if (window.confirm(`Delete member ${m1.phone}?`)) {
-                                            deleteTeamMember(m1.id);
-                                            showToast('Member deleted.');
-                                          }
-                                        }}
-                                        className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition"
-                                        title="Delete member"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-
-                                {/* LEVEL 2 MEMBERS (Dropped Down Under m1 in their own lines) */}
-                                {isM1Expanded && m1Stats.l1Members.map((m2) => {
-                                  const m2Stats = getDownlineStats(m2.id);
-                                  const isM2Expanded = expandedDownlineIds.includes(m2.id);
-
-                                  return (
-                                    <React.Fragment key={m2.id}>
-                                      <tr className="hover:bg-blue-50/40 transition bg-slate-50/40">
-                                        {/* Member Identity with L2 Tree Indentation */}
-                                        <td className="p-3.5 pl-12">
-                                          <div className="flex items-center gap-2">
-                                            <CornerDownRight className="w-4 h-4 text-blue-500 shrink-0" />
-                                            <div className="w-5 h-5 rounded-md bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-[10px] shrink-0 border border-blue-200">
-                                              2
-                                            </div>
-                                            <div>
-                                              <span className="font-mono font-bold text-slate-800 text-xs block">{m2.phone}</span>
-                                              <span className="text-[10px] text-slate-400 font-mono">
-                                                ID: {m2.id} · Joined {m2.joinDate}
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </td>
-
-                                        {/* Tier Level */}
-                                        <td className="p-3.5">
-                                          <span className="px-2 py-0.5 rounded-full font-black text-[10px] uppercase bg-blue-100 text-blue-800 border border-blue-200">
-                                            Level 2 (2%)
-                                          </span>
-                                        </td>
-
-                                        {/* Invited By */}
-                                        <td className="p-3.5 text-slate-700 font-mono text-[11px]">
-                                          <span className="bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200">
-                                            {m1.id} ({m1.phone.slice(-5)})
-                                          </span>
-                                        </td>
-
-                                        {/* Single-Line Breakdown with Drop Down Button */}
-                                        <td className="p-3.5">
-                                          <div className="flex items-center gap-1.5">
-                                            <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold" title="Their direct invites (Level 3 to you)">
-                                              L3: {m2Stats.l1Count}
-                                            </span>
-
-                                            {m2Stats.totalCount > 0 ? (
-                                              <button
-                                                onClick={() => toggleDownlineExpand(m2.id)}
-                                                className={`ml-1 px-2 py-0.5 rounded-md text-[10px] font-black flex items-center gap-1 transition ${
-                                                  isM2Expanded
-                                                    ? 'bg-blue-600 text-white'
-                                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                                                }`}
-                                              >
-                                                {isM2Expanded ? (
-                                                  <ChevronDown className="w-3 h-3" />
-                                                ) : (
-                                                  <ChevronRight className="w-3 h-3" />
-                                                )}
-                                                <span>{isM2Expanded ? 'Hide' : `Drop Down (${m2Stats.totalCount})`}</span>
-                                              </button>
-                                            ) : (
-                                              <span className="text-[10px] text-slate-400 italic ml-1">0 Downlines</span>
-                                            )}
-                                          </div>
-                                        </td>
-
-                                        {/* Total Invested */}
-                                        <td className="p-3.5">
-                                          <span className="font-black text-blue-600 font-mono text-sm block">
-                                            ₹{m2.rechargeAmount.toLocaleString()}
-                                          </span>
-                                          <span className="text-[10px] text-emerald-600 font-bold">
-                                            Status: {m2.status}
-                                          </span>
-                                        </td>
-
-                                        {/* Commission to You */}
-                                        <td className="p-3.5">
-                                          <span className="font-bold font-mono text-blue-600 text-xs block">
-                                            +₹{m2.commissionGenerated.toLocaleString()}
-                                          </span>
-                                          <span className="text-[10px] text-slate-400 font-mono">2% Indirect</span>
-                                        </td>
-
-                                        {/* Plans Bought & Days Active */}
-                                        <td className="p-3.5 max-w-xs">
-                                          {(!m2.plans || m2.plans.length === 0) ? (
-                                            <span className="text-slate-400 text-[11px] italic">No active plans</span>
-                                          ) : (
-                                            <div className="flex flex-wrap gap-1">
-                                              {m2.plans.map(p => (
-                                                <div 
-                                                  key={p.id}
-                                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono shadow-2xs"
-                                                >
-                                                  <span className="font-bold text-blue-700">{p.planName}</span>
-                                                  <span className="text-slate-400">({p.quantity}u)</span>
-                                                  <span className="text-emerald-700 font-black">Day {p.daysElapsed}/{p.durationDays}</span>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          )}
-                                        </td>
-
-                                        {/* Actions */}
-                                        <td className="p-3.5 text-right">
-                                          <div className="flex items-center justify-end gap-1.5">
-                                            <button
-                                              onClick={() => setSelectedMemberForPlans(m2)}
-                                              className="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition flex items-center gap-1"
-                                            >
-                                              <Eye className="w-3 h-3" />
-                                              <span>Plans</span>
-                                            </button>
-                                            <button
-                                              onClick={() => handleAddDownlineMember(m2.id, 3)}
-                                              title={`Add direct referral under ${m2.phone}`}
-                                              className="px-2 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] transition flex items-center gap-0.5"
-                                            >
-                                              <Plus className="w-3 h-3" />
-                                              <span>Add L3</span>
-                                            </button>
-                                            <button
-                                              onClick={() => {
-                                                if (window.confirm(`Delete member ${m2.phone}?`)) {
-                                                  deleteTeamMember(m2.id);
-                                                  showToast('Member deleted.');
-                                                }
-                                              }}
-                                              className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition"
-                                              title="Delete member"
-                                            >
-                                              <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                          </div>
-                                        </td>
-                                      </tr>
-
-                                      {/* LEVEL 3 MEMBERS (Dropped Down Under m2 in their own lines) */}
-                                      {isM2Expanded && m2Stats.l1Members.map((m3) => (
-                                        <tr key={m3.id} className="hover:bg-purple-50/40 transition bg-slate-100/50">
-                                          {/* Member Identity with L3 Tree Indentation */}
-                                          <td className="p-3.5 pl-20">
-                                            <div className="flex items-center gap-2">
-                                              <CornerDownRight className="w-4 h-4 text-purple-500 shrink-0" />
-                                              <div className="w-5 h-5 rounded-md bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-[10px] shrink-0 border border-purple-200">
-                                                3
-                                              </div>
-                                              <div>
-                                                <span className="font-mono font-bold text-slate-800 text-xs block">{m3.phone}</span>
-                                                <span className="text-[10px] text-slate-400 font-mono">
-                                                  ID: {m3.id} · Joined {m3.joinDate}
-                                                </span>
-                                              </div>
-                                            </div>
-                                          </td>
-
-                                          {/* Tier Level */}
-                                          <td className="p-3.5">
-                                            <span className="px-2 py-0.5 rounded-full font-black text-[10px] uppercase bg-purple-100 text-purple-800 border border-purple-200">
-                                              Level 3 (1%)
-                                            </span>
-                                          </td>
-
-                                          {/* Invited By */}
-                                          <td className="p-3.5 text-slate-700 font-mono text-[11px]">
-                                            <span className="bg-white px-1.5 py-0.5 rounded-md border border-slate-200">
-                                              {m2.id} ({m2.phone.slice(-5)})
-                                            </span>
-                                          </td>
-
-                                          {/* Single-Line Breakdown (Terminal level) */}
-                                          <td className="p-3.5">
-                                            <span className="text-[10px] text-slate-400 font-mono italic">
-                                              0 Downlines (Terminal Level 3)
-                                            </span>
-                                          </td>
-
-                                          {/* Total Invested */}
-                                          <td className="p-3.5">
-                                            <span className="font-black text-blue-600 font-mono text-sm block">
-                                              ₹{m3.rechargeAmount.toLocaleString()}
-                                            </span>
-                                            <span className="text-[10px] text-emerald-600 font-bold">
-                                              Status: {m3.status}
-                                            </span>
-                                          </td>
-
-                                          {/* Commission to You */}
-                                          <td className="p-3.5">
-                                            <span className="font-bold font-mono text-purple-600 text-xs block">
-                                              +₹{m3.commissionGenerated.toLocaleString()}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400 font-mono">1% Downline</span>
-                                          </td>
-
-                                          {/* Plans Bought & Days Active */}
-                                          <td className="p-3.5 max-w-xs">
-                                            {(!m3.plans || m3.plans.length === 0) ? (
-                                              <span className="text-slate-400 text-[11px] italic">No active plans</span>
-                                            ) : (
-                                              <div className="flex flex-wrap gap-1">
-                                                {m3.plans.map(p => (
-                                                  <div 
-                                                    key={p.id}
-                                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-mono shadow-2xs"
-                                                  >
-                                                    <span className="font-bold text-blue-700">{p.planName}</span>
-                                                    <span className="text-slate-400">({p.quantity}u)</span>
-                                                    <span className="text-emerald-700 font-black">Day {p.daysElapsed}/{p.durationDays}</span>
-                                                  </div>
-                                                ))}
-                                              </div>
-                                            )}
-                                          </td>
-
-                                          {/* Actions */}
-                                          <td className="p-3.5 text-right">
-                                            <div className="flex items-center justify-end gap-1.5">
-                                              <button
-                                                onClick={() => setSelectedMemberForPlans(m3)}
-                                                className="px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition flex items-center gap-1"
-                                              >
-                                                <Eye className="w-3 h-3" />
-                                                <span>Plans</span>
-                                              </button>
-                                              <button
-                                                onClick={() => {
-                                                  if (window.confirm(`Delete member ${m3.phone}?`)) {
-                                                    deleteTeamMember(m3.id);
-                                                    showToast('Member deleted.');
-                                                  }
-                                                }}
-                                                className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition"
-                                                title="Delete member"
-                                              >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                              </button>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </React.Fragment>
-                            );
-                          })
-                        ) : (
-                          /* ================= 3. FILTERED OR FLAT LIST VIEW ================= */
-                          filteredMembers.length === 0 ? (
-                            <tr>
-                              <td colSpan={8} className="p-8 text-center text-slate-400 text-xs">
-                                No referral members found matching the filter.
-                              </td>
-                            </tr>
-                          ) : (
-                            filteredMembers.map((member) => {
-                              const mStats = getDownlineStats(member.id);
-
-                              return (
-                                <tr key={member.id} className="hover:bg-slate-50/70 transition">
-                                  {/* Member Identity */}
-                                  <td className="p-3.5">
-                                    <span className="font-mono font-bold text-slate-900 block">{member.phone}</span>
-                                    <span className="text-[10px] text-slate-400 font-mono">ID: {member.id} · Joined {member.joinDate}</span>
-                                  </td>
-
-                                  {/* Level Pill */}
-                                  <td className="p-3.5">
-                                    <span className={`px-2 py-0.5 rounded-full font-black text-[10px] uppercase ${
-                                      member.level === 1 ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                                      member.level === 2 ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                      'bg-purple-100 text-purple-800 border border-purple-200'
-                                    }`}>
-                                      Level {member.level} ({member.level === 1 ? '22%' : member.level === 2 ? '2%' : '1%'})
-                                    </span>
-                                  </td>
-
-                                  {/* Inviter */}
-                                  <td className="p-3.5 text-slate-700 font-mono text-[11px]">
-                                    {member.inviterId || 'Direct'}
-                                  </td>
-
-                                  {/* Single Line Breakdown */}
-                                  <td className="p-3.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
-                                        L1: {mStats.l1Count}
-                                      </span>
-                                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold">
-                                        L2: {mStats.l2Count}
-                                      </span>
-                                      <span className="text-[10px] text-slate-400 font-mono ml-1">
-                                        ({mStats.totalCount} total)
-                                      </span>
-                                    </div>
-                                  </td>
-
-                                  {/* Personal Investment */}
-                                  <td className="p-3.5">
-                                    <span className="font-black text-blue-600 font-mono text-sm block">
-                                      ₹{member.rechargeAmount.toLocaleString()}
-                                    </span>
-                                    <span className="text-[10px] text-emerald-600 font-bold">
-                                      Status: {member.status}
-                                    </span>
-                                  </td>
-
-                                  {/* Commission */}
-                                  <td className="p-3.5 font-bold font-mono text-emerald-600">
-                                    +₹{member.commissionGenerated.toLocaleString()}
-                                  </td>
-
-                                  {/* Plans Bought & Days Active */}
-                                  <td className="p-3.5 max-w-sm">
-                                    {(!member.plans || member.plans.length === 0) ? (
-                                      <span className="text-slate-400 text-[11px] italic">No active plans</span>
-                                    ) : (
-                                      <div className="space-y-1">
-                                        {member.plans.map(p => (
-                                          <div 
-                                            key={p.id}
-                                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-mono mr-1 mb-1"
-                                          >
-                                            <span className="font-bold text-blue-700">{p.planName}</span>
-                                            <span className="text-slate-400">({p.quantity}u)</span>
-                                            <span className="text-emerald-700 font-black">Day {p.daysElapsed}/{p.durationDays}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </td>
-
-                                  {/* Actions */}
-                                  <td className="p-3.5 text-right">
-                                    <div className="flex items-center justify-end gap-1.5">
-                                      <button
-                                        onClick={() => setSelectedMemberForPlans(member)}
-                                        className="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition flex items-center gap-1"
-                                      >
-                                        <Eye className="w-3 h-3" />
-                                        <span>Plans</span>
-                                      </button>
-                                      {member.level < 3 && (
-                                        <button
-                                          onClick={() => handleAddDownlineMember(member.id, (member.level + 1) as 2 | 3)}
-                                          title={`Add downline member under ${member.phone}`}
-                                          className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition flex items-center gap-0.5"
-                                        >
-                                          <Plus className="w-3 h-3" />
-                                          <span>Add L{member.level + 1}</span>
-                                        </button>
-                                      )}
-                                      <button
-                                        onClick={() => {
-                                          if (window.confirm(`Delete member ${member.phone}?`)) {
-                                            deleteTeamMember(member.id);
-                                            showToast('Member deleted.');
-                                          }
-                                        }}
-                                        className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition"
-                                        title="Delete member"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          )
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* ================= SECTION 2: DAILY WITHDRAWAL LOGS TABLE (NEW) ================= */}
           {activeTab === 'dailyWithdrawals' && (
@@ -4893,7 +4058,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-[#70c028]" />
+                <Wallet className="w-5 h-5 text-[#FF4A00]" />
                 <h3 className="font-bold text-base font-sans">Add Wallet Balance</h3>
               </div>
               <button
@@ -4913,7 +4078,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       key={amt}
                       type="button"
                       onClick={() => setQuickBalanceAmt(String(amt))}
-                      className="py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition"
+                      className="py-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#FF4A00] font-bold text-xs border border-orange-200 transition"
                     >
                       +₹{amt.toLocaleString()}
                     </button>
@@ -4928,7 +4093,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   placeholder="Enter amount (e.g. 1000)"
                   value={quickBalanceAmt}
                   onChange={(e) => setQuickBalanceAmt(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 
@@ -4939,7 +4104,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   placeholder="e.g. Promotional Bonus or Recharge Adjustment"
                   value={quickBalanceNote}
                   onChange={(e) => setQuickBalanceNote(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 
@@ -4965,7 +4130,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     setQuickBalanceAmt('');
                     setQuickBalanceNote('');
                   }}
-                  className="flex-1 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-extrabold text-xs shadow-md shadow-[#70c028]/20 transition"
+                  className="flex-1 py-2.5 rounded-xl bg-[#FF4A00] hover:bg-[#E04000] text-white font-extrabold text-xs shadow-md shadow-[#FF4A00]/25 transition"
                 >
                   Confirm Credit
                 </button>

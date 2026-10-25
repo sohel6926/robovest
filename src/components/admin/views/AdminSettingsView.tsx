@@ -94,7 +94,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
 
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-extrabold text-sm shadow-md shadow-[#70c028]/20 transition active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF4A00] hover:bg-[#E04000] text-white font-extrabold text-sm shadow-md shadow-[#FF4A00]/25 transition active:scale-95 cursor-pointer"
         >
           <Save className="w-4 h-4" />
           <span>Save Changes</span>
@@ -149,7 +149,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
                   type="text"
                   value={withdrawalStart}
                   onChange={(e) => setWithdrawalStart(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
                 <Clock className="w-3.5 h-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
@@ -164,7 +164,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
                   type="text"
                   value={withdrawalEnd}
                   onChange={(e) => setWithdrawalEnd(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
                 <Clock className="w-3.5 h-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
@@ -197,7 +197,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
                     onClick={() => toggleTopupDay(day)}
                     className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition shadow-xs ${
                       isSelected
-                        ? 'bg-[#70c028] text-slate-950 font-extrabold'
+                        ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
                         : 'bg-[#F1F5F9] text-slate-500 hover:bg-slate-200'
                     }`}
                   >
@@ -218,7 +218,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
                   type="text"
                   value={topupStart}
                   onChange={(e) => setTopupStart(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
                 <Clock className="w-3.5 h-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
@@ -233,7 +233,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
                   type="text"
                   value={topupEnd}
                   onChange={(e) => setTopupEnd(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#70c028]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-800 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
                 <Clock className="w-3.5 h-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
@@ -264,7 +264,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
               max={50}
               value={tdsPercent}
               onChange={(e) => setTdsPercent(Number(e.target.value))}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-900 outline-none focus:border-[#70c028]"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-900 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
               %

@@ -979,7 +979,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Sponsor ID</span>
-                  <span className="font-mono font-bold text-[#70c028]">{currentUser.sponsorId}</span>
+                  <span className="font-mono font-bold text-slate-900">{currentUser.sponsorId}</span>
                 </div>
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
@@ -1131,7 +1131,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleApproveKyc}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-black text-xs transition shadow-xs"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FF4A00] hover:bg-[#E04000] text-white font-extrabold text-xs transition shadow-md shadow-[#FF4A00]/25"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>Approve KYC</span>

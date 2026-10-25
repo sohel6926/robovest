@@ -77,7 +77,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               onClick={() => setActiveFilter('PENDING')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'PENDING'
-                  ? 'bg-[#70c028] text-slate-950 shadow-xs'
+                  ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -87,7 +87,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               onClick={() => setActiveFilter('APPROVED')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'APPROVED'
-                  ? 'bg-[#70c028] text-slate-950 shadow-xs'
+                  ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -97,7 +97,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               onClick={() => setActiveFilter('REJECTED')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'REJECTED'
-                  ? 'bg-[#70c028] text-slate-950 shadow-xs'
+                  ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -107,7 +107,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               onClick={() => setActiveFilter('ALL')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'ALL'
-                  ? 'bg-[#70c028] text-slate-950 shadow-xs'
+                  ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
@@ -117,7 +117,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-xs font-extrabold shadow-xs transition"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-extrabold shadow-xs transition"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export</span>
@@ -165,7 +165,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
                   <p className="text-xs text-slate-500 font-medium">{t.description}</p>
                   <p className="text-[11px] font-mono text-slate-400">{t.formattedTime || t.timestamp}</p>
                   {(t.proofReference || t.paymentReference) && (
-                    <p className="text-xs font-mono font-bold text-[#70c028]">
+                    <p className="text-xs font-mono font-bold text-[#FF4A00]">
                       UTR: {t.proofReference || t.paymentReference}
                     </p>
                   )}
