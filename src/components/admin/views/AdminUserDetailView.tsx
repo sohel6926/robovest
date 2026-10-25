@@ -16,13 +16,16 @@ import {
   Plus, 
   Download, 
   ShieldCheck, 
-  Sparkles, 
   Building2, 
   RefreshCw,
   Award,
   Wallet,
   Check,
-  X
+  X,
+  Edit3,
+  FileText,
+  Shield,
+  UploadCloud
 } from 'lucide-react';
 import { AdminUserItem } from './AdminUserManagementView';
 
@@ -43,34 +46,46 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<AdminUserItem>(initialUser);
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'cadre' | 'profile' | 'kyc_bank' | 'add_money'
+    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'cadre' | 'profile' | 'kyc_bank' | 'add_money' | 'topup'
   >('overview');
 
-  // Form states for editable sections
-  const [addAmount, setAddAmount] = useState<string>('');
-  const [addReason, setAddReason] = useState<string>('Admin Manual Credit');
-  const [isCreditMode, setIsCreditMode] = useState<boolean>(true);
-
-  // Profile edit states
+  // Edit states for Profile (Screenshot 2)
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileName, setProfileName] = useState(currentUser.name);
   const [profileMobile, setProfileMobile] = useState(currentUser.mobile);
   const [profileEmail, setProfileEmail] = useState(
     currentUser.email || `${currentUser.name.toLowerCase().replace(/\s+/g, '')}821@gmail.com`
   );
   const [profileCity, setProfileCity] = useState(currentUser.city || 'Amadalavalasa');
-  const [profilePin, setProfilePin] = useState('1234');
-  const [profilePassword, setProfilePassword] = useState('password123');
+  const [profilePassword, setProfilePassword] = useState('12345678');
+  const [profilePin, setProfilePin] = useState('9025');
+  const [profileAddress, setProfileAddress] = useState('—');
+  const [profileDistrict, setProfileDistrict] = useState('—');
+  const [profileState, setProfileState] = useState('—');
+  const [profilePincode, setProfilePincode] = useState('—');
 
-  // Bank edit states
-  const [bankHolder, setBankHolder] = useState(currentUser.bankAccount?.accountHolder || currentUser.name);
-  const [bankName, setBankName] = useState(currentUser.bankAccount?.bankName || 'State Bank of India');
-  const [bankAccountNum, setBankAccountNum] = useState(currentUser.bankAccount?.accountNumber || '38927189201');
-  const [bankIfsc, setBankIfsc] = useState(currentUser.bankAccount?.ifscCode || 'SBIN0001824');
-  const [bankUpi, setBankUpi] = useState(currentUser.bankAccount?.upiId || `${currentUser.mobile}@ybl`);
-  const [bankIsBound, setBankIsBound] = useState(currentUser.bankAccount?.isBound ?? true);
-  const [kycStatus, setKycStatus] = useState(currentUser.kycStatus || 'UNFILLED');
+  // Edit states for KYC & Bank (Screenshot 3)
+  const [isEditingBank, setIsEditingBank] = useState(false);
+  const [aadhaarNum, setAadhaarNum] = useState('—');
+  const [panNum, setPanNum] = useState('—');
+  const [bankName, setBankName] = useState(currentUser.bankAccount?.bankName || '—');
+  const [bankAccountNum, setBankAccountNum] = useState(currentUser.bankAccount?.accountNumber || '—');
+  const [bankIfsc, setBankIfsc] = useState(currentUser.bankAccount?.ifscCode || '—');
+  const [bankBranch, setBankBranch] = useState('—');
+  const [bankPayeeName, setBankPayeeName] = useState(currentUser.bankAccount?.accountHolder || '—');
+  const [kycStatus, setKycStatus] = useState<'UNFILLED' | 'APPROVED' | 'PENDING' | 'REJECTED'>(
+    currentUser.kycStatus || 'UNFILLED'
+  );
 
-  // Investments state
+  // Top-Up state (Screenshot 4)
+  const [topupAmount, setTopupAmount] = useState('');
+
+  // Add Money state
+  const [addAmount, setAddAmount] = useState<string>('');
+  const [addReason, setAddReason] = useState<string>('Admin Manual Credit');
+  const [isCreditMode, setIsCreditMode] = useState<boolean>(true);
+
+  // Investments state (Screenshot 3)
   const [userInvestments, setUserInvestments] = useState(
     currentUser.investments && currentUser.investments.length > 0
       ? currentUser.investments
@@ -127,6 +142,24 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     showToast(`User profile ${newLock ? 'LOCKED' : 'UNLOCKED'}`);
   };
 
+  // Approve KYC
+  const handleApproveKyc = () => {
+    setKycStatus('APPROVED');
+    const updated: AdminUserItem = { ...currentUser, kycStatus: 'APPROVED' };
+    setCurrentUser(updated);
+    if (onUpdateUser) onUpdateUser(updated);
+    showToast(`KYC Approved for ${currentUser.name}!`);
+  };
+
+  // Reject KYC
+  const handleRejectKyc = () => {
+    setKycStatus('REJECTED');
+    const updated: AdminUserItem = { ...currentUser, kycStatus: 'REJECTED' };
+    setCurrentUser(updated);
+    if (onUpdateUser) onUpdateUser(updated);
+    showToast(`KYC Rejected for ${currentUser.name}.`, 'error');
+  };
+
   // Handle Add / Deduct money
   const handleBalanceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +178,43 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     showToast(`${isCreditMode ? 'Credited' : 'Debited'} ₹${amt.toLocaleString()} to user wallet`);
   };
 
-  // Handle Save Profile
+  // Handle Account Top-Up (Screenshot 4)
+  const handleTopupSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const amt = parseFloat(topupAmount);
+    if (isNaN(amt) || amt <= 0) {
+      showToast('Please enter a valid top-up amount', 'error');
+      return;
+    }
+    const newInv = {
+      id: `topup-${Date.now().toString().slice(-8)}`,
+      planName: `Account Top-up (2X Renewal)`,
+      category: 'direct',
+      amountInvested: amt,
+      totalReturn: amt * 2,
+      earnedSoFar: 0,
+      monthlyReturn: '6.66%',
+      startDate: new Date().toLocaleString(),
+      endDate: new Date(Date.now() + 86400000 * 365).toLocaleString(),
+      duration: '12 Months',
+      nextPayout: new Date(Date.now() + 86400000 * 30).toLocaleString(),
+      status: 'Active' as const,
+    };
+    const updatedInvs = [newInv, ...userInvestments];
+    setUserInvestments(updatedInvs);
+    const newTotal = totalInvested + amt;
+    const updated = {
+      ...currentUser,
+      totalInvested: newTotal,
+      investments: updatedInvs,
+    };
+    setCurrentUser(updated);
+    if (onUpdateUser) onUpdateUser(updated);
+    setTopupAmount('');
+    showToast(`Account top-up of ₹${amt.toLocaleString()} executed! 2X returns limit renewed.`);
+  };
+
+  // Save Profile Changes
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     const updated: AdminUserItem = {
@@ -157,27 +226,28 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     };
     setCurrentUser(updated);
     if (onUpdateUser) onUpdateUser(updated);
-    showToast('Profile information updated successfully!');
+    setIsEditingProfile(false);
+    showToast('Profile information saved successfully!');
   };
 
-  // Handle Save Bank & KYC
-  const handleSaveBankAndKyc = (e: React.FormEvent) => {
+  // Save Bank Changes
+  const handleSaveBank = (e: React.FormEvent) => {
     e.preventDefault();
     const updated: AdminUserItem = {
       ...currentUser,
       kycStatus,
       bankAccount: {
-        accountHolder: bankHolder,
+        accountHolder: bankPayeeName,
         bankName,
         accountNumber: bankAccountNum,
         ifscCode: bankIfsc,
-        upiId: bankUpi,
-        isBound: bankIsBound,
+        isBound: true,
       }
     };
     setCurrentUser(updated);
     if (onUpdateUser) onUpdateUser(updated);
-    showToast('Bank details and KYC status saved!');
+    setIsEditingBank(false);
+    showToast('Bank details updated successfully!');
   };
 
   // Handle Assign Plan
@@ -348,7 +418,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Pill Tab Navigation (Exact match to Bee Grow Screenshots) */}
+      {/* Horizontal Pill Tab Navigation (ALL 10 TABS - Exact match to Bee Grow Screenshots) */}
       <div className="overflow-x-auto pb-1 scrollbar-none">
         <div className="flex items-center gap-2 min-w-max">
           {[
@@ -361,6 +431,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             { id: 'profile', label: 'Profile' },
             { id: 'kyc_bank', label: 'KYC & Bank' },
             { id: 'add_money', label: 'Add Money' },
+            { id: 'topup', label: 'Top-Up' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -545,7 +616,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 2: INVESTMENTS (Exact match to Screenshot 3) ================= */}
+      {/* ================= TAB 2: INVESTMENTS (Exact match to Screenshot 3 from prev message) ================= */}
       {activeTab === 'investments' && (
         <div className="space-y-4 animate-in fade-in-50 duration-150">
           <div className="flex items-center justify-between">
@@ -576,7 +647,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </div>
               </div>
 
-              {/* 4 Large Highlight Boxes (Screenshot 3) */}
+              {/* 4 Large Highlight Boxes */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <span className="text-xs text-slate-500 font-bold block mb-1">Amount Invested</span>
@@ -607,7 +678,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </div>
               </div>
 
-              {/* Date Metadata Row (Screenshot 3) */}
+              {/* Date Metadata Row */}
               <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-500 pt-2 border-t border-slate-100">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
@@ -646,7 +717,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 3: TEAM TREE (Exact match to Screenshot 4) ================= */}
+      {/* ================= TAB 3: TEAM TREE ================= */}
       {activeTab === 'team_tree' && (
         <div className="space-y-5 animate-in fade-in-50 duration-150">
           {/* Top 4 Business Cards Grid */}
@@ -680,12 +751,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             </div>
           </div>
 
-          {/* Two-Column Layout: Level-wise Business (Left) & Detailed Team Report (Right) */}
+          {/* Two-Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            {/* Left Column: Level-wise Business (Screenshot 4) */}
             <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <h3 className="font-bold text-slate-900 text-sm font-sans">Level-wise Business</h3>
-
               <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
                 {[1, 2, 3, 4, 5, 6].map((lvl) => (
                   <div
@@ -706,7 +775,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </div>
             </div>
 
-            {/* Right Column: Detailed Team Report (Screenshot 4) */}
             <div className="lg:col-span-8 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-slate-900 text-sm font-sans">Detailed Team Report</h3>
@@ -719,7 +787,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </button>
               </div>
 
-              {/* Table with Empty State */}
               <div className="border border-slate-200 rounded-xl overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
@@ -899,189 +966,405 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 7: PROFILE ================= */}
+      {/* ================= TAB 7: PROFILE (Exact match to Screenshot 2) ================= */}
       {activeTab === 'profile' && (
-        <form onSubmit={handleSaveProfile} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5 animate-in fade-in-50 duration-150">
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 animate-in fade-in-50 duration-150">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-slate-900 text-base font-sans">User Profile & Account Safeguards</h3>
+            <h3 className="font-bold text-slate-900 text-base font-sans">Profile Information</h3>
             <button
-              type="button"
-              onClick={handleToggleLock}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition ${
-                currentUser.profileLocked
-                  ? 'bg-rose-100 text-rose-700 hover:bg-rose-200'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
+              onClick={() => setIsEditingProfile(!isEditingProfile)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition"
             >
-              {currentUser.profileLocked ? '🔒 Profile Locked' : '🔓 Profile Unlocked'}
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>{isEditingProfile ? 'Cancel' : 'Edit'}</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Full Name</label>
-              <input
-                type="text"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          {!isEditingProfile ? (
+            <div className="space-y-6 text-xs">
+              {/* Main Info Grid (Screenshot 2) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Full Name</span>
+                  <span className="font-bold text-slate-900">{currentUser.name}</span>
+                </div>
 
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Mobile Number</label>
-              <input
-                type="text"
-                value={profileMobile}
-                onChange={(e) => setProfileMobile(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Email</span>
+                  <span className="font-bold text-slate-900">{profileEmail}</span>
+                </div>
 
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Email Address</label>
-              <input
-                type="email"
-                value={profileEmail}
-                onChange={(e) => setProfileEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Mobile</span>
+                  <span className="font-mono font-bold text-slate-900">{currentUser.mobile}</span>
+                </div>
 
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">City / Location</label>
-              <input
-                type="text"
-                value={profileCity}
-                onChange={(e) => setProfileCity(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">City</span>
+                  <span className="font-bold text-slate-900">{profileCity}</span>
+                </div>
 
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">4-Digit Security PIN</label>
-              <input
-                type="text"
-                maxLength={4}
-                value={profilePin}
-                onChange={(e) => setProfilePin(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Password</span>
+                  <span className="font-mono font-bold text-slate-900">{profilePassword}</span>
+                </div>
 
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Account Login Password</label>
-              <input
-                type="text"
-                value={profilePassword}
-                onChange={(e) => setProfilePassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Security PIN</span>
+                  <span className="font-mono font-bold text-slate-900">{profilePin}</span>
+                </div>
 
-          <div className="pt-2 flex justify-end">
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition"
-            >
-              Save Profile Changes
-            </button>
-          </div>
-        </form>
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Sponsor ID</span>
+                  <span className="font-mono font-bold text-[#70c028]">{currentUser.sponsorId}</span>
+                </div>
+
+                <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                  <span className="text-slate-500 font-semibold w-28">Joined</span>
+                  <span className="font-mono font-bold text-slate-900">{currentUser.joined}</span>
+                </div>
+              </div>
+
+              {/* Divider & Address Details (Screenshot 2) */}
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <h4 className="font-bold text-slate-900 text-sm">Address Details</h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                    <span className="text-slate-500 font-semibold w-28">Address</span>
+                    <span className="text-slate-700">{profileAddress}</span>
+                  </div>
+
+                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                    <span className="text-slate-500 font-semibold w-28">District</span>
+                    <span className="text-slate-700">{profileDistrict}</span>
+                  </div>
+
+                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                    <span className="text-slate-500 font-semibold w-28">State</span>
+                    <span className="text-slate-700">{profileState}</span>
+                  </div>
+
+                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
+                    <span className="text-slate-500 font-semibold w-28">Pincode</span>
+                    <span className="text-slate-700">{profilePincode}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Editable Profile Form */
+            <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={profileEmail}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Mobile</label>
+                  <input
+                    type="text"
+                    value={profileMobile}
+                    onChange={(e) => setProfileMobile(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">City</label>
+                  <input
+                    type="text"
+                    value={profileCity}
+                    onChange={(e) => setProfileCity(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Login Password</label>
+                  <input
+                    type="text"
+                    value={profilePassword}
+                    onChange={(e) => setProfilePassword(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Security PIN</label>
+                  <input
+                    type="text"
+                    maxLength={4}
+                    value={profilePin}
+                    onChange={(e) => setProfilePin(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Address</label>
+                  <input
+                    type="text"
+                    value={profileAddress}
+                    onChange={(e) => setProfileAddress(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Pincode</label>
+                  <input
+                    type="text"
+                    value={profilePincode}
+                    onChange={(e) => setProfilePincode(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingProfile(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs"
+                >
+                  Save Profile Information
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
 
-      {/* ================= TAB 8: KYC & BANK ================= */}
+      {/* ================= TAB 8: KYC & BANK (Exact match to Screenshot 3) ================= */}
       {activeTab === 'kyc_bank' && (
-        <form onSubmit={handleSaveBankAndKyc} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5 animate-in fade-in-50 duration-150">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-slate-900 text-base font-sans">Bank Card & KYC Verification Management</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-bold">KYC Status:</span>
-              <select
-                value={kycStatus}
-                onChange={(e) => setKycStatus(e.target.value as any)}
-                className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold outline-hidden focus:ring-2 focus:ring-blue-500 bg-white"
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6 animate-in fade-in-50 duration-150">
+          {/* Header Row with Action Pills (Screenshot 3) */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <h3 className="font-bold text-slate-900 text-base font-sans">KYC & Bank Details</h3>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={handleApproveKyc}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-black text-xs transition shadow-xs"
               >
-                <option value="UNFILLED">UNFILLED</option>
-                <option value="PENDING">PENDING</option>
-                <option value="APPROVED">APPROVED</option>
-                <option value="REJECTED">REJECTED</option>
-              </select>
+                <ShieldCheck className="w-4 h-4" />
+                <span>Approve KYC</span>
+              </button>
+
+              <button
+                onClick={handleRejectKyc}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 font-bold text-xs transition"
+              >
+                <X className="w-4 h-4" />
+                <span>Reject KYC</span>
+              </button>
+
+              <button
+                onClick={handleToggleLock}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 font-bold text-xs transition"
+              >
+                <Lock className="w-4 h-4" />
+                <span>{currentUser.profileLocked ? 'Unlock Profile' : 'Lock Profile'}</span>
+              </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Account Holder Name</label>
-              <input
-                type="text"
-                value={bankHolder}
-                onChange={(e) => setBankHolder(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Bank Name</label>
-              <input
-                type="text"
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">Bank Account Number</label>
-              <input
-                type="text"
-                value={bankAccountNum}
-                onChange={(e) => setBankAccountNum(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">IFSC Code</label>
-              <input
-                type="text"
-                value={bankIfsc}
-                onChange={(e) => setBankIfsc(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="font-bold text-slate-700 block mb-1">UPI ID (VPA)</label>
-              <input
-                type="text"
-                value={bankUpi}
-                onChange={(e) => setBankUpi(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-            <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
-              <input
-                type="checkbox"
-                checked={bankIsBound}
-                onChange={(e) => setBankIsBound(e.target.checked)}
-                className="w-4 h-4 rounded text-blue-600"
-              />
-              <span>Mark Bank Account as Verified & Bound</span>
-            </label>
-
+          {/* Edit Button */}
+          <div>
             <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition"
+              onClick={() => setIsEditingBank(!isEditingBank)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition"
             >
-              Save Bank & KYC Settings
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>{isEditingBank ? 'Cancel' : 'Edit'}</span>
             </button>
           </div>
-        </form>
+
+          {!isEditingBank ? (
+            <div className="space-y-6 text-xs">
+              {/* Section 1: Aadhaar & PAN (Screenshot 3) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                <div>
+                  <span className="text-slate-500 font-semibold block mb-1">Aadhaar Number</span>
+                  <span className="font-mono text-slate-700">{aadhaarNum}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-500 font-semibold block mb-1">PAN Number</span>
+                  <span className="font-mono text-slate-700">{panNum}</span>
+                </div>
+              </div>
+
+              {/* Section 2: Bank Information (Screenshot 3) */}
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <h4 className="font-bold text-slate-900 text-sm">Bank Information</h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                  <div>
+                    <span className="text-slate-500 font-semibold block mb-1">Bank Name</span>
+                    <span className="text-slate-700">{bankName}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500 font-semibold block mb-1">Account No</span>
+                    <span className="font-mono text-slate-700">{bankAccountNum}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500 font-semibold block mb-1">IFSC Code</span>
+                    <span className="font-mono text-slate-700">{bankIfsc}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-500 font-semibold block mb-1">Branch</span>
+                    <span className="text-slate-700">{bankBranch}</span>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <span className="text-slate-500 font-semibold block mb-1">Payee Name</span>
+                    <span className="text-slate-700">{bankPayeeName}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: KYC Documents (Screenshot 3) */}
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <h4 className="font-bold text-slate-900 text-sm">KYC Documents</h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                    <span className="text-xs font-bold text-slate-700 block">Aadhaar Front</span>
+                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                    <span className="text-xs font-bold text-slate-700 block">Aadhaar Back</span>
+                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                    <span className="text-xs font-bold text-slate-700 block">PAN Card</span>
+                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Editable Bank Form */
+            <form onSubmit={handleSaveBank} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Aadhaar Number</label>
+                  <input
+                    type="text"
+                    value={aadhaarNum}
+                    onChange={(e) => setAadhaarNum(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">PAN Number</label>
+                  <input
+                    type="text"
+                    value={panNum}
+                    onChange={(e) => setPanNum(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Bank Name</label>
+                  <input
+                    type="text"
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Account Number</label>
+                  <input
+                    type="text"
+                    value={bankAccountNum}
+                    onChange={(e) => setBankAccountNum(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">IFSC Code</label>
+                  <input
+                    type="text"
+                    value={bankIfsc}
+                    onChange={(e) => setBankIfsc(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Branch</label>
+                  <input
+                    type="text"
+                    value={bankBranch}
+                    onChange={(e) => setBankBranch(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">Payee Name</label>
+                  <input
+                    type="text"
+                    value={bankPayeeName}
+                    onChange={(e) => setBankPayeeName(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingBank(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs"
+                >
+                  Save Bank Details
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
 
       {/* ================= TAB 9: ADD / DEDUCT MONEY ================= */}
@@ -1176,6 +1459,53 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             </button>
           </div>
         </form>
+      )}
+
+      {/* ================= TAB 10: TOP-UP (Exact match to Screenshot 4) ================= */}
+      {activeTab === 'topup' && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-amber-300/80 shadow-md space-y-6 animate-in fade-in-50 duration-150">
+          {/* Header with Icon (Screenshot 4) */}
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 border border-amber-200/60">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 text-base font-sans">Account Top-up</h3>
+              <p className="text-xs text-slate-500">Renew {currentUser.name}'s 2X returns limit</p>
+            </div>
+          </div>
+
+          {/* Light Blue-Gray Callout Notice (Screenshot 4) */}
+          <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs text-slate-600 leading-relaxed">
+            If the user has reached their 2X exact limit, you can top-up their account here to reactivate their daily ROI and Level Income generation. This effectively acts as a fresh investment.
+          </div>
+
+          {/* Form (Screenshot 4) */}
+          <form onSubmit={handleTopupSubmit} className="space-y-4 text-xs">
+            <div>
+              <label className="font-bold text-slate-800 block mb-1">
+                Top-up Amount (₹) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="number"
+                placeholder="Enter top-up amount"
+                value={topupAmount}
+                onChange={(e) => setTopupAmount(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-mono font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-[#70c028] focus:ring-1 focus:ring-[#70c028] transition"
+                required
+              />
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="px-6 py-3 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-black text-xs shadow-md shadow-[#70c028]/25 transition"
+              >
+                Execute Account Top-Up
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       {/* ================= MODAL: ASSIGN NEW PLAN ================= */}
