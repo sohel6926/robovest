@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { TablePagination } from '../TablePagination';
 import { Filter, Download, ArrowDownToLine, Check, X, Eye, Image as ImageIcon, QrCode } from 'lucide-react';
 import { Transaction } from '../../../types';
 
@@ -22,6 +23,10 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
   const [activeFilter, setActiveFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL'>('PENDING');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
   // Live top-up items
   const recharges = pendingTransactions.filter(t => t.type === 'RECHARGE');
 
@@ -31,6 +36,12 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
     if (activeFilter === 'REJECTED') return t.status === 'REJECTED';
     return true;
   });
+
+  const paginatedRecharges = useMemo(() => {
+    const size = pageSize >= 99999 ? filteredRecharges.length : pageSize;
+    const start = (currentPage - 1) * size;
+    return filteredRecharges.slice(start, start + size);
+  }, [filteredRecharges, currentPage, pageSize]);
 
   const handleExport = () => {
     const headers = ['Txn ID', 'Type', 'Amount', 'Status', 'Date', 'Description', 'UTR Reference'];
@@ -74,7 +85,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-xs">
             <button
-              onClick={() => setActiveFilter('PENDING')}
+              onClick={() => { setActiveFilter('PENDING'); setCurrentPage(1); }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'PENDING'
                   ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
@@ -84,7 +95,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               Pending
             </button>
             <button
-              onClick={() => setActiveFilter('APPROVED')}
+              onClick={() => { setActiveFilter('APPROVED'); setCurrentPage(1); }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'APPROVED'
                   ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
@@ -94,7 +105,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               Approved
             </button>
             <button
-              onClick={() => setActiveFilter('REJECTED')}
+              onClick={() => { setActiveFilter('REJECTED'); setCurrentPage(1); }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'REJECTED'
                   ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
@@ -104,7 +115,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               Rejected
             </button>
             <button
-              onClick={() => setActiveFilter('ALL')}
+              onClick={() => { setActiveFilter('ALL'); setCurrentPage(1); }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition ${
                 activeFilter === 'ALL'
                   ? 'bg-[#FF4A00] text-white shadow-md shadow-[#FF4A00]/25'
@@ -140,9 +151,8 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
           </p>
         </div>
       ) : (
-        /* Recharges List */
         <div className="space-y-3">
-          {filteredRecharges.map(t => (
+          {paginatedRecharges.map(t => (
             <div
               key={t.id}
               className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
@@ -207,6 +217,18 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               </div>
             </div>
           ))}
+
+          {/* Pagination & Rows-Per-Page Selector */}
+          <div className="rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+            <TablePagination
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalItems={filteredRecharges.length}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              itemLabel="requests"
+            />
+          </div>
         </div>
       )}
 

@@ -61,6 +61,7 @@ import { AdminWithdrawalsView } from './views/AdminWithdrawalsView';
 import { AdminTopupsView } from './views/AdminTopupsView';
 import { AdminSettingsView } from './views/AdminSettingsView';
 import { AdminRechargeDetailsView } from './views/AdminRechargeDetailsView';
+import { TablePagination } from './TablePagination';
 import { resolveProductImage } from '../../data/products';
 
 import heroImage from '../../assets/images/hero_home_robot_1791407310783.jpg';
@@ -132,7 +133,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Navigation Tab
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'users' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'dailyWithdrawals'
+    'dashboard' | 'users' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'dailyWithdrawals'
   >('dashboard');
   const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
 
@@ -195,6 +196,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [bankReferenceInput, setBankReferenceInput] = useState('');
   const [withdrawalAdminNote, setWithdrawalAdminNote] = useState('');
   const [withdrawalRejectReason, setWithdrawalRejectReason] = useState('');
+
+  // Table Pagination States
+  const [dailyLogsPage, setDailyLogsPage] = useState<number>(1);
+  const [dailyLogsPageSize, setDailyLogsPageSize] = useState<number>(10);
+  const [rechargesTablePage, setRechargesTablePage] = useState<number>(1);
+  const [rechargesTablePageSize, setRechargesTablePageSize] = useState<number>(10);
+  const [withdrawalsTablePage, setWithdrawalsTablePage] = useState<number>(1);
+  const [withdrawalsTablePageSize, setWithdrawalsTablePageSize] = useState<number>(10);
 
   // User 360 Comprehensive Inspection (Bee Grow UserDetail.tsx)
   const [isUser360Open, setIsUser360Open] = useState(false);
@@ -938,24 +947,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <span>Plans ({catalog.length})</span>
               </button>
 
-              {/* Nodes & Yield Engine */}
-              <button
-                onClick={() => setActiveTab('orders')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                  activeTab === 'orders'
-                    ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
-                    : 'text-slate-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="w-4 h-4 shrink-0" />
-                  <span>Nodes & Yield Engine</span>
-                </div>
-                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
-                  {activeNodes.length}
-                </span>
-              </button>
-
               {/* Daily Withdrawal Logs */}
               <button
                 onClick={() => setActiveTab('dailyWithdrawals')}
@@ -1303,8 +1294,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-medium">
-                      {dailyWithdrawalLogs.map((log) => {
-                        const isExpanded = expandedDateRow === log.date;
+                      {dailyWithdrawalLogs
+                        .slice(
+                          (dailyLogsPage - 1) * (dailyLogsPageSize >= 99999 ? dailyWithdrawalLogs.length : dailyLogsPageSize),
+                          (dailyLogsPage - 1) * (dailyLogsPageSize >= 99999 ? dailyWithdrawalLogs.length : dailyLogsPageSize) +
+                            (dailyLogsPageSize >= 99999 ? dailyWithdrawalLogs.length : dailyLogsPageSize)
+                        )
+                        .map((log) => {
+                          const isExpanded = expandedDateRow === log.date;
 
                         return (
                           <React.Fragment key={log.date}>
@@ -1438,6 +1435,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     </tbody>
                   </table>
                 </div>
+
+                {/* Pagination & Rows-Per-Page Selector */}
+                <TablePagination
+                  currentPage={dailyLogsPage}
+                  pageSize={dailyLogsPageSize}
+                  totalItems={dailyWithdrawalLogs.length}
+                  onPageChange={setDailyLogsPage}
+                  onPageSizeChange={setDailyLogsPageSize}
+                  itemLabel="days"
+                />
               </div>
             </div>
           )}
@@ -1745,8 +1752,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             </td>
                           </tr>
                         ) : (
-                          filteredRechargeList.map((txn) => {
-                            const isPending = txn.status === 'PROCESSING';
+                          filteredRechargeList
+                            .slice(
+                              (rechargesTablePage - 1) * (rechargesTablePageSize >= 99999 ? filteredRechargeList.length : rechargesTablePageSize),
+                              (rechargesTablePage - 1) * (rechargesTablePageSize >= 99999 ? filteredRechargeList.length : rechargesTablePageSize) +
+                                (rechargesTablePageSize >= 99999 ? filteredRechargeList.length : rechargesTablePageSize)
+                            )
+                            .map((txn) => {
+                              const isPending = txn.status === 'PROCESSING';
                             const utr = txn.referenceId || 'N/A';
 
                             return (
@@ -1841,6 +1854,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Pagination & Rows-Per-Page Selector */}
+                  <TablePagination
+                    currentPage={rechargesTablePage}
+                    pageSize={rechargesTablePageSize}
+                    totalItems={filteredRechargeList.length}
+                    onPageChange={setRechargesTablePage}
+                    onPageSizeChange={setRechargesTablePageSize}
+                    itemLabel="records"
+                  />
                 </div>
               </div>
             );
@@ -2025,8 +2048,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             </td>
                           </tr>
                         ) : (
-                          filteredWithdrawalList.map((txn) => {
-                            const isPending = txn.status === 'PROCESSING';
+                          filteredWithdrawalList
+                            .slice(
+                              (withdrawalsTablePage - 1) * (withdrawalsTablePageSize >= 99999 ? filteredWithdrawalList.length : withdrawalsTablePageSize),
+                              (withdrawalsTablePage - 1) * (withdrawalsTablePageSize >= 99999 ? filteredWithdrawalList.length : withdrawalsTablePageSize) +
+                                (withdrawalsTablePageSize >= 99999 ? filteredWithdrawalList.length : withdrawalsTablePageSize)
+                            )
+                            .map((txn) => {
+                              const isPending = txn.status === 'PROCESSING';
                             const gross = Math.abs(txn.amount);
                             const fee = txn.fee ?? Math.round(gross * 0.1);
                             const net = txn.netAmount ?? (gross - fee);
@@ -2151,172 +2180,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Pagination & Rows-Per-Page Selector */}
+                  <TablePagination
+                    currentPage={withdrawalsTablePage}
+                    pageSize={withdrawalsTablePageSize}
+                    totalItems={filteredWithdrawalList.length}
+                    onPageChange={setWithdrawalsTablePage}
+                    onPageSizeChange={setWithdrawalsTablePageSize}
+                    itemLabel="records"
+                  />
                 </div>
               </div>
             );
           })()}
 
 
-          {/* ================= SECTION 6: USER ACTIVE ROBOTS & YIELD ENGINE (Bee Grow dailyRoi) ================= */}
-          {activeTab === 'orders' && (() => {
-            const activeNodes = investments.filter(i => i.status === 'ACTIVE');
-            const totalDailyExpectedYield = activeNodes.reduce((sum, inv) => sum + inv.dailyIncome, 0);
-            const estimatedL1Commission = Math.round(totalDailyExpectedYield * 0.10);
-            const estimatedL2Commission = Math.round(totalDailyExpectedYield * 0.05);
-            const estimatedL3Commission = Math.round(totalDailyExpectedYield * 0.02);
-            const totalEstimatedCommissions = estimatedL1Commission + estimatedL2Commission + estimatedL3Commission;
 
-            return (
-              <div className="space-y-4">
-                {/* Bee Grow dailyRoi Automated Yield & Commission Engine Control */}
-                <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-5 text-white shadow-xl space-y-4">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-5 h-5 text-amber-400" />
-                        <h3 className="text-base font-black font-sans">
-                          Automated Daily Yield & Commission Engine (FanCode dailyRoi)
-                        </h3>
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase">
-                          Ready
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-300 mt-1">
-                        Execute today's yield payout cycle: advances active contracts, distributes node ROI, calculates downline referral commissions (L1: 10%, L2: 5%, L3: 2%), and creates transaction audit records.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => setIsYieldConfirmOpen(true)}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 active:scale-95 transition shrink-0"
-                    >
-                      <Play className="w-4 h-4 fill-slate-950" />
-                      <span>Run Daily Yield & Referral Payout Cycle</span>
-                    </button>
-                  </div>
-
-                  {/* 4 Engine Metrics */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <div>
-                      <span className="text-xs font-semibold text-slate-400 block font-sans">Active Robot Nodes</span>
-                      <div className="font-black text-2xl text-white font-sans tracking-tight mt-1">{activeNodes.length} Units</div>
-                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Cap: Duration check active</span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-semibold text-slate-400 block font-sans">Expected Node Yield</span>
-                      <div className="font-black text-2xl text-emerald-400 font-sans tracking-tight mt-1">₹ {totalDailyExpectedYield.toLocaleString('en-IN')}</div>
-                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Direct into user wallet</span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-semibold text-slate-400 block font-sans">Downline Referral Comm.</span>
-                      <div className="font-black text-2xl text-[#FF4A00] font-sans tracking-tight mt-1">₹ {totalEstimatedCommissions.toLocaleString('en-IN')}</div>
-                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">L1 10% · L2 5% · L3 2%</span>
-                    </div>
-                    <div>
-                      <span className="text-xs font-semibold text-slate-400 block font-sans">Total Payout Volume</span>
-                      <div className="font-black text-2xl text-amber-400 font-sans tracking-tight mt-1">
-                        ₹ {(totalDailyExpectedYield + totalEstimatedCommissions).toLocaleString('en-IN')}
-                      </div>
-                      <span className="text-[11px] text-slate-400 block mt-0.5 font-sans">Simulated Time Synced</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Fleet Header */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
-                  <div>
-                    <h2 className="text-lg font-black text-slate-900 font-sans">
-                      Active FanCode Plan Orders
-                    </h2>
-                    <p className="text-xs text-slate-500 font-sans">
-                      Currently deployed plans generating daily revenue for User5294.
-                    </p>
-                  </div>
-                  <span className="px-3 py-1 rounded-xl bg-orange-50 text-[#FF4A00] font-bold text-xs border border-orange-200 font-sans">
-                    {investments.length} Active Contracts
-                  </span>
-                </div>
-
-                {investments.length === 0 ? (
-                <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs font-sans">
-                  No active plan investments yet. User can purchase units from the catalog.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {investments.map((inv) => {
-                    const daysActive = calculateDaysPassed(
-                      inv.purchaseTimestamp || inv.purchaseDateFormatted,
-                      simulatedTime,
-                      platformSettings.dailyWithdrawalWindowStart,
-                      inv.daysElapsed
-                    );
-                    const remainingDays = Math.max(0, 150 - daysActive);
-                    const progressPercent = Math.min(100, Math.round((daysActive / 150) * 100));
-
-                    return (
-                      <div key={inv.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-slate-900 text-sm font-sans tracking-tight">{inv.productName}</span>
-                              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px] font-sans">
-                                Qty: {inv.quantity}
-                              </span>
-                            </div>
-                            <p className="text-xs text-slate-500 mt-0.5 font-sans">{inv.robotModel}</p>
-                          </div>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black font-sans ${
-                            inv.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
-                          }`}>
-                            {inv.status}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl text-xs font-sans">
-                          <div>
-                            <span className="text-xs font-semibold text-slate-500 block font-sans">Invested</span>
-                            <span className="font-black text-base text-slate-900 tracking-tight font-sans block mt-0.5">₹ {inv.totalInvested.toLocaleString('en-IN')}</span>
-                          </div>
-                          <div>
-                            <span className="text-xs font-semibold text-slate-500 block font-sans">Daily Yield</span>
-                            <span className="font-black text-base text-emerald-600 tracking-tight font-sans block mt-0.5">₹ {inv.dailyIncome.toLocaleString('en-IN')}</span>
-                          </div>
-                          <div>
-                            <span className="text-xs font-semibold text-slate-500 block font-sans">Bonus Given</span>
-                            <span className="font-black text-base text-[#FF4A00] tracking-tight font-sans block mt-0.5">₹ {inv.bonusReceived.toLocaleString('en-IN')}</span>
-                          </div>
-                        </div>
-
-                        {/* Self-Updating Days Active & Lifecycle Progress */}
-                        <div className="space-y-1.5 pt-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                              <span className="text-slate-400 text-[11px] font-sans">
-                                Purchased: {inv.purchaseDateFormatted}
-                              </span>
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">
-                                {daysActive} {daysActive === 1 ? 'day' : 'days'} active (Day {daysActive}/150)
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-sans text-slate-400">
-                              {remainingDays}d remaining
-                            </span>
-                          </div>
-                          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                              style={{ width: `${progressPercent}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })()}
 
           {/* ================= SECTION 7: PLATFORM SETTINGS ================= */}
           {activeTab === 'settings' && (

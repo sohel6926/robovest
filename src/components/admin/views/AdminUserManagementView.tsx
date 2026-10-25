@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { TablePagination } from '../TablePagination';
 import { 
   Search, 
   Calendar, 
@@ -290,7 +291,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState<number>(10);
 
   // Filtered Users
   const filteredUsers = useMemo(() => {
@@ -650,59 +651,15 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-center gap-1.5 bg-white text-xs font-bold text-slate-600">
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>Previous</span>
-          </button>
-
-          {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-            const pageNum = i + 1;
-            return (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition ${
-                  currentPage === pageNum
-                    ? 'bg-[#0B1536] text-white font-bold shadow-xs'
-                    : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-
-          {totalPages > 5 && (
-            <>
-              <span className="px-1 text-slate-400">...</span>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition ${
-                  currentPage === totalPages
-                    ? 'bg-[#0B1536] text-white font-bold shadow-xs'
-                    : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                {totalPages}
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
-          >
-            <span>Next</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        {/* Pagination & Rows-Per-Page Selector */}
+        <TablePagination
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalItems={filteredUsers.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="users"
+        />
       </div>
 
       {/* ================= MODAL: CREATE USER ================= */}

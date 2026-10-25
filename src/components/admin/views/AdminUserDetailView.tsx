@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TablePagination } from '../TablePagination';
 import { 
   ArrowLeft, 
   Power, 
@@ -111,6 +112,12 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
   const [selectedProductId, setSelectedProductId] = useState<string>('B');
   const [newPlanAmount, setNewPlanAmount] = useState('2100');
   const [newPlanRoi, setNewPlanRoi] = useState('₹500 / Day');
+
+  // Table Pagination
+  const [incomePage, setIncomePage] = useState<number>(1);
+  const [incomePageSize, setIncomePageSize] = useState<number>(10);
+  const [walletHistPage, setWalletHistPage] = useState<number>(1);
+  const [walletHistPageSize, setWalletHistPageSize] = useState<number>(10);
 
   // Calculations & default fallbacks
   const walletBal = currentUser.walletBalance ?? 2220;
@@ -822,6 +829,16 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={incomePage}
+            pageSize={incomePageSize}
+            totalItems={4}
+            onPageChange={setIncomePage}
+            onPageSizeChange={setIncomePageSize}
+            itemLabel="entries"
+            className="rounded-xl border border-slate-200"
+          />
         </div>
       )}
 
@@ -864,7 +881,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-INV-4412</td>
                   <td className="px-4 py-3 font-bold text-indigo-600">SPORTS_CONTRACT</td>
                   <td className="px-4 py-3 font-sans font-bold text-slate-800">-₹ 5,00,000</td>
-                  <td className="px-4 py-3 text-slate-600">Subscribed Product B (Formula 1 Velocity Grand Prix)</td>
+                  <td className="px-4 py-3 text-slate-600">Subscribed Product B</td>
                   <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:44</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -887,6 +904,16 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </tbody>
             </table>
           </div>
+
+          <TablePagination
+            currentPage={walletHistPage}
+            pageSize={walletHistPageSize}
+            totalItems={3}
+            onPageChange={setWalletHistPage}
+            onPageSizeChange={setWalletHistPageSize}
+            itemLabel="transactions"
+            className="rounded-xl border border-slate-200"
+          />
         </div>
       )}
 

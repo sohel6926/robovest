@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { TablePagination } from '../TablePagination';
 import { Wallet, Search, Download, Plus, Clock, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Transaction } from '../../../types';
 
@@ -110,6 +111,10 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
   const [typeFilter, setTypeFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
   const filteredRecords = useMemo(() => {
     return records.filter(rec => {
       if (search.trim()) {
@@ -127,6 +132,12 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
       return true;
     });
   }, [records, search, typeFilter, sourceFilter]);
+
+  const paginatedRecords = useMemo(() => {
+    const size = pageSize >= 99999 ? filteredRecords.length : pageSize;
+    const start = (currentPage - 1) * size;
+    return filteredRecords.slice(start, start + size);
+  }, [filteredRecords, currentPage, pageSize]);
 
   const handleExport = () => {
     const headers = ['#', 'Date', 'User', 'User ID', 'Type', 'Amount', 'Balance After', 'Description', 'Source'];
@@ -198,7 +209,10 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             type="text"
             placeholder="Filter by User ID..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
           />
         </div>
@@ -207,7 +221,10 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
+            onChange={(e) => {
+              setTypeFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#FF4A00]"
           >
             <option value="">All Types</option>
@@ -217,7 +234,10 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
 
           <select
             value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
+            onChange={(e) => {
+              setSourceFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-[#FF4A00]"
           >
             <option value="">All Sources</option>
@@ -270,7 +290,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
                   </td>
                 </tr>
               ) : (
-                filteredRecords.map(item => (
+                paginatedRecords.map((item, idx) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-4 py-3.5 font-sans text-slate-400 font-bold">
                       {item.serialNo}
@@ -317,6 +337,16 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination & Rows-Per-Page Selector */}
+        <TablePagination
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalItems={filteredRecords.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          itemLabel="transactions"
+        />
       </div>
     </div>
   );

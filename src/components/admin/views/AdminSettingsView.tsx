@@ -242,39 +242,6 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
         </div>
       </div>
 
-      {/* Tax & Deductions Card (matching Screenshot 3) */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-black">
-            %
-          </div>
-          <h3 className="font-black text-base text-slate-900 font-sans tracking-tight">
-            Tax & Deductions
-          </h3>
-        </div>
-
-        <div>
-          <label className="text-xs font-semibold text-slate-500 block mb-1.5 font-sans">
-            TDS Deduction (%)
-          </label>
-          <div className="relative max-w-xs">
-            <input
-              type="number"
-              min={0}
-              max={50}
-              value={tdsPercent}
-              onChange={(e) => setTdsPercent(Number(e.target.value))}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-sans text-base font-black text-slate-900 tracking-tight outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
-            />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400 font-sans">
-              %
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-1 font-medium">
-            Percentage deducted automatically on withdrawals.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

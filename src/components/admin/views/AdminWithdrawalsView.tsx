@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { TablePagination } from '../TablePagination';
 import { 
   ArrowUpToLine, 
   Clock, 
@@ -42,9 +43,9 @@ export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
     userId: 'FC9271551',
     requestedDate: '12 Oct 2026',
     amount: 560,
-    tdsPercent: 5,
-    tdsAmount: 28,
-    netAmount: 532,
+    tdsPercent: 10,
+    tdsAmount: 56,
+    netAmount: 504,
     bankName: 'State Bank of india',
     accountNumber: '31877094491',
     ifscCode: 'SBIN0000919',
@@ -59,9 +60,9 @@ export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
     userId: 'FC2447574',
     requestedDate: '12 Oct 2026',
     amount: 10000,
-    tdsPercent: 5,
-    tdsAmount: 500,
-    netAmount: 9500,
+    tdsPercent: 10,
+    tdsAmount: 1000,
+    netAmount: 9000,
     bankName: 'Sbi',
     accountNumber: '33997522575',
     ifscCode: 'SBIN0004827',
@@ -76,9 +77,9 @@ export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
     userId: 'FC7638923',
     requestedDate: '14 Oct 2026',
     amount: 2500,
-    tdsPercent: 5,
-    tdsAmount: 125,
-    netAmount: 2375,
+    tdsPercent: 10,
+    tdsAmount: 250,
+    netAmount: 2250,
     bankName: 'Union Bank of India',
     accountNumber: '09811010004921',
     ifscCode: 'UBIN0530981',
@@ -93,9 +94,9 @@ export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
     userId: 'FC1402520',
     requestedDate: '15 Oct 2026',
     amount: 1200,
-    tdsPercent: 5,
-    tdsAmount: 60,
-    netAmount: 1140,
+    tdsPercent: 10,
+    tdsAmount: 120,
+    netAmount: 1080,
     bankName: 'Punjab National Bank',
     accountNumber: '4421000100234190',
     ifscCode: 'PUNB0442100',
@@ -110,9 +111,9 @@ export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
     userId: 'FC4553454',
     requestedDate: '16 Oct 2026',
     amount: 800,
-    tdsPercent: 5,
-    tdsAmount: 40,
-    netAmount: 760,
+    tdsPercent: 10,
+    tdsAmount: 80,
+    netAmount: 720,
     bankName: 'HDFC Bank',
     accountNumber: '50100349182910',
     ifscCode: 'HDFC0001290',
@@ -148,9 +149,9 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
         userId: 'FC5294001',
         requestedDate: t.formattedTime || t.timestamp,
         amount: Math.abs(t.amount),
-        tdsPercent: 5,
-        tdsAmount: Math.round(Math.abs(t.amount) * 0.05),
-        netAmount: Math.round(Math.abs(t.amount) * 0.95),
+        tdsPercent: 10,
+        tdsAmount: Math.round(Math.abs(t.amount) * 0.10),
+        netAmount: Math.round(Math.abs(t.amount) * 0.90),
         bankName: t.bankDetails?.bankName || 'State Bank of India',
         accountNumber: t.bankDetails?.accountNumber || '31877094491',
         ifscCode: t.bankDetails?.ifscCode || 'SBIN0000919',
@@ -172,6 +173,10 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
   const [utrInput, setUtrInput] = useState('');
   const [rejectModalItem, setRejectModalItem] = useState<WithdrawalRequestItem | null>(null);
   const [rejectReasonInput, setRejectReasonInput] = useState('');
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   // Counts
   const pendingCount = items.filter(i => i.status === 'PENDING').length;
@@ -198,6 +203,12 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
       return true;
     });
   }, [items, activeFilter, search]);
+
+  const paginatedItems = useMemo(() => {
+    const size = pageSize >= 99999 ? filteredItems.length : pageSize;
+    const start = (currentPage - 1) * size;
+    return filteredItems.slice(start, start + size);
+  }, [filteredItems, currentPage, pageSize]);
 
   const handleApproveConfirm = () => {
     if (!approveModalItem) return;
@@ -240,7 +251,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
   };
 
   const handleExport = () => {
-    const headers = ['#', 'User Name', 'User ID', 'Requested Date', 'Amount', 'TDS (5%)', 'Net Amount', 'Bank Name', 'A/C Number', 'IFSC', 'Status', 'UTR / Reason'];
+    const headers = ['#', 'User Name', 'User ID', 'Requested Date', 'Amount', 'FEE (10%)', 'Net Amount', 'Bank Name', 'A/C Number', 'IFSC', 'Status', 'UTR / Reason'];
     const rows = filteredItems.map(it => [
       it.serialNo,
       it.userName,
@@ -320,7 +331,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
         {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setActiveFilter('ALL')}
+            onClick={() => { setActiveFilter('ALL'); setCurrentPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'ALL'
                 ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
@@ -330,7 +341,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             All
           </button>
           <button
-            onClick={() => setActiveFilter('PENDING')}
+            onClick={() => { setActiveFilter('PENDING'); setCurrentPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'PENDING'
                 ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
@@ -340,7 +351,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             Pending {pendingCount > 0 && `(${pendingCount})`}
           </button>
           <button
-            onClick={() => setActiveFilter('REJECTED')}
+            onClick={() => { setActiveFilter('REJECTED'); setCurrentPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'REJECTED'
                 ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
@@ -350,7 +361,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             Rejected
           </button>
           <button
-            onClick={() => setActiveFilter('PROCESSED')}
+            onClick={() => { setActiveFilter('PROCESSED'); setCurrentPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs ${
               activeFilter === 'PROCESSED'
                 ? 'bg-[#FF4A00] text-white font-extrabold shadow-md shadow-[#FF4A00]/25'
@@ -378,7 +389,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             No withdrawal requests found for the selected filter.
           </div>
         ) : (
-          filteredItems.map(item => (
+          paginatedItems.map(item => (
             <div
               key={item.id}
               className="bg-[#F8FAFC] hover:bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
@@ -418,13 +429,13 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                     Requested on {item.requestedDate}
                   </div>
 
-                  {/* Row 3: Amount, TDS, Net */}
+                  {/* Row 3: Amount, FEE, Net */}
                   <div className="flex flex-wrap items-center gap-3 text-xs font-sans font-medium pt-0.5">
                     <span className="text-slate-800">
                       Amount: <span className="font-bold text-slate-900 tracking-tight">₹ {item.amount.toLocaleString()}</span>
                     </span>
                     <span className="text-amber-600 font-semibold">
-                      TDS ({item.tdsPercent}%): - ₹ {item.tdsAmount.toLocaleString()}
+                      FEE ({item.tdsPercent || 10}%): - ₹ {item.tdsAmount.toLocaleString()}
                     </span>
                     <span className="text-emerald-600 font-extrabold tracking-tight">
                       Net: ₹ {item.netAmount.toLocaleString()}
@@ -486,6 +497,20 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
               </div>
             </div>
           ))
+        )}
+
+        {/* Pagination & Rows-Per-Page Selector */}
+        {filteredItems.length > 0 && (
+          <div className="rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+            <TablePagination
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalItems={filteredItems.length}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              itemLabel="requests"
+            />
+          </div>
         )}
       </div>
 
