@@ -54,7 +54,8 @@ import {
 } from 'lucide-react';
 
 import { AdminDashboardView, CadreClaimItem } from './views/AdminDashboardView';
-import { AdminUserManagementView } from './views/AdminUserManagementView';
+import { AdminUserManagementView, AdminUserItem } from './views/AdminUserManagementView';
+import { AdminUserDetailView } from './views/AdminUserDetailView';
 import { AdminWalletsView } from './views/AdminWalletsView';
 import { AdminWithdrawalsView } from './views/AdminWithdrawalsView';
 import { AdminTopupsView } from './views/AdminTopupsView';
@@ -133,6 +134,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<
     'dashboard' | 'users' | 'referrals' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
   >('dashboard');
+  const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
 
   // Cadre Reward Claims State (from Bee Grow live admin console)
   const [cadreClaims, setCadreClaims] = useState<CadreClaimItem[]>([
@@ -824,7 +826,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
               {/* Users */}
               <button
-                onClick={() => setActiveTab('users')}
+                onClick={() => {
+                  setActiveTab('users');
+                  setSelectedAdminUser(null);
+                }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
                   activeTab === 'users'
                     ? 'bg-[#70c028] text-slate-950 font-extrabold shadow-sm'
@@ -1143,11 +1148,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             )}
 
             {/* TAB 1: USERS (Bee Grow UserManagement.tsx) */}
-            {activeTab === 'users' && (
+            {activeTab === 'users' && !selectedAdminUser && (
               <AdminUserManagementView
-                onInspectUser={() => setIsUser360Open(true)}
-                onOpenAddMoneyForUser={() => setIsAddBalanceModalOpen(true)}
+                onInspectUser={(u) => setSelectedAdminUser(u)}
+                onOpenAddMoneyForUser={(u) => {
+                  setSelectedAdminUser(u);
+                }}
                 onExportCSV={exportToCSV}
+                showToast={showToast}
+              />
+            )}
+
+            {activeTab === 'users' && selectedAdminUser && (
+              <AdminUserDetailView
+                user={selectedAdminUser}
+                onBack={() => setSelectedAdminUser(null)}
+                onUpdateUser={(updated) => {
+                  setSelectedAdminUser(updated);
+                }}
+                onAdjustBalance={(userId, amt, reason) => {
+                  adjustUserBalance(amt, reason);
+                }}
                 showToast={showToast}
               />
             )}

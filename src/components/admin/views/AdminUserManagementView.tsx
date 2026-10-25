@@ -21,18 +21,88 @@ export interface AdminUserItem {
   userId: string;
   name: string;
   mobile: string;
+  email?: string;
+  city?: string;
   sponsorId: string;
   kycStatus: 'UNFILLED' | 'APPROVED' | 'PENDING' | 'REJECTED';
   cadre: string;
   status: 'Active' | 'InActive';
   walletBalance: number;
   totalEarned: number;
+  totalInvested?: number;
+  activePlansCount?: number;
+  directReferrals?: number;
+  totalTeam?: number;
+  referralIncome?: number;
+  levelIncome?: number;
+  roiIncome?: number;
   joined: string;
   profileLocked?: boolean;
+  bankAccount?: {
+    accountHolder?: string;
+    bankName?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+    upiId?: string;
+    isBound?: boolean;
+  };
+  investments?: {
+    id: string;
+    planName: string;
+    category: string;
+    amountInvested: number;
+    totalReturn: number;
+    earnedSoFar: number;
+    monthlyReturn: string;
+    startDate: string;
+    endDate: string;
+    duration: string;
+    nextPayout: string;
+    status: 'Active' | 'Completed';
+  }[];
 }
 
 // Authentic registered users from Bee Grow live console (Screenshot 4 & 5)
 export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
+  {
+    id: 'usr-maddi',
+    userId: 'B4443722',
+    name: 'Maddi Satyanarayana',
+    mobile: '9676389932',
+    email: 'satyanarayanamaddi821@gmail.com',
+    city: 'Amadalavalasa',
+    sponsorId: 'B9776636',
+    kycStatus: 'UNFILLED',
+    cadre: 'Star',
+    status: 'Active',
+    walletBalance: 2220,
+    totalEarned: 2220,
+    totalInvested: 500000,
+    activePlansCount: 1,
+    directReferrals: 0,
+    totalTeam: 0,
+    referralIncome: 0,
+    levelIncome: 0,
+    roiIncome: 2220,
+    joined: '2026-10-23',
+    profileLocked: false,
+    investments: [
+      {
+        id: 'cmvl41fl327klkva0wfcxeh2w',
+        planName: 'Plan 2 (6.66% ROI with Security)',
+        category: 'direct',
+        amountInvested: 500000,
+        totalReturn: 1000000,
+        earnedSoFar: 2220,
+        monthlyReturn: '6.66%',
+        startDate: '23/10/2026, 8:43:57 pm',
+        endDate: '23/4/2029, 8:43:57 pm',
+        duration: '30 Months',
+        nextPayout: '23/4/2029, 8:43:57 pm',
+        status: 'Active'
+      }
+    ]
+  },
   {
     id: 'usr-1',
     userId: 'B1326654',
