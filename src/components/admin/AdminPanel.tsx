@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp, calculateDaysPassed } from '../../context/AppContext';
 import { InvestmentProduct, Transaction, PlatformSettings, TeamMember, MemberPlanHolding, DailyWithdrawalLog } from '../../types';
 import { verifyAdminPinDB } from '../../lib/supabase';
