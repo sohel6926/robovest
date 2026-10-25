@@ -66,12 +66,12 @@ export interface AdminUserItem {
 export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   {
     id: 'usr-maddi',
-    userId: 'B4443722',
+    userId: 'FC4443722',
     name: 'Maddi Satyanarayana',
     mobile: '9676389932',
     email: 'satyanarayanamaddi821@gmail.com',
     city: 'Amadalavalasa',
-    sponsorId: 'B9776636',
+    sponsorId: 'FC9776636',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'Active',
@@ -89,7 +89,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     investments: [
       {
         id: 'fnc-spt-7721',
-        planName: 'Product B (Formula 1 Grand Prix)',
+        planName: 'Product B',
         category: 'FanCode Sports Yield',
         amountInvested: 500000,
         totalReturn: 1000000,
@@ -105,10 +105,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-1',
-    userId: 'B1326654',
+    userId: 'FC1326654',
     name: 'Rowthu Bangarulaxmi',
     mobile: '8688344830',
-    sponsorId: 'B6176059',
+    sponsorId: 'FC6176059',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -119,10 +119,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-2',
-    userId: 'B2169683',
+    userId: 'FC2169683',
     name: 'GORLE HARISH',
     mobile: '8688951464',
-    sponsorId: 'B9418694',
+    sponsorId: 'FC9418694',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -133,10 +133,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-3',
-    userId: 'B3273426',
+    userId: 'FC3273426',
     name: 'Konapala Santosh kumar',
     mobile: '6302507044',
-    sponsorId: 'B6677949',
+    sponsorId: 'FC6677949',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -147,10 +147,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-4',
-    userId: 'B2485735',
+    userId: 'FC2485735',
     name: 'P SAMPATH KUMAR',
     mobile: '8328109953',
-    sponsorId: 'B1734794',
+    sponsorId: 'FC1734794',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -161,10 +161,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-5',
-    userId: 'B4553454',
+    userId: 'FC4553454',
     name: 'Varshitha varma',
     mobile: '9014362717',
-    sponsorId: 'B2895816',
+    sponsorId: 'FC2895816',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -175,10 +175,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-6',
-    userId: 'B1402520',
+    userId: 'FC1402520',
     name: 'YEDDU NAGABHUSHANA RAO',
     mobile: '7093626362',
-    sponsorId: 'B3822517',
+    sponsorId: 'FC3822517',
     kycStatus: 'APPROVED',
     vipLevel: 'VIP 1',
     status: 'Active',
@@ -189,10 +189,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-7',
-    userId: 'B1641345',
+    userId: 'FC1641345',
     name: 'BUDIDA NARASA',
     mobile: '9441121206',
-    sponsorId: 'B3822517',
+    sponsorId: 'FC3822517',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -203,10 +203,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-8',
-    userId: 'B5677881',
+    userId: 'FC5677881',
     name: 'SAVARA RAJARAO',
     mobile: '7702676850',
-    sponsorId: 'B3822517',
+    sponsorId: 'FC3822517',
     kycStatus: 'UNFILLED',
     vipLevel: 'VIP 1',
     status: 'InActive',
@@ -217,10 +217,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-9',
-    userId: 'B4386992',
+    userId: 'FC4386992',
     name: 'MEESALA ASWANI',
     mobile: '7780477960',
-    sponsorId: 'B7638923',
+    sponsorId: 'FC7638923',
     kycStatus: 'APPROVED',
     vipLevel: 'VIP 1',
     status: 'Active',
@@ -231,10 +231,10 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-10',
-    userId: 'B7638923',
+    userId: 'FC7638923',
     name: 'MEESALA RAMU',
     mobile: '8185835615',
-    sponsorId: 'B3434967',
+    sponsorId: 'FC3434967',
     kycStatus: 'APPROVED',
     vipLevel: 'VIP 1',
     status: 'Active',
@@ -245,7 +245,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-11',
-    userId: 'B5294001',
+    userId: 'FC5294001',
     name: 'User5294 (Master Account)',
     mobile: '9876543210',
     sponsorId: 'Root',
@@ -283,7 +283,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
   const [createForm, setCreateForm] = useState({
     name: '',
     mobile: '',
-    sponsorId: 'B5294001',
+    sponsorId: 'FC5294001',
     password: '',
     initialBalance: 0,
   });
@@ -361,7 +361,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       return;
     }
 
-    const randomId = `B${Math.floor(1000000 + Math.random() * 9000000)}`;
+    const randomId = `FC${Math.floor(1000000 + Math.random() * 9000000)}`;
     const newUser: AdminUserItem = {
       id: `usr-${Date.now()}`,
       userId: randomId,
@@ -380,12 +380,12 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
     setUsers(prev => [newUser, ...prev]);
     showToast(`User ${newUser.name} created successfully with ID ${newUser.userId}!`);
     setShowCreateModal(false);
-    setCreateForm({ name: '', mobile: '', sponsorId: 'B5294001', password: '', initialBalance: 0 });
+    setCreateForm({ name: '', mobile: '', sponsorId: 'FC5294001', password: '', initialBalance: 0 });
   };
 
   // Export Excel / CSV
   const handleExport = () => {
-    const headers = ['#', 'User ID', 'Name', 'Mobile', 'Sponsor ID', 'KYC', 'VIP Tier', 'Status', 'Wallet Balance', 'Joined'];
+    const headers = ['#', 'User ID', 'Name', 'Mobile', 'Sponsor ID', 'KYC', 'Status', 'Wallet Balance', 'Joined'];
     const rows = filteredUsers.map((u, i) => [
       i + 1,
       u.userId,
@@ -393,7 +393,6 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       u.mobile,
       u.sponsorId,
       u.kycStatus,
-      u.vipLevel || 'VIP 1',
       u.status,
       u.walletBalance,
       u.joined
@@ -539,7 +538,6 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                 <th className="px-4 py-3">Mobile</th>
                 <th className="px-4 py-3">Sponsor ID</th>
                 <th className="px-4 py-3">KYC</th>
-                <th className="px-4 py-3">VIP Tier</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Wallet</th>
                 <th className="px-4 py-3">Joined</th>
@@ -549,7 +547,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
               {paginatedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-12 text-center text-slate-400 font-medium">
+                  <td colSpan={10} className="py-12 text-center text-slate-400 font-medium">
                     No users matching criteria found.
                   </td>
                 </tr>
@@ -580,11 +578,6 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                             : 'bg-slate-100 text-slate-500'
                         }`}>
                           {user.kycStatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold">
-                          {user.vipLevel || 'VIP 1'}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
@@ -758,7 +751,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                 <label className="text-xs font-bold text-slate-700 block mb-1">Sponsor ID</label>
                 <input
                   type="text"
-                  placeholder="e.g. B5294001 or Root"
+                  placeholder="e.g. FC5294001 or Root"
                   value={createForm.sponsorId}
                   onChange={(e) => setCreateForm({ ...createForm, sponsorId: e.target.value })}
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"

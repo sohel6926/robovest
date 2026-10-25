@@ -47,7 +47,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<AdminUserItem>(initialUser);
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'profile' | 'kyc_bank' | 'add_money' | 'topup'
+    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'profile' | 'kyc_bank' | 'add_money'
   >('overview');
 
   // Edit states for Profile (Screenshot 2)
@@ -78,8 +78,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     currentUser.kycStatus || 'UNFILLED'
   );
 
-  // Top-Up state (Screenshot 4)
-  const [topupAmount, setTopupAmount] = useState('');
 
   // Add Money state
   const [addAmount, setAddAmount] = useState<string>('');
@@ -93,7 +91,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
       : [
           {
             id: 'fnc-spt-7721',
-            planName: 'Product B (Formula 1 Grand Prix)',
+            planName: 'Product B',
             category: 'FanCode Sports Yield',
             amountInvested: currentUser.totalInvested || 500000,
             totalReturn: (currentUser.totalInvested || 500000) * 2,
@@ -179,41 +177,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     showToast(`${isCreditMode ? 'Credited' : 'Debited'} ₹${amt.toLocaleString()} to user wallet`);
   };
 
-  // Handle Account Top-Up (FanCode 2X Limit Renewal)
-  const handleTopupSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const amt = parseFloat(topupAmount);
-    if (isNaN(amt) || amt <= 0) {
-      showToast('Please enter a valid top-up amount', 'error');
-      return;
-    }
-    const newInv = {
-      id: `topup-${Date.now().toString().slice(-8)}`,
-      planName: `Sports Contract Top-up (2X Renewal)`,
-      category: 'FanCode Sports Yield',
-      amountInvested: amt,
-      totalReturn: amt * 2,
-      earnedSoFar: 0,
-      monthlyReturn: 'Daily Payout',
-      startDate: new Date().toLocaleString(),
-      endDate: new Date(Date.now() + 86400000 * 150).toLocaleString(),
-      duration: '150 Days',
-      nextPayout: 'Daily 18:30 IST',
-      status: 'Active' as const,
-    };
-    const updatedInvs = [newInv, ...userInvestments];
-    setUserInvestments(updatedInvs);
-    const newTotal = totalInvested + amt;
-    const updated = {
-      ...currentUser,
-      totalInvested: newTotal,
-      investments: updatedInvs,
-    };
-    setCurrentUser(updated);
-    if (onUpdateUser) onUpdateUser(updated);
-    setTopupAmount('');
-    showToast(`Account top-up of ₹${amt.toLocaleString()} executed! 2X returns limit renewed.`);
-  };
 
   // Save Profile Changes
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -258,7 +221,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     const amt = parseFloat(newPlanAmount) || selectedProd.price;
     const newInv = {
       id: `fnc-spt-${Date.now().toString().slice(-6)}`,
-      planName: `${selectedProd.name} (${selectedProd.robotModel})`,
+      planName: selectedProd.name,
       category: 'FanCode Sports Yield',
       amountInvested: amt,
       totalReturn: selectedProd.totalReturn || (amt * 2),
@@ -436,7 +399,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             { id: 'profile', label: 'Profile' },
             { id: 'kyc_bank', label: 'KYC & Bank' },
             { id: 'add_money', label: 'Add Money' },
-            { id: 'topup', label: 'Top-Up' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -487,7 +449,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <TrendingUp className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-500 block">Sports ROI Yield</span>
+                <span className="text-xs font-bold text-slate-500 block">ROI Yield</span>
                 <span className="text-2xl font-black font-sans text-amber-500">
                   ₹ {roiIncome.toLocaleString('en-IN')}
                 </span>
@@ -555,7 +517,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-slate-900 text-sm">{inv.planName}</h4>
+                      <h4 className="font-bold text-slate-900 text-sm">{inv.planName.replace(/\s*\(Formula 1 Grand Prix\)/g, '')}</h4>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px]">
                         {inv.status}
                       </span>
@@ -564,27 +526,27 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                       ID: {inv.id} · Category: {inv.category}
                     </span>
                   </div>
-                  <span className="text-xs font-bold font-sans text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
+                  <span className="text-xs font-black font-sans text-amber-950 bg-amber-100 border border-amber-300 px-3.5 py-1.5 rounded-xl shadow-xs">
                     {inv.monthlyReturn}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl text-xs">
-                  <div>
-                    <span className="text-slate-400 font-semibold block text-[10px]">Amount Invested</span>
-                    <span className="font-sans font-bold text-slate-900 text-sm">₹ {inv.amountInvested.toLocaleString('en-IN')}</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-100/80 border border-slate-200/80 p-3.5 rounded-xl text-xs">
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    <span className="text-slate-700 font-bold block text-[11px] uppercase tracking-wide">Amount Invested</span>
+                    <span className="font-sans font-black text-slate-950 text-base mt-0.5 block">₹ {inv.amountInvested.toLocaleString('en-IN')}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block text-[10px]">Total Return</span>
-                    <span className="font-sans font-bold text-emerald-600 text-sm">₹ {inv.totalReturn.toLocaleString('en-IN')}</span>
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    <span className="text-slate-700 font-bold block text-[11px] uppercase tracking-wide">Total Return</span>
+                    <span className="font-sans font-black text-emerald-600 text-base mt-0.5 block">₹ {inv.totalReturn.toLocaleString('en-IN')}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block text-[10px]">Earned So Far</span>
-                    <span className="font-sans font-bold text-emerald-600 text-sm">₹ {inv.earnedSoFar.toLocaleString('en-IN')}</span>
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    <span className="text-slate-700 font-bold block text-[11px] uppercase tracking-wide">Earned So Far</span>
+                    <span className="font-sans font-black text-emerald-600 text-base mt-0.5 block">₹ {inv.earnedSoFar.toLocaleString('en-IN')}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 font-semibold block text-[10px]">Duration</span>
-                    <span className="font-sans font-bold text-slate-800 text-sm">{inv.duration}</span>
+                  <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    <span className="text-slate-700 font-bold block text-[11px] uppercase tracking-wide">Duration</span>
+                    <span className="font-sans font-black text-slate-900 text-base mt-0.5 block">{inv.duration}</span>
                   </div>
                 </div>
               </div>
@@ -613,7 +575,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-black text-slate-900 text-base font-sans">{inv.planName}</h3>
+                    <h3 className="font-black text-slate-900 text-base font-sans">{inv.planName.replace(/\s*\(Formula 1 Grand Prix\)/g, '')}</h3>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
                       {inv.status}
                     </span>
@@ -815,8 +777,8 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-bold text-amber-600">Daily ROI Yield</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Product B</td>
                   <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -827,7 +789,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 14:15</td>
                   <td className="px-4 py-3 font-bold text-blue-600">Level 1 Referral Bonus (22%)</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Direct Partner: B994821</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Direct Partner: FC994821</td>
                   <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 462.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -837,8 +799,8 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-sans text-slate-500">2026-10-24 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-bold text-amber-600">Daily ROI Yield</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Product B</td>
                   <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -987,33 +949,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   <span className="font-sans font-bold text-slate-900">{currentUser.joined}</span>
                 </div>
               </div>
-
-              {/* Divider & Address Details (Screenshot 2) */}
-              <div className="pt-4 border-t border-slate-100 space-y-4">
-                <h4 className="font-bold text-slate-900 text-sm">Address Details</h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
-                    <span className="text-slate-500 font-semibold w-28">Address</span>
-                    <span className="text-slate-700">{profileAddress}</span>
-                  </div>
-
-                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
-                    <span className="text-slate-500 font-semibold w-28">District</span>
-                    <span className="text-slate-700">{profileDistrict}</span>
-                  </div>
-
-                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
-                    <span className="text-slate-500 font-semibold w-28">State</span>
-                    <span className="text-slate-700">{profileState}</span>
-                  </div>
-
-                  <div className="flex justify-between md:justify-start md:gap-16 items-center">
-                    <span className="text-slate-500 font-semibold w-28">Pincode</span>
-                    <span className="text-slate-700">{profilePincode}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           ) : (
             /* Editable Profile Form */
@@ -1077,26 +1012,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     value={profilePin}
                     onChange={(e) => setProfilePin(e.target.value)}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">Address</label>
-                  <input
-                    type="text"
-                    value={profileAddress}
-                    onChange={(e) => setProfileAddress(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">Pincode</label>
-                  <input
-                    type="text"
-                    value={profilePincode}
-                    onChange={(e) => setProfilePincode(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -1168,21 +1083,8 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
           {!isEditingBank ? (
             <div className="space-y-6 text-xs">
-              {/* Section 1: Aadhaar & PAN (Screenshot 3) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                <div>
-                  <span className="text-slate-500 font-semibold block mb-1">Aadhaar Number</span>
-                  <span className="font-sans text-slate-700">{aadhaarNum}</span>
-                </div>
-
-                <div>
-                  <span className="text-slate-500 font-semibold block mb-1">PAN Number</span>
-                  <span className="font-sans text-slate-700">{panNum}</span>
-                </div>
-              </div>
-
-              {/* Section 2: Bank Information (Screenshot 3) */}
-              <div className="pt-4 border-t border-slate-100 space-y-4">
+              {/* Bank Information */}
+              <div className="space-y-4">
                 <h4 className="font-bold text-slate-900 text-sm">Bank Information</h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
@@ -1212,52 +1114,11 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </div>
                 </div>
               </div>
-
-              {/* Section 3: KYC Documents (Screenshot 3) */}
-              <div className="pt-4 border-t border-slate-100 space-y-4">
-                <h4 className="font-bold text-slate-900 text-sm">KYC Documents</h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                    <span className="text-xs font-bold text-slate-700 block">Aadhaar Front</span>
-                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                    <span className="text-xs font-bold text-slate-700 block">Aadhaar Back</span>
-                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
-                    <span className="text-xs font-bold text-slate-700 block">PAN Card</span>
-                    <span className="text-[11px] font-medium text-slate-400 block py-6">Not Uploaded</span>
-                  </div>
-                </div>
-              </div>
             </div>
           ) : (
             /* Editable Bank Form */
             <form onSubmit={handleSaveBank} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">Aadhaar Number</label>
-                  <input
-                    type="text"
-                    value={aadhaarNum}
-                    onChange={(e) => setAadhaarNum(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">PAN Number</label>
-                  <input
-                    type="text"
-                    value={panNum}
-                    onChange={(e) => setPanNum(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
 
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Bank Name</label>
@@ -1424,74 +1285,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </form>
       )}
 
-      {/* ================= TAB 10: TOP-UP ================= */}
-      {activeTab === 'topup' && (
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-blue-200/80 shadow-md space-y-6 animate-in fade-in-50 duration-150">
-          {/* Header with Icon */}
-          <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-900 text-base font-sans">Sports Contract Top-up & Limit Renewal</h3>
-              <p className="text-xs text-slate-500">Renew {currentUser.name}'s FanCode 2X contract yield limit</p>
-            </div>
-          </div>
-
-          {/* Callout Notice */}
-          <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs text-slate-600 leading-relaxed">
-            When a user reaches their 2X maximum return limit on their active FanCode sports contracts, execute an account top-up here to reactivate their daily sports yield distribution and 3-tier team commission payouts.
-          </div>
-
-          {/* Quick Select Buttons */}
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1.5">Quick Select Contract Tier</label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'Product B (₹2,100)', amt: 2100 },
-                { label: 'Product A (₹5,200)', amt: 5200 },
-                { label: 'Product D (₹10,500)', amt: 10500 },
-                { label: 'Product E (₹25,000)', amt: 25000 },
-              ].map((tier) => (
-                <button
-                  key={tier.amt}
-                  type="button"
-                  onClick={() => setTopupAmount(tier.amt.toString())}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 font-sans font-bold text-xs text-slate-700 transition"
-                >
-                  {tier.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleTopupSubmit} className="space-y-4 text-xs">
-            <div>
-              <label className="font-bold text-slate-800 block mb-1">
-                Top-up Amount (₹) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="number"
-                placeholder="Enter top-up amount"
-                value={topupAmount}
-                onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-sans font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/25 transition"
-              >
-                Execute Sports Contract Top-Up
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
       {/* ================= MODAL: ASSIGN NEW PLAN ================= */}
       {showAssignPlanModal && (
