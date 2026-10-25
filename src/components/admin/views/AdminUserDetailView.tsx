@@ -28,6 +28,7 @@ import {
   UploadCloud
 } from 'lucide-react';
 import { AdminUserItem } from './AdminUserManagementView';
+import { PRODUCTS_CATALOG } from '../../../data/products';
 
 interface AdminUserDetailViewProps {
   user: AdminUserItem;
@@ -85,33 +86,33 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
   const [addReason, setAddReason] = useState<string>('Admin Manual Credit');
   const [isCreditMode, setIsCreditMode] = useState<boolean>(true);
 
-  // Investments state (Screenshot 3)
+  // Investments state (FanCode Sports Platform)
   const [userInvestments, setUserInvestments] = useState(
     currentUser.investments && currentUser.investments.length > 0
       ? currentUser.investments
       : [
           {
-            id: 'cmvl41fl327klkva0wfcxeh2w',
-            planName: 'Plan 2 (6.66% ROI with Security)',
-            category: 'direct',
+            id: 'fnc-spt-7721',
+            planName: 'Product B (Formula 1 Grand Prix)',
+            category: 'FanCode Sports Yield',
             amountInvested: currentUser.totalInvested || 500000,
             totalReturn: (currentUser.totalInvested || 500000) * 2,
             earnedSoFar: currentUser.totalEarned || 2220,
-            monthlyReturn: '6.66%',
+            monthlyReturn: '₹500 / Day',
             startDate: '23/10/2026, 8:43:57 pm',
-            endDate: '23/4/2029, 8:43:57 pm',
-            duration: '30 Months',
-            nextPayout: '23/4/2029, 8:43:57 pm',
+            endDate: '22/03/2027, 8:43:57 pm',
+            duration: '150 Days',
+            nextPayout: 'Daily 18:30 IST',
             status: 'Active' as const,
           }
         ]
   );
 
-  // New investment modal state
+  // New investment modal state (FanCode Sports Catalog)
   const [showAssignPlanModal, setShowAssignPlanModal] = useState(false);
-  const [newPlanName, setNewPlanName] = useState('Plan 1 (High Efficiency Yield)');
-  const [newPlanAmount, setNewPlanAmount] = useState('50000');
-  const [newPlanRoi, setNewPlanRoi] = useState('8.5%');
+  const [selectedProductId, setSelectedProductId] = useState<string>('B');
+  const [newPlanAmount, setNewPlanAmount] = useState('2100');
+  const [newPlanRoi, setNewPlanRoi] = useState('₹500 / Day');
 
   // Calculations & default fallbacks
   const walletBal = currentUser.walletBalance ?? 2220;
@@ -178,7 +179,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     showToast(`${isCreditMode ? 'Credited' : 'Debited'} ₹${amt.toLocaleString()} to user wallet`);
   };
 
-  // Handle Account Top-Up (Screenshot 4)
+  // Handle Account Top-Up (FanCode 2X Limit Renewal)
   const handleTopupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amt = parseFloat(topupAmount);
@@ -188,16 +189,16 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     }
     const newInv = {
       id: `topup-${Date.now().toString().slice(-8)}`,
-      planName: `Account Top-up (2X Renewal)`,
-      category: 'direct',
+      planName: `Sports Contract Top-up (2X Renewal)`,
+      category: 'FanCode Sports Yield',
       amountInvested: amt,
       totalReturn: amt * 2,
       earnedSoFar: 0,
-      monthlyReturn: '6.66%',
+      monthlyReturn: 'Daily Payout',
       startDate: new Date().toLocaleString(),
-      endDate: new Date(Date.now() + 86400000 * 365).toLocaleString(),
-      duration: '12 Months',
-      nextPayout: new Date(Date.now() + 86400000 * 30).toLocaleString(),
+      endDate: new Date(Date.now() + 86400000 * 150).toLocaleString(),
+      duration: '150 Days',
+      nextPayout: 'Daily 18:30 IST',
       status: 'Active' as const,
     };
     const updatedInvs = [newInv, ...userInvestments];
@@ -250,22 +251,23 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     showToast('Bank details updated successfully!');
   };
 
-  // Handle Assign Plan
+  // Handle Assign Plan (FanCode Sports Catalog)
   const handleAssignPlan = (e: React.FormEvent) => {
     e.preventDefault();
-    const amt = parseFloat(newPlanAmount) || 50000;
+    const selectedProd = PRODUCTS_CATALOG.find(p => p.id === selectedProductId) || PRODUCTS_CATALOG[1];
+    const amt = parseFloat(newPlanAmount) || selectedProd.price;
     const newInv = {
-      id: `inv-${Date.now().toString().slice(-8)}`,
-      planName: newPlanName,
-      category: 'direct',
+      id: `fnc-spt-${Date.now().toString().slice(-6)}`,
+      planName: `${selectedProd.name} (${selectedProd.robotModel})`,
+      category: 'FanCode Sports Yield',
       amountInvested: amt,
-      totalReturn: amt * 2,
+      totalReturn: selectedProd.totalReturn || (amt * 2),
       earnedSoFar: 0,
-      monthlyReturn: newPlanRoi,
+      monthlyReturn: newPlanRoi || `₹${selectedProd.dailyIncome} / Day`,
       startDate: new Date().toLocaleString(),
-      endDate: new Date(Date.now() + 86400000 * 365).toLocaleString(),
-      duration: '12 Months',
-      nextPayout: new Date(Date.now() + 86400000 * 30).toLocaleString(),
+      endDate: new Date(Date.now() + 86400000 * selectedProd.durationDays).toLocaleString(),
+      duration: `${selectedProd.durationDays} Days`,
+      nextPayout: 'Daily 18:30 IST',
       status: 'Active' as const,
     };
     const updatedInvs = [newInv, ...userInvestments];
@@ -278,7 +280,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
     setCurrentUser(updated);
     if (onUpdateUser) onUpdateUser(updated);
     setShowAssignPlanModal(false);
-    showToast(`Assigned ${newPlanName} of ₹${amt.toLocaleString()} to user!`);
+    showToast(`Assigned ${newInv.planName} of ₹${amt.toLocaleString()} to user!`);
   };
 
   return (
@@ -298,17 +300,17 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </h1>
         <p className="text-xs font-mono text-slate-500 mt-0.5">
           User ID: <span className="font-bold text-slate-700">{currentUser.userId}</span> — Sponsor:{' '}
-          <span className="font-bold text-[#70c028]">{currentUser.sponsorId}</span> — Member since{' '}
+          <span className="font-bold text-blue-600 font-mono">{currentUser.sponsorId}</span> — Member since{' '}
           <span className="font-bold text-slate-700">{currentUser.joined}</span>
         </p>
       </div>
 
-      {/* Hero Header Card (Exact match to Bee Grow dark navy console) */}
+      {/* Hero Header Card */}
       <div className="bg-[#0B1536] text-white rounded-3xl p-5 md:p-6 border border-slate-800 shadow-xl space-y-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
           {/* Avatar + Main Info */}
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#70c028] text-slate-950 font-black text-2xl flex items-center justify-center shrink-0 shadow-lg shadow-[#70c028]/20 font-sans">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-black text-2xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20 font-sans">
               {currentUser.name.charAt(0).toUpperCase()}
             </div>
             <div className="space-y-1">
@@ -332,6 +334,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
                 <span className="px-2.5 py-0.5 rounded-full bg-white text-slate-900 text-[10px] font-extrabold tracking-wide uppercase">
                   KYC: {kycStatus}
+                </span>
+
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-extrabold tracking-wide uppercase border border-blue-500/30">
+                  {currentUser.vipLevel || currentUser.cadre || 'VIP 1'}
                 </span>
 
                 {currentUser.profileLocked && (
@@ -418,7 +424,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Pill Tab Navigation (ALL 10 TABS - Exact match to Bee Grow Screenshots) */}
+      {/* Horizontal Pill Tab Navigation */}
       <div className="overflow-x-auto pb-1 scrollbar-none">
         <div className="flex items-center gap-2 min-w-max">
           {[
@@ -437,7 +443,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs ${
                 activeTab === tab.id
-                  ? 'bg-[#70c028] text-slate-950 font-black shadow-md shadow-[#70c028]/20 scale-102'
+                  ? 'bg-blue-600 text-white font-black shadow-md shadow-blue-500/25 scale-102'
                   : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
               }`}
             >
@@ -469,7 +475,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <GitBranch className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-500 block">Level Income</span>
+                <span className="text-xs font-bold text-slate-500 block">3-Tier Level Income</span>
                 <span className="text-2xl font-black font-mono text-[#0B1536]">
                   ₹ {levelIncome.toLocaleString('en-IN')}
                 </span>
@@ -481,7 +487,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <TrendingUp className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-500 block">ROI Income</span>
+                <span className="text-xs font-bold text-slate-500 block">Sports ROI Yield</span>
                 <span className="text-2xl font-black font-mono text-amber-500">
                   ₹ {roiIncome.toLocaleString('en-IN')}
                 </span>
@@ -501,45 +507,17 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             </div>
           </div>
 
-          {/* Cadre Progress Card (Screenshot 2) */}
-          <div className="bg-[#0B1536] text-white p-6 rounded-2xl border border-slate-800 shadow-lg space-y-3">
-            <div>
-              <h3 className="text-base font-bold font-sans text-white">Cadre Progress</h3>
-              <span className="text-xs font-black text-[#70c028]">Not yet achieved</span>
-            </div>
-
-            <div className="pt-2">
-              <div className="flex items-center justify-between text-xs text-slate-300 font-semibold mb-2">
-                <span>Target to Marketing coordinator (MC):</span>
-                <span className="font-mono font-bold text-white">₹ 25,00,000</span>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-[#70c028] transition-all duration-500"
-                  style={{ width: `${Math.min(100, (totalInvested / 2500000) * 100)}%` }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono mt-2">
-                <span>Eligible: ₹ {totalInvested.toLocaleString('en-IN')}</span>
-                <span>{((totalInvested / 2500000) * 100).toFixed(1)}%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 4 Team & Referral Stat Cards (Screenshot 2) */}
+          {/* 4 Team & Referral Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-xs font-bold text-slate-500 block">Direct Referrals</span>
+              <span className="text-xs font-bold text-slate-500 block">Direct Referrals (L1 - 22%)</span>
               <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
                 {directRefs}
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-xs font-bold text-slate-500 block">Indirect Referrals</span>
+              <span className="text-xs font-bold text-slate-500 block">Indirect Downline (L2 & L3)</span>
               <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
                 {Math.max(0, totalTeam - directRefs)}
               </span>
@@ -563,7 +541,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           {/* Active Investments Preview */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 font-sans">Active Investments</h3>
+              <h3 className="text-base font-bold text-slate-900 font-sans">Active Sports Contracts</h3>
               <button
                 onClick={() => setActiveTab('investments')}
                 className="text-xs font-bold text-blue-600 hover:underline"
@@ -587,7 +565,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     </span>
                   </div>
                   <span className="text-xs font-bold font-mono text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
-                    {inv.monthlyReturn} Monthly
+                    {inv.monthlyReturn}
                   </span>
                 </div>
 
@@ -615,17 +593,17 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 2: INVESTMENTS (Exact match to Screenshot 3 from prev message) ================= */}
+      {/* ================= TAB 2: INVESTMENTS ================= */}
       {activeTab === 'investments' && (
         <div className="space-y-4 animate-in fade-in-50 duration-150">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900 font-sans">Active & Completed Investments</h3>
+            <h3 className="text-base font-bold text-slate-900 font-sans">Active & Completed Sports Contracts</h3>
             <button
               onClick={() => setShowAssignPlanModal(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-xs font-black transition shadow-xs"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Assign New Plan</span>
+              <span>Assign Sports Contract</span>
             </button>
           </div>
 
@@ -670,7 +648,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </div>
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <span className="text-xs text-slate-500 font-bold block mb-1">Monthly Return</span>
+                  <span className="text-xs text-slate-500 font-bold block mb-1">Daily Yield</span>
                   <span className="text-xl font-black font-mono text-amber-500">
                     {inv.monthlyReturn}
                   </span>
@@ -722,14 +700,14 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           {/* Top 4 Business Cards Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-xs font-bold text-slate-500 block">Direct Business</span>
+              <span className="text-xs font-bold text-slate-500 block">Direct Referrals (L1 - 22%)</span>
               <span className="text-2xl font-black font-mono text-emerald-600 mt-1 block">
                 ₹ 0
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-xs font-bold text-slate-500 block">Indirect Business</span>
+              <span className="text-xs font-bold text-slate-500 block">Indirect Downline (L2 & L3)</span>
               <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
                 ₹ 0
               </span>
@@ -753,21 +731,28 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           {/* Two-Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-              <h3 className="font-bold text-slate-900 text-sm font-sans">Level-wise Business</h3>
-              <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
-                {[1, 2, 3, 4, 5, 6].map((lvl) => (
+              <h3 className="font-bold text-slate-900 text-sm font-sans">3-Level Affiliate Structure</h3>
+              <div className="space-y-2.5">
+                {[
+                  { lvl: 1, title: 'Level 1 · Direct Referrals', rate: '22% Comm.', desc: 'People invited directly with sponsor ID', members: directRefs, vol: 0 },
+                  { lvl: 2, title: 'Level 2 · Secondary Tier', rate: '2% Comm.', desc: 'Invited by your Level 1 partners', members: 0, vol: 0 },
+                  { lvl: 3, title: 'Level 3 · Tertiary Tier', rate: '1% Comm.', desc: 'Invited by your Level 2 partners', members: 0, vol: 0 },
+                ].map((item) => (
                   <div
-                    key={lvl}
+                    key={item.lvl}
                     className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between hover:bg-slate-100 transition"
                   >
                     <div>
-                      <span className="font-bold text-slate-900 text-xs block">Level {lvl}</span>
-                      <span className="text-[10px] text-slate-400">0 members</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-slate-900 text-xs">{item.title}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[9px] font-black">{item.rate}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 block mt-0.5">{item.desc}</span>
                     </div>
 
                     <div className="text-right">
-                      <span className="font-mono font-bold text-slate-700 text-xs block">₹ 0</span>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">LOCKED</span>
+                      <span className="font-mono font-bold text-slate-700 text-xs block">₹ {item.vol.toLocaleString('en-IN')}</span>
+                      <span className="text-[10px] font-bold text-emerald-600">{item.members} members</span>
                     </div>
                   </div>
                 ))}
@@ -779,10 +764,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <h3 className="font-bold text-slate-900 text-sm font-sans">Detailed Team Report</h3>
                 <button
                   onClick={() => showToast('Team report exported successfully!')}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 text-xs font-black transition shadow-xs"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Export All Levels</span>
+                  <span>Export 3 Levels</span>
                 </button>
               </div>
 
@@ -793,14 +778,14 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                       <th className="px-4 py-3">Member Name</th>
                       <th className="px-4 py-3">User ID</th>
                       <th className="px-4 py-3">Level</th>
-                      <th className="px-4 py-3">Business</th>
+                      <th className="px-4 py-3">Turnover</th>
                       <th className="px-4 py-3">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     <tr>
                       <td colSpan={5} className="py-16 text-center text-slate-400 font-medium">
-                        No team members found.
+                        No team downline members found yet.
                       </td>
                     </tr>
                   </tbody>
@@ -814,7 +799,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
       {/* ================= TAB 4: INCOME BREAKDOWN ================= */}
       {activeTab === 'income' && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 animate-in fade-in-50 duration-150">
-          <h3 className="font-bold text-slate-900 text-base font-sans">Daily Yield & Commission Ledger</h3>
+          <h3 className="font-bold text-slate-900 text-base font-sans">Daily Sports Yield & Referral Ledger</h3>
 
           <div className="border border-slate-200 rounded-xl overflow-hidden">
             <table className="w-full text-left text-xs">
@@ -830,9 +815,20 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily Contract ROI Yield</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">Plan 2 (6.66% ROI)</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 1,110.00</td>
+                  <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
+                  <td className="px-4 py-3 font-mono text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 500.00</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      Settled
+                    </span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 14:15</td>
+                  <td className="px-4 py-3 font-bold text-blue-600">Level 1 Referral Bonus (22%)</td>
+                  <td className="px-4 py-3 font-mono text-slate-600">Direct Partner: B994821</td>
+                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 462.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -841,9 +837,20 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-500">2026-10-24 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily Contract ROI Yield</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">Plan 2 (6.66% ROI)</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 1,110.00</td>
+                  <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
+                  <td className="px-4 py-3 font-mono text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 500.00</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      Settled
+                    </span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:45</td>
+                  <td className="px-4 py-3 font-bold text-emerald-600">Welcome Activation Bonus</td>
+                  <td className="px-4 py-3 font-mono text-slate-600">FanCode Platform Tier</td>
+                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 100.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -883,7 +890,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-DEP-9921</td>
                   <td className="px-4 py-3 font-bold text-blue-600">RECHARGE</td>
                   <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 5,00,000</td>
-                  <td className="px-4 py-3 text-slate-600">Bank Transfer / UPI (Ref: UTR884920)</td>
+                  <td className="px-4 py-3 text-slate-600">Bank Transfer / UPI (Ref: UTR884920491)</td>
                   <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:43</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -893,9 +900,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </tr>
                 <tr className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-INV-4412</td>
-                  <td className="px-4 py-3 font-bold text-indigo-600">INVESTMENT</td>
+                  <td className="px-4 py-3 font-bold text-indigo-600">SPORTS_CONTRACT</td>
                   <td className="px-4 py-3 font-mono font-bold text-slate-800">-₹ 5,00,000</td>
-                  <td className="px-4 py-3 text-slate-600">Allocated Plan 2 (6.66% ROI with Security)</td>
+                  <td className="px-4 py-3 text-slate-600">Subscribed Product B (Formula 1 Velocity Grand Prix)</td>
                   <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:44</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -907,7 +914,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-YLD-1102</td>
                   <td className="px-4 py-3 font-bold text-amber-600">DAILY_YIELD</td>
                   <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 2,220</td>
-                  <td className="px-4 py-3 text-slate-600">Automated Contract Yield Cycle</td>
+                  <td className="px-4 py-3 text-slate-600">FanCode Automated Daily Sports Yield Cycle</td>
                   <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 18:30</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -1417,26 +1424,48 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </form>
       )}
 
-      {/* ================= TAB 10: TOP-UP (Exact match to Screenshot 4) ================= */}
+      {/* ================= TAB 10: TOP-UP ================= */}
       {activeTab === 'topup' && (
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-amber-300/80 shadow-md space-y-6 animate-in fade-in-50 duration-150">
-          {/* Header with Icon (Screenshot 4) */}
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-blue-200/80 shadow-md space-y-6 animate-in fade-in-50 duration-150">
+          {/* Header with Icon */}
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0 border border-amber-200/60">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base font-sans">Account Top-up</h3>
-              <p className="text-xs text-slate-500">Renew {currentUser.name}'s 2X returns limit</p>
+              <h3 className="font-bold text-slate-900 text-base font-sans">Sports Contract Top-up & Limit Renewal</h3>
+              <p className="text-xs text-slate-500">Renew {currentUser.name}'s FanCode 2X contract yield limit</p>
             </div>
           </div>
 
-          {/* Light Blue-Gray Callout Notice (Screenshot 4) */}
+          {/* Callout Notice */}
           <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs text-slate-600 leading-relaxed">
-            If the user has reached their 2X exact limit, you can top-up their account here to reactivate their daily ROI and Level Income generation. This effectively acts as a fresh investment.
+            When a user reaches their 2X maximum return limit on their active FanCode sports contracts, execute an account top-up here to reactivate their daily sports yield distribution and 3-tier team commission payouts.
           </div>
 
-          {/* Form (Screenshot 4) */}
+          {/* Quick Select Buttons */}
+          <div>
+            <label className="text-xs font-bold text-slate-700 block mb-1.5">Quick Select Contract Tier</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Product B (₹2,100)', amt: 2100 },
+                { label: 'Product A (₹5,200)', amt: 5200 },
+                { label: 'Product D (₹10,500)', amt: 10500 },
+                { label: 'Product E (₹25,000)', amt: 25000 },
+              ].map((tier) => (
+                <button
+                  key={tier.amt}
+                  type="button"
+                  onClick={() => setTopupAmount(tier.amt.toString())}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 font-mono font-bold text-xs text-slate-700 transition"
+                >
+                  {tier.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Form */}
           <form onSubmit={handleTopupSubmit} className="space-y-4 text-xs">
             <div>
               <label className="font-bold text-slate-800 block mb-1">
@@ -1447,7 +1476,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 placeholder="Enter top-up amount"
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-mono font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-[#70c028] focus:ring-1 focus:ring-[#70c028] transition"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-mono font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                 required
               />
             </div>
@@ -1455,9 +1484,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             <div className="pt-2">
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-black text-xs shadow-md shadow-[#70c028]/25 transition"
+                className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/25 transition"
               >
-                Execute Account Top-Up
+                Execute Sports Contract Top-Up
               </button>
             </div>
           </form>
@@ -1470,8 +1499,8 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-[#0B1536] p-5 text-white flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-base font-sans">Assign New Investment Plan</h3>
-                <span className="text-xs text-slate-400">Allocate robotic yield node to {currentUser.name}</span>
+                <h3 className="font-bold text-base font-sans">Assign FanCode Sports Contract</h3>
+                <span className="text-xs text-slate-400">Allocate sports yield tier to {currentUser.name}</span>
               </div>
               <button
                 onClick={() => setShowAssignPlanModal(false)}
@@ -1483,16 +1512,25 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
             <form onSubmit={handleAssignPlan} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Plan Name</label>
+                <label className="font-bold text-slate-700 block mb-1">Sports Contract Tier</label>
                 <select
-                  value={newPlanName}
-                  onChange={(e) => setNewPlanName(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-[#70c028]"
+                  value={selectedProductId}
+                  onChange={(e) => {
+                    const prodId = e.target.value;
+                    setSelectedProductId(prodId);
+                    const prod = PRODUCTS_CATALOG.find((p) => p.id === prodId);
+                    if (prod) {
+                      setNewPlanAmount(prod.price.toString());
+                      setNewPlanRoi(`₹${prod.dailyIncome} / Day`);
+                    }
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold outline-hidden focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="Plan 1 (High Efficiency Yield)">Plan 1 (High Efficiency Yield - 8.5% ROI)</option>
-                  <option value="Plan 2 (6.66% ROI with Security)">Plan 2 (6.66% ROI with Security)</option>
-                  <option value="Plan 3 (Autonomous Titan Fleet)">Plan 3 (Autonomous Titan Fleet - 10.0% ROI)</option>
-                  <option value="Plan 4 (Cybernetic Core Pro)">Plan 4 (Cybernetic Core Pro - 12.5% ROI)</option>
+                  {PRODUCTS_CATALOG.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} - {p.robotModel} (₹{p.price.toLocaleString('en-IN')} · ₹{p.dailyIncome}/day · {p.durationDays} Days)
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1502,18 +1540,23 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   type="number"
                   value={newPlanAmount}
                   onChange={(e) => setNewPlanAmount(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-[#70c028]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Monthly Return Rate (%)</label>
+                <label className="font-bold text-slate-700 block mb-1">Daily Yield Payout</label>
                 <input
                   type="text"
                   value={newPlanRoi}
                   onChange={(e) => setNewPlanRoi(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-[#70c028]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-[11px]">
+                <span>Contract Duration: <strong className="text-slate-900 font-mono">150 Days</strong></span>
+                <span className="block mt-0.5">Payout Frequency: <strong className="text-emerald-600 font-mono">Daily at 18:30 IST</strong></span>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">
@@ -1526,9 +1569,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#70c028] hover:bg-[#84cc16] text-slate-950 font-black transition shadow-md shadow-[#70c028]/25"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-md shadow-blue-500/25"
                 >
-                  Confirm Allocation
+                  Confirm Contract Allocation
                 </button>
               </div>
             </form>

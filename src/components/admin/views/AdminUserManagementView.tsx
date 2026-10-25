@@ -25,7 +25,8 @@ export interface AdminUserItem {
   city?: string;
   sponsorId: string;
   kycStatus: 'UNFILLED' | 'APPROVED' | 'PENDING' | 'REJECTED';
-  cadre: string;
+  cadre?: string;
+  vipLevel?: string;
   status: 'Active' | 'InActive';
   walletBalance: number;
   totalEarned: number;
@@ -73,7 +74,8 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     city: 'Amadalavalasa',
     sponsorId: 'B9776636',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    cadre: 'VIP 1',
+    vipLevel: 'VIP 1',
     status: 'Active',
     walletBalance: 2220,
     totalEarned: 2220,
@@ -88,17 +90,17 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     profileLocked: false,
     investments: [
       {
-        id: 'cmvl41fl327klkva0wfcxeh2w',
-        planName: 'Plan 2 (6.66% ROI with Security)',
-        category: 'direct',
+        id: 'fnc-spt-7721',
+        planName: 'Product B (Formula 1 Grand Prix)',
+        category: 'FanCode Sports Yield',
         amountInvested: 500000,
         totalReturn: 1000000,
         earnedSoFar: 2220,
-        monthlyReturn: '6.66%',
+        monthlyReturn: '₹500 / Day',
         startDate: '23/10/2026, 8:43:57 pm',
-        endDate: '23/4/2029, 8:43:57 pm',
-        duration: '30 Months',
-        nextPayout: '23/4/2029, 8:43:57 pm',
+        endDate: '22/03/2027, 8:43:57 pm',
+        duration: '150 Days',
+        nextPayout: 'Daily 18:30 IST',
         status: 'Active'
       }
     ]
@@ -385,7 +387,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
 
   // Export Excel / CSV
   const handleExport = () => {
-    const headers = ['#', 'User ID', 'Name', 'Mobile', 'Sponsor ID', 'KYC', 'Cadre', 'Status', 'Wallet Balance', 'Joined'];
+    const headers = ['#', 'User ID', 'Name', 'Mobile', 'Sponsor ID', 'KYC', 'VIP Tier', 'Status', 'Wallet Balance', 'Joined'];
     const rows = filteredUsers.map((u, i) => [
       i + 1,
       u.userId,
@@ -393,7 +395,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       u.mobile,
       u.sponsorId,
       u.kycStatus,
-      u.cadre,
+      u.vipLevel || u.cadre || 'VIP 1',
       u.status,
       u.walletBalance,
       u.joined
@@ -539,7 +541,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                 <th className="px-4 py-3">Mobile</th>
                 <th className="px-4 py-3">Sponsor ID</th>
                 <th className="px-4 py-3">KYC</th>
-                <th className="px-4 py-3">Cadre</th>
+                <th className="px-4 py-3">VIP Tier</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Wallet</th>
                 <th className="px-4 py-3">Joined</th>
@@ -583,8 +585,8 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
-                          {user.cadre}
+                        <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold">
+                          {user.vipLevel || user.cadre || 'VIP 1'}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
