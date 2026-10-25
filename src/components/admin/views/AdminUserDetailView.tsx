@@ -46,7 +46,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<AdminUserItem>(initialUser);
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'cadre' | 'profile' | 'kyc_bank' | 'add_money' | 'topup'
+    'overview' | 'investments' | 'team_tree' | 'income' | 'wallet_history' | 'profile' | 'kyc_bank' | 'add_money' | 'topup'
   >('overview');
 
   // Edit states for Profile (Screenshot 2)
@@ -427,7 +427,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             { id: 'team_tree', label: 'Team Tree' },
             { id: 'income', label: 'Income Breakdown' },
             { id: 'wallet_history', label: 'Wallet History' },
-            { id: 'cadre', label: 'Cadre Milestones' },
             { id: 'profile', label: 'Profile' },
             { id: 'kyc_bank', label: 'KYC & Bank' },
             { id: 'add_money', label: 'Add Money' },
@@ -922,49 +921,6 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 6: CADRE MILESTONES ================= */}
-      {activeTab === 'cadre' && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 animate-in fade-in-50 duration-150">
-          <h3 className="font-bold text-slate-900 text-base font-sans">Cadre Rewards & Recognition Milestones</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { title: 'Star', target: '₹ 1,00,000', bonus: '₹ 2,500', achieved: true },
-              { title: 'Silver Leader', target: '₹ 5,00,000', bonus: '₹ 12,500', achieved: true },
-              { title: 'Gold Executive', target: '₹ 10,00,000', bonus: '₹ 25,000', achieved: false },
-              { title: 'Platinum Director', target: '₹ 15,00,000', bonus: '₹ 50,000', achieved: false },
-              { title: 'Marketing Coordinator (MC)', target: '₹ 25,00,000', bonus: '₹ 1,00,000', achieved: false },
-              { title: 'Diamond President', target: '₹ 50,00,000', bonus: '₹ 2,50,000', achieved: false },
-            ].map((c) => (
-              <div
-                key={c.title}
-                className={`p-5 rounded-2xl border transition ${
-                  c.achieved ? 'bg-emerald-50/60 border-emerald-200' : 'bg-slate-50 border-slate-200'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold text-slate-900 text-sm">{c.title}</h4>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      c.achieved ? 'bg-emerald-200 text-emerald-900' : 'bg-slate-200 text-slate-600'
-                    }`}
-                  >
-                    {c.achieved ? 'Achieved' : 'In Progress'}
-                  </span>
-                </div>
-                <div className="text-xs text-slate-600 space-y-1">
-                  <div>
-                    Target Turnover: <span className="font-mono font-bold text-slate-900">{c.target}</span>
-                  </div>
-                  <div>
-                    Cash Bonus: <span className="font-mono font-bold text-emerald-600">{c.bonus}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ================= TAB 7: PROFILE (Exact match to Screenshot 2) ================= */}
       {activeTab === 'profile' && (
