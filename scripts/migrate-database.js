@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   daily_withdrawal_window_start TEXT NOT NULL DEFAULT '00:30',
   daily_withdrawal_window_end TEXT NOT NULL DEFAULT '17:00',
   enforce_next_day_withdrawal_lock BOOLEAN NOT NULL DEFAULT true,
-  telegram_support_url TEXT NOT NULL DEFAULT 'https://t.me/robovest_support',
-  telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/robovest_official',
+  telegram_support_url TEXT NOT NULL DEFAULT 'https://t.me/fancode_support',
+  telegram_channel_url TEXT NOT NULL DEFAULT 'https://t.me/fancode_official',
   platform_announcement TEXT NOT NULL DEFAULT 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS bank_accounts (
   account_number TEXT NOT NULL DEFAULT '50100492817264',
   ifsc_code TEXT NOT NULL DEFAULT 'HDFC0001234',
   bank_name TEXT NOT NULL DEFAULT 'HDFC Bank',
-  upi_id TEXT DEFAULT 'rahul.robo@okaxis',
+  upi_id TEXT DEFAULT 'rahul.fancode@okaxis',
   is_bound BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -216,7 +216,7 @@ END $$;
 const seedSQL = `
 -- SEED PLATFORM SETTINGS
 INSERT INTO platform_settings (id, min_recharge, min_withdrawal, withdrawal_fee_percent, daily_withdrawal_window_start, daily_withdrawal_window_end, enforce_next_day_withdrawal_lock, telegram_support_url, telegram_channel_url, platform_announcement)
-VALUES ('default', 520, 150, 10, '00:30', '17:00', true, 'https://t.me/robovest_support', 'https://t.me/robovest_official', 'Autonomous Fleet v2.4 active. Daily yields processing 24/7.')
+VALUES ('default', 520, 150, 10, '00:30', '17:00', true, 'https://t.me/fancode_support', 'https://t.me/fancode_official', 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.')
 ON CONFLICT (id) DO NOTHING;
 
 -- SEED USER PROFILE
@@ -226,7 +226,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- SEED BANK ACCOUNT
 INSERT INTO bank_accounts (id, user_id, account_holder, account_number, ifsc_code, bank_name, upi_id, is_bound)
-VALUES ('bank_main', 'User5294', 'Rahul Sharma', '50100492817264', 'HDFC0001234', 'HDFC Bank', 'rahul.robo@okaxis', true)
+VALUES ('bank_main', 'User5294', 'Rahul Sharma', '50100492817264', 'HDFC0001234', 'HDFC Bank', 'rahul.fancode@okaxis', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- SEED ADMIN SETTINGS

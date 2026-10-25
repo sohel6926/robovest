@@ -79,7 +79,7 @@ const PRESET_IMAGES = [
   { label: 'Aurora Freight Titan (Plan E)', url: planEImage },
   { label: 'Valkyrie Sovereign (Plan F)', url: planFImage },
   { label: 'Omega Colossus Titan (Plan G)', url: planGImage },
-  { label: 'Robovest HQ Cyber Fleet (Hero)', url: heroImage },
+  { label: 'FanCode Live Sports Arena (Hero)', url: heroImage },
 ];
 
 interface AdminPanelProps {
@@ -652,7 +652,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               ADMIN CONTROL PANEL
             </h2>
             <p className="text-xs text-slate-300 mt-1">
-              Robovest Autonomous Robotics Fleet Master Console
+              FanCode Sports & Gaming Master Console
             </p>
           </div>
 
@@ -2258,7 +2258,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
                 <div>
                   <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk']">
-                    Robotics Investment Plans Catalog
+                    FanCode Investment Plans Catalog
                   </h2>
                   <p className="text-xs text-slate-500">
                     Add new investment plans, modify prices, yields, durations, prerequisites, or remove plans.
@@ -3339,10 +3339,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk']">
-                      Active Robot Fleet Orders
+                      Active FanCode Plan Orders
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Currently deployed robotic units generating daily revenue for User5294.
+                      Currently deployed plans generating daily revenue for User5294.
                     </p>
                   </div>
                   <span className="px-3 py-1 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200">
@@ -3352,7 +3352,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                 {investments.length === 0 ? (
                 <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs">
-                  No active robot investments yet. User can purchase units from the catalog.
+                  No active plan investments yet. User can purchase units from the catalog.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3456,9 +3456,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           dailyWithdrawalWindowStart: '00:30',
                           dailyWithdrawalWindowEnd: '17:00',
                           enforceNextDayWithdrawalLock: true,
-                          telegramSupportUrl: 'https://t.me/robovest_support',
-                          telegramChannelUrl: 'https://t.me/robovest_official',
-                          platformAnnouncement: 'Autonomous Robotics Fleet v2.4 active.',
+                          telegramSupportUrl: 'https://t.me/fancode_support',
+                          telegramChannelUrl: 'https://t.me/fancode_official',
+                          platformAnnouncement: 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
                         });
                         showToast('Settings reset to default.');
                       }
@@ -3916,10 +3916,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <div className="bg-gradient-to-r from-slate-900 to-blue-950 p-5 text-white flex items-center justify-between">
               <div>
                 <h3 className="text-base font-black font-['Space_Grotesk'] tracking-wide">
-                  {editingPlanId ? `Edit Plan ${editingPlanId}` : 'Create New Robotic Investment Plan'}
+                  {editingPlanId ? `Edit Plan ${editingPlanId}` : 'Create New FanCode Investment Plan'}
                 </h3>
                 <p className="text-xs text-slate-300">
-                  {editingPlanId ? 'Modify price, daily ROI yield, duration, or specifications' : 'Define robot specifications, returns, and tier'}
+                  {editingPlanId ? 'Modify price, daily ROI yield, duration, or specifications' : 'Define plan specifications, returns, and tier'}
                 </p>
               </div>
               <button

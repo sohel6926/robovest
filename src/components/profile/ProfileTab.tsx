@@ -50,11 +50,11 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {/* User Info Hero Card */}
       <div className="rounded-3xl p-5 bg-white border border-slate-200 shadow-sm flex items-center gap-3.5">
-        {/* Avatar with Robot Emblem */}
-        <div className="relative w-16 h-16 rounded-2xl bg-blue-600 p-0.5 shadow-md shadow-blue-500/20 shrink-0 flex items-center justify-center">
-          <Bot className="w-9 h-9 text-white" />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-800 text-white flex items-center justify-center border-2 border-white">
-            <Crown className="w-3 h-3 fill-white" />
+        {/* Avatar with FanCode Emblem */}
+        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] p-0.5 shadow-md shadow-orange-500/20 shrink-0 flex items-center justify-center">
+          <span className="font-black italic text-white text-2xl tracking-tight">FC</span>
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center border-2 border-white">
+            <Crown className="w-3 h-3 fill-amber-400 text-amber-400" />
           </div>
         </div>
 
@@ -273,7 +273,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                 {activeSubModal === 'balanceDetails' && 'Balance Details / Ledger'}
                 {activeSubModal === 'withdrawalDetails' && 'Withdrawal Records'}
                 {activeSubModal === 'notifications' && 'Notification Center'}
-                {activeSubModal === 'about' && 'About RoboVest Capital'}
+                {activeSubModal === 'about' && 'About FanCode'}
               </h3>
               <button
                 onClick={() => setActiveSubModal(null)}
@@ -353,7 +353,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
                     <span className="font-bold text-blue-600 block">Level 1 Commission Updated to 22%</span>
                     <p className="text-slate-600">
-                      Invite friends and earn 22% direct commission on every robot fleet purchase!
+                      Invite friends and earn 22% direct commission on every sports pass purchase!
                     </p>
                   </div>
                 </div>
@@ -362,10 +362,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
               {activeSubModal === 'about' && (
                 <div className="space-y-3 leading-relaxed text-slate-700">
                   <p>
-                    <strong className="text-slate-900">RoboVest AI Capital</strong> is an international enterprise robotics management company deploying autonomous bipedal and industrial cybernetic hardware fleets across modern smart logistics, data centers, and advanced manufacturing hubs.
+                    <strong className="text-slate-900">FanCode</strong> is a premier live sports streaming and interactive sports entertainment platform delivering high-engagement sports broadcasts, real-time analytics, and high-yield digital sports event contracts worldwide.
                   </p>
                   <p>
-                    Every investment contract corresponds to a dedicated autonomous robot unit operating 24/7 on industrial tasks, delivering predictable, transparent daily revenue directly to our commanders worldwide.
+                    Every investment contract delivers predictable, transparent daily revenue directly to our users worldwide.
                   </p>
                 </div>
               )}

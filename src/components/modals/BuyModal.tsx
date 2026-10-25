@@ -129,7 +129,7 @@ export const BuyModal: React.FC = () => {
                   {quantity}
                 </span>
                 <span className="text-[10px] text-slate-500 block -mt-1">
-                  {quantity === 1 ? 'Robot Unit' : 'Robot Units'}
+                  {quantity === 1 ? 'Plan Unit' : 'Plan Units'}
                 </span>
               </div>
 
@@ -176,7 +176,7 @@ export const BuyModal: React.FC = () => {
         <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-[11px] text-blue-900 flex items-start gap-2">
           <Clock className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
           <span>
-            Daily earnings from this robot unit unlock for withdrawal <strong>Next Day after 12:30 AM (00:30 hrs)</strong>.
+            Daily earnings from this plan unlock for withdrawal <strong>Next Day after 12:30 AM (00:30 hrs)</strong>.
           </span>
         </div>
 

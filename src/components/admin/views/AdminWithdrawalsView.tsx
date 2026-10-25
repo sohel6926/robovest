@@ -138,7 +138,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
   showToast,
 }) => {
   const [items, setItems] = useState<WithdrawalRequestItem[]>(() => {
-    // Merge any live pending withdrawal transactions from Robovest
+    // Merge any live pending withdrawal transactions from FanCode
     const livePendingItems: WithdrawalRequestItem[] = pendingTransactions
       .filter(t => t.type === 'WITHDRAWAL' && (t.status === 'PROCESSING' || t.status === 'PENDING'))
       .map((t, idx) => ({

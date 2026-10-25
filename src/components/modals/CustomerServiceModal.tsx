@@ -8,7 +8,7 @@ export const CustomerServiceModal: React.FC = () => {
   const [messages, setMessages] = useState<Array<{ sender: 'agent' | 'user'; text: string; time: string }>>([
     {
       sender: 'agent',
-      text: 'Hello Commander! Welcome to RoboVest 24/7 Priority Support Desk. How may we assist your robotics portfolio today?',
+      text: 'Hello! Welcome to FanCode 24/7 Priority Support Desk. How may we assist your sports portfolio today?',
       time: '12:00 PM'
     }
   ]);
@@ -32,7 +32,7 @@ export const CustomerServiceModal: React.FC = () => {
       if (lower.includes('withdraw') || lower.includes('12:30') || lower.includes('next day')) {
         reply = 'Withdrawal Rule Reminder: Any investment deployed today unlocks for withdrawal tomorrow after 12:30 AM (00:30 hrs). Minimum withdrawal is ₹150 with a 10% tax deduction.';
       } else if (lower.includes('product') || lower.includes('unlock') || lower.includes('e') || lower.includes('f') || lower.includes('g')) {
-        reply = 'Elite Products E, F, and G require holding an active investment in Product A, B, C, or D first. You can purchase up to 10 units per robot model!';
+        reply = 'Elite Products E, F, and G require holding an active investment in Product A, B, C, or D first. You can purchase up to 10 units per plan!';
       } else if (lower.includes('recharge') || lower.includes('deposit') || lower.includes('upi')) {
         reply = 'Recharges are credited instantly once you submit your 12-digit UTR reference code. Minimum recharge is ₹520.';
       }

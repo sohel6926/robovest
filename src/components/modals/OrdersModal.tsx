@@ -3,21 +3,37 @@ import { useApp } from '../../context/AppContext';
 import { X, Bot, Zap, CheckCircle2, Clock } from 'lucide-react';
 
 export const OrdersModal: React.FC = () => {
-  const { showOrdersModal, setShowOrdersModal, investments, claimDailyReturns, setActiveTab } = useApp();
-  const [claimStatus, setClaimStatus] = useState<string | null>(null);
+  const { 
+    showOrdersModal, 
+    setShowOrdersModal, 
+    investments, 
+    claimDailyReturns, 
+    unharvestedYield,
+    isHarvestedToday,
+    unharvestedDays,
+    simulatedTime,
+    platformSettings,
+    setActiveTab 
+  } = useApp();
+  const [claimNotice, setClaimNotice] = useState<{ message: string; type: 'success' | 'info' | 'warning' } | null>(null);
 
   if (!showOrdersModal) return null;
 
-  const totalDailyRevenue = investments.reduce((sum, inv) => sum + inv.dailyIncome, 0);
-  const totalUnits = investments.reduce((sum, inv) => sum + inv.quantity, 0);
+  const activeInvestments = investments.filter(inv => inv.status === 'ACTIVE');
+  const totalDailyRevenue = activeInvestments.reduce((sum, inv) => sum + inv.dailyIncome, 0);
+  const totalUnits = activeInvestments.reduce((sum, inv) => sum + inv.quantity, 0);
 
   const handleClaim = () => {
     const res = claimDailyReturns();
     if (res.success) {
-      setClaimStatus(res.message);
-      setTimeout(() => setClaimStatus(null), 2500);
+      setClaimNotice({ message: res.message, type: 'success' });
+      setTimeout(() => setClaimNotice(null), 4000);
     } else {
-      alert(res.message);
+      setClaimNotice({ 
+        message: res.message, 
+        type: res.alreadyHarvested ? 'info' : 'warning' 
+      });
+      setTimeout(() => setClaimNotice(null), 4000);
     }
   };
 
@@ -27,11 +43,11 @@ export const OrdersModal: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-              <Bot className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100">
+              <Zap className="w-4 h-4 fill-orange-500" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900">Active Robot Contracts</h3>
+              <h3 className="font-bold text-sm text-slate-900">Active FanCode Contracts</h3>
               <p className="text-[10px] text-slate-500 font-medium">
                 {totalUnits} Units Deployed ({investments.length} contracts)
               </p>
@@ -39,36 +55,89 @@ export const OrdersModal: React.FC = () => {
           </div>
           <button
             onClick={() => setShowOrdersModal(false)}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition border border-slate-200"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition border border-slate-200 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Daily Harvest Summary Box */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between shrink-0 shadow-xs">
-          <div>
-            <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
-              Daily Combined Yield
-            </span>
-            <div className="text-xl font-black text-emerald-600 tabular-nums">
-              ₹{totalDailyRevenue.toLocaleString()} <span className="text-xs font-semibold text-slate-400">/ day</span>
+        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 shrink-0 shadow-xs">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
+                Daily Combined Yield
+              </span>
+              <div className="text-xl font-black text-emerald-600 tabular-nums">
+                ₹{totalDailyRevenue.toLocaleString()} <span className="text-xs font-semibold text-slate-400">/ day</span>
+              </div>
             </div>
+
+            <button
+              onClick={handleClaim}
+              disabled={totalDailyRevenue <= 0}
+              title={isHarvestedToday ? 'Click to check harvest status' : 'Harvest your daily returns'}
+              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-xs active:scale-95 transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                isHarvestedToday
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 shadow-emerald-500/10'
+                  : 'bg-gradient-to-r from-[#FF5500] to-[#FF3500] hover:brightness-105 text-white shadow-orange-500/25'
+              }`}
+            >
+              {isHarvestedToday ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Harvested Today</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 fill-white text-white" />
+                  <span>
+                    {unharvestedDays > 1 
+                      ? `Harvest Stacked (₹${unharvestedYield.toLocaleString()})` 
+                      : `Harvest Yield (₹${unharvestedYield.toLocaleString()})`}
+                  </span>
+                </>
+              )}
+            </button>
           </div>
-          <button
-            onClick={handleClaim}
-            disabled={totalDailyRevenue <= 0}
-            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs shadow-xs active:scale-95 transition flex items-center gap-1.5 shadow-blue-500/20"
-          >
-            <Zap className="w-3.5 h-3.5 fill-white" />
-            <span>Harvest Yield</span>
-          </button>
+
+          {/* Subtext info pill */}
+          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[11px]">
+            {isHarvestedToday ? (
+              <span className="text-emerald-700 font-medium flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="line-clamp-1">Harvested for today · Next cycle at 00:30 AM</span>
+              </span>
+            ) : unharvestedDays > 1 ? (
+              <span className="text-orange-600 font-bold flex items-center gap-1">
+                <Zap className="w-3.5 h-3.5 text-orange-600 fill-orange-600 shrink-0" />
+                <span>{unharvestedDays} days unharvested · Harvest in 1 click!</span>
+              </span>
+            ) : (
+              <span className="text-slate-600 font-medium flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-orange-600 shrink-0" />
+                <span>Ready to harvest for today's cycle</span>
+              </span>
+            )}
+            <span className="font-mono text-slate-400 text-[10px] shrink-0 ml-1">1 harvest / day</span>
+          </div>
         </div>
 
-        {claimStatus && (
-          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{claimStatus}</span>
+        {/* Claim Notice Message Banner */}
+        {claimNotice && (
+          <div className={`p-3 rounded-2xl text-xs flex items-start gap-2 animate-in fade-in transition-all ${
+            claimNotice.type === 'success' 
+              ? 'bg-emerald-50 border border-emerald-300 text-emerald-800 shadow-xs' 
+              : 'bg-amber-50 border border-amber-300 text-amber-900 shadow-xs'
+          }`}>
+            {claimNotice.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            ) : (
+              <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            )}
+            <div className="leading-snug">
+              <span className="font-semibold block">{claimNotice.message}</span>
+            </div>
           </div>
         )}
 
@@ -76,16 +145,16 @@ export const OrdersModal: React.FC = () => {
         <div className="overflow-y-auto space-y-3 flex-1 pr-1">
           {investments.length === 0 ? (
             <div className="py-12 text-center space-y-3">
-              <Bot className="w-12 h-12 text-slate-300 mx-auto" />
-              <p className="text-xs text-slate-500">No active robot units deployed yet.</p>
+              <Zap className="w-12 h-12 text-slate-300 mx-auto" />
+              <p className="text-xs text-slate-500">No active sports contracts deployed yet.</p>
               <button
                 onClick={() => {
                   setShowOrdersModal(false);
                   setActiveTab('home');
                 }}
-                className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-xs"
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-xs cursor-pointer"
               >
-                Explore Robotics Plans →
+                Explore Sports Plans →
               </button>
             </div>
           ) : (
@@ -134,7 +203,7 @@ export const OrdersModal: React.FC = () => {
 
                 <div className="pt-1 flex items-center justify-between text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-blue-600" />
+                    <Clock className="w-3 h-3 text-orange-600" />
                     <span>Payout cycle: Daily 00:30 AM</span>
                   </span>
                   <span className="text-blue-600 font-medium">+₹{inv.bonusReceived} Bonus Given</span>

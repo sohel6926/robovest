@@ -20,7 +20,7 @@ export const AuthModal: React.FC = () => {
       alert('Please agree to the Terms & Conditions.');
       return;
     }
-    setSuccessNotice(mode === 'login' ? 'Welcome back! Logged in successfully.' : 'Registration complete! Welcome to RoboVest.');
+    setSuccessNotice(mode === 'login' ? 'Welcome back! Logged in successfully.' : 'Registration complete! Welcome to FanCode.');
     setTimeout(() => {
       setSuccessNotice(null);
       setShowAuthModal(false);
@@ -40,14 +40,14 @@ export const AuthModal: React.FC = () => {
 
         {/* Brand Lockup */}
         <div className="text-center pt-2 space-y-1">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-blue-600 p-0.5 shadow-md shadow-blue-500/20 flex items-center justify-center">
-            <Bot className="w-7 h-7 text-white" />
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] p-0.5 shadow-md shadow-orange-500/20 flex items-center justify-center">
+            <span className="font-black italic text-white text-base tracking-tight">FC</span>
           </div>
           <h2 className="text-xl font-black tracking-tight text-slate-900 font-['Space_Grotesk']">
-            ROBO<span className="text-blue-600">VEST</span>
+            FAN<span className="text-[#FF4A00]">CODE</span>
           </h2>
           <p className="text-[11px] text-slate-500">
-            Autonomous Robotics · Institutional Financial Yields
+            Live Sports · High-Yield Payouts & Exclusive Events
           </p>
         </div>
 

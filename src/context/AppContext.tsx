@@ -68,7 +68,16 @@ interface AppContextType {
   purchaseProduct: (productId: string, quantity: number) => { success: boolean; message: string };
   requestWithdrawal: (amount: number) => { success: boolean; message: string };
   updateBankAccount: (bank: BankAccount) => void;
-  claimDailyReturns: () => { success: boolean; message: string; claimed: number };
+  unharvestedYield: number;
+  isHarvestedToday: boolean;
+  unharvestedDays: number;
+  claimDailyReturns: () => { 
+    success: boolean; 
+    message: string; 
+    claimed: number;
+    alreadyHarvested?: boolean;
+    daysStacked?: number;
+  };
   
   // Prerequisite & limit helpers
   canInvestInProduct: (productId: string) => { allowed: boolean; reason?: string };
@@ -129,7 +138,7 @@ const INITIAL_BANK: BankAccount = {
   accountNumber: '50100492817264',
   ifscCode: 'HDFC0001234',
   bankName: 'HDFC Bank',
-  upiId: 'rahul.robo@okaxis',
+  upiId: 'rahul.fancode@okaxis',
   isBound: true,
 };
 
@@ -317,14 +326,14 @@ const DEFAULT_SETTINGS: PlatformSettings = {
   dailyWithdrawalWindowStart: '00:30',
   dailyWithdrawalWindowEnd: '17:00',
   enforceNextDayWithdrawalLock: true,
-  telegramSupportUrl: 'https://t.me/robovest_support',
-  telegramChannelUrl: 'https://t.me/robovest_official',
+  telegramSupportUrl: 'https://t.me/fancode_support',
+  telegramChannelUrl: 'https://t.me/fancode_official',
   platformAnnouncement: 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.',
-  rechargeUpiId: 'robovest.payments@hdfcbank',
+  rechargeUpiId: 'fancode.payments@hdfcbank',
   rechargePayeeName: 'FanCode Payments',
   rechargeBankName: 'HDFC Bank',
   rechargeQrImageUrl: '',
-  rechargeAccountHolder: 'Robovest Technologies Pvt Ltd',
+  rechargeAccountHolder: 'FanCode Technologies Pvt Ltd',
   rechargeAccountNumber: '50200084729103',
   rechargeIfscCode: 'HDFC0000128',
   rechargeInstructions: 'Scan using PhonePe, Google Pay, Paytm, or BHIM. After payment is successful, enter the 12-digit UTR transaction reference number below.',
@@ -334,7 +343,7 @@ const DEFAULT_SETTINGS: PlatformSettings = {
     {
       id: 'qr-1',
       label: 'Primary UPI (PhonePe / GPay / BHIM)',
-      upiId: 'robovest.payments@hdfcbank',
+      upiId: 'fancode.payments@hdfcbank',
       payeeName: 'FanCode Payments',
       qrImageUrl: '',
       isActive: true,
@@ -344,7 +353,7 @@ const DEFAULT_SETTINGS: PlatformSettings = {
     {
       id: 'bank-1',
       bankName: 'HDFC Bank',
-      accountHolder: 'Robovest Technologies Pvt Ltd',
+      accountHolder: 'FanCode Technologies Pvt Ltd',
       accountNumber: '50200084729103',
       ifscCode: 'HDFC0000128',
       accountType: 'Current Account',
@@ -396,6 +405,93 @@ export function calculateDaysPassed(
   return days;
 }
 
+// Helper: Get the daily cycle date string (YYYY-MM-DD) taking 00:30 AM reset into account
+export function getCycleDateKey(date: Date, resetTimeStr: string = '00:30'): string {
+  const [resetH, resetM] = (resetTimeStr || '00:30').split(':').map(Number);
+  const d = new Date(date);
+  if (d.getHours() < resetH || (d.getHours() === resetH && d.getMinutes() < (resetM || 0))) {
+    d.setDate(d.getDate() - 1);
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Helper: Calculate total cycles elapsed for an active plan from its purchase date
+export function getInvestmentEligibleCycles(
+  inv: UserInvestment,
+  currentDate: Date = new Date(),
+  resetTimeStr: string = '00:30'
+): number {
+  if (inv.status !== 'ACTIVE') return inv.daysElapsed || 0;
+
+  const pDate = inv.purchaseTimestamp ? new Date(inv.purchaseTimestamp) : new Date(inv.purchaseDateFormatted);
+  if (isNaN(pDate.getTime())) {
+    return Math.max(1, (inv.daysElapsed || 0) + 1);
+  }
+
+  const purchaseCycleKey = getCycleDateKey(pDate, resetTimeStr);
+  const currentCycleKey = getCycleDateKey(currentDate, resetTimeStr);
+
+  const pParts = purchaseCycleKey.split('-').map(Number);
+  const cParts = currentCycleKey.split('-').map(Number);
+
+  const pUtc = Date.UTC(pParts[0], pParts[1] - 1, pParts[2]);
+  const cUtc = Date.UTC(cParts[0], cParts[1] - 1, cParts[2]);
+
+  const diffDays = Math.max(0, Math.round((cUtc - pUtc) / (1000 * 60 * 60 * 24)));
+  const cycles = diffDays + 1; // Purchase cycle is Cycle 1
+  return Math.min(cycles, 150);
+}
+
+// Helper: Get unharvested days/amount for a single investment
+export function getInvestmentUnharvested(
+  inv: UserInvestment,
+  currentDate: Date = new Date(),
+  resetTimeStr: string = '00:30'
+): { eligibleCycles: number; harvestedCycles: number; unharvestedCycles: number; unharvestedAmount: number; isHarvestedToday: boolean } {
+  if (inv.status !== 'ACTIVE') {
+    return { eligibleCycles: 0, harvestedCycles: 0, unharvestedCycles: 0, unharvestedAmount: 0, isHarvestedToday: true };
+  }
+
+  const currentCycleKey = getCycleDateKey(currentDate, resetTimeStr);
+  const eligibleCycles = getInvestmentEligibleCycles(inv, currentDate, resetTimeStr);
+
+  let harvestedCycles = 0;
+  let localHarvestMap: Record<string, { cyclesHarvested: number; lastHarvestDate: string }> = {};
+  try {
+    const saved = localStorage.getItem('fancode_harvest_map');
+    if (saved) localHarvestMap = JSON.parse(saved);
+  } catch (e) {}
+
+  const mapped = localHarvestMap[inv.id];
+
+  if (inv.cyclesHarvested !== undefined) {
+    harvestedCycles = inv.cyclesHarvested;
+  } else if (mapped?.cyclesHarvested !== undefined) {
+    harvestedCycles = mapped.cyclesHarvested;
+  } else if (inv.lastHarvestDate === currentCycleKey || mapped?.lastHarvestDate === currentCycleKey) {
+    harvestedCycles = eligibleCycles;
+  } else if (inv.totalEarned && inv.dailyIncome && inv.totalEarned > 0) {
+    harvestedCycles = Math.min(eligibleCycles, Math.floor(inv.totalEarned / inv.dailyIncome));
+  } else {
+    harvestedCycles = 0;
+  }
+
+  const unharvestedCycles = Math.max(0, eligibleCycles - harvestedCycles);
+  const unharvestedAmount = unharvestedCycles * inv.dailyIncome;
+  const isHarvestedToday = unharvestedCycles === 0;
+
+  return {
+    eligibleCycles,
+    harvestedCycles,
+    unharvestedCycles,
+    unharvestedAmount,
+    isHarvestedToday
+  };
+}
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'invite' | 'contact' | 'team' | 'profile'>('home');
   const navigateToRechargeRef = React.useRef<() => void>(() => {});
@@ -410,7 +506,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('robovest_admin_auth') === 'true';
+    return (localStorage.getItem('fancode_admin_auth') || localStorage.getItem('robovest_admin_auth')) === 'true';
   });
 
   // Dynamic Catalog backed by Supabase
@@ -435,7 +531,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Platform Settings backed by Supabase
   const [platformSettings, setPlatformSettings] = useState<PlatformSettings>(() => {
     try {
-      const saved = localStorage.getItem('robovest_settings');
+      const saved = localStorage.getItem('fancode_settings') || localStorage.getItem('robovest_settings');
       if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
     } catch (e) {
       console.error('Failed to parse settings from storage', e);
@@ -449,7 +545,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // User Profile backed by Supabase
   const [user, setUser] = useState<UserProfile>(() => {
     try {
-      const saved = localStorage.getItem('robovest_user');
+      const saved = localStorage.getItem('fancode_user') || localStorage.getItem('robovest_user');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error('Failed to parse user from storage', e);
@@ -471,7 +567,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Investments backed by Supabase
   const [investments, setInvestments] = useState<UserInvestment[]>(() => {
     try {
-      const saved = localStorage.getItem('robovest_investments');
+      const saved = localStorage.getItem('fancode_investments') || localStorage.getItem('robovest_investments');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error('Failed to parse investments from storage', e);
@@ -499,7 +595,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Transactions backed by Supabase
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
-      const saved = localStorage.getItem('robovest_transactions');
+      const saved = localStorage.getItem('fancode_transactions') || localStorage.getItem('robovest_transactions');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error('Failed to parse transactions from storage', e);
@@ -510,7 +606,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Team Members backed by Supabase
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
     try {
-      const saved = localStorage.getItem('robovest_team_members');
+      const saved = localStorage.getItem('fancode_team_members') || localStorage.getItem('robovest_team_members');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -614,27 +710,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [catalog]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_settings', JSON.stringify(platformSettings));
+    localStorage.setItem('fancode_settings', JSON.stringify(platformSettings));
   }, [platformSettings]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_user', JSON.stringify(user));
+    localStorage.setItem('fancode_user', JSON.stringify(user));
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_investments', JSON.stringify(investments));
+    localStorage.setItem('fancode_investments', JSON.stringify(investments));
   }, [investments]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_transactions', JSON.stringify(transactions));
+    localStorage.setItem('fancode_transactions', JSON.stringify(transactions));
   }, [transactions]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_team_members', JSON.stringify(teamMembers));
+    localStorage.setItem('fancode_team_members', JSON.stringify(teamMembers));
   }, [teamMembers]);
 
   useEffect(() => {
-    localStorage.setItem('robovest_admin_auth', isAdminAuthenticated ? 'true' : 'false');
+    localStorage.setItem('fancode_admin_auth', isAdminAuthenticated ? 'true' : 'false');
   }, [isAdminAuthenticated]);
 
   // Count how many units user already owns of a product
@@ -817,12 +913,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       });
     });
 
-    // 3. Credit user's wallet
-    if (yieldSum > 0) {
+    // 3. Referral commissions credited to user wallet if applicable
+    if (commissionSum > 0) {
       setUser(prev => {
-        const newAvail = prev.availableBalance + yieldSum;
-        const newWithdr = prev.withdrawableBalance + yieldSum;
-        const newIncome = prev.totalIncome + yieldSum;
+        const newAvail = prev.availableBalance + commissionSum;
+        const newWithdr = prev.withdrawableBalance + commissionSum;
+        const newIncome = prev.totalIncome + commissionSum;
         updateUserProfileDB(prev.id, {
           availableBalance: newAvail,
           withdrawableBalance: newWithdr,
@@ -836,40 +932,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
       });
 
-      const yieldTxn: Transaction = {
-        id: `TXN-YLD-${Date.now().toString().slice(-6)}`,
-        type: 'DAILY_RETURN',
-        amount: yieldSum,
+      const commTxn: Transaction = {
+        id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
+        type: 'COMMISSION',
+        amount: commissionSum,
         status: 'COMPLETED',
         timestamp: resetDate.getTime(),
         formattedTime: resetDate.toLocaleString(),
-        description: `Daily Fleet ROI Yield (Everyday Night Reset Settlement)`,
-        referenceId: `RESET-${Date.now().toString().slice(-4)}`
+        description: `Referral Level Commission Distributed Across Downline Network`,
+        referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
       };
-
-      insertTransactionDB(user.id, yieldTxn);
-
-      if (commissionSum > 0) {
-        const commTxn: Transaction = {
-          id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
-          type: 'COMMISSION',
-          amount: commissionSum,
-          status: 'COMPLETED',
-          timestamp: resetDate.getTime(),
-          formattedTime: resetDate.toLocaleString(),
-          description: `Referral Level Commission Distributed Across Downline Network`,
-          referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
-        };
-        insertTransactionDB(user.id, commTxn);
-        setTransactions(prev => [yieldTxn, commTxn, ...prev]);
-      } else {
-        setTransactions(prev => [yieldTxn, ...prev]);
-      }
+      insertTransactionDB(user.id, commTxn);
+      setTransactions(prev => [commTxn, ...prev]);
     }
 
     return {
       success: true,
-      message: `Night reset completed! Active plans updated (+1 day elapsed for all user and downline plans). Distributed ₹${yieldSum.toLocaleString()} in fleet yields and ₹${commissionSum.toLocaleString()} in referral commissions. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
+      message: `Night reset completed! Active plans advanced to next cycle. Distributed ₹${commissionSum.toLocaleString()} in referral commissions. Daily yields of ₹${yieldSum.toLocaleString()} accumulated for manual harvest. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
       yieldDistributed: yieldSum,
       commissionDistributed: commissionSum,
       activeNodesCount: investments.filter(inv => inv.status === 'ACTIVE').length,
@@ -882,14 +961,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const checkAndExecuteNightReset = () => {
       const now = new Date();
       const todayKey = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
-      const lastResetDate = localStorage.getItem('robovest_last_night_reset_date');
+      const lastResetDate = localStorage.getItem('fancode_last_night_reset_date') || localStorage.getItem('robovest_last_night_reset_date');
 
       // Platform reset time (default 00:30 AM)
       const [resetH, resetM] = (platformSettings.dailyWithdrawalWindowStart || '00:30').split(':').map(Number);
       const isPastResetTime = now.getHours() > resetH || (now.getHours() === resetH && now.getMinutes() >= resetM);
 
       if (isPastResetTime && lastResetDate !== todayKey) {
-        localStorage.setItem('robovest_last_night_reset_date', todayKey);
+        localStorage.setItem('fancode_last_night_reset_date', todayKey);
         performNightResetSettlement(now);
       }
     };
@@ -1000,6 +1079,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       purchaseDateFormatted: simulatedTime.toLocaleDateString(),
       daysElapsed: 0,
       totalEarned: 0,
+      cyclesHarvested: 0,
       status: 'ACTIVE',
     };
 
@@ -1130,30 +1210,123 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateBankAccountDB(user.id, updatedBank);
   };
 
-  // Claim daily accumulated returns
-  const claimDailyReturns = () => {
-    const totalDaily = investments
-      .filter(inv => inv.status === 'ACTIVE')
-      .reduce((sum, inv) => sum + inv.dailyIncome, 0);
+  // Calculate unharvested yield & today's status across all active plans
+  const unharvestedStats = useMemo(() => {
+    const active = investments.filter(i => i.status === 'ACTIVE');
+    if (active.length === 0) {
+      return { totalUnharvested: 0, isHarvestedToday: true, maxUnharvestedDays: 0 };
+    }
+    let totalUnharvested = 0;
+    let maxUnharvestedDays = 0;
+    let anyUnharvested = false;
 
-    if (totalDaily <= 0) {
-      return { success: false, message: 'No active robot investments to claim returns from.', claimed: 0 };
+    active.forEach(inv => {
+      const { unharvestedCycles, unharvestedAmount } = getInvestmentUnharvested(
+        inv,
+        simulatedTime,
+        platformSettings.dailyWithdrawalWindowStart
+      );
+      if (unharvestedCycles > 0) {
+        anyUnharvested = true;
+        totalUnharvested += unharvestedAmount;
+        if (unharvestedCycles > maxUnharvestedDays) {
+          maxUnharvestedDays = unharvestedCycles;
+        }
+      }
+    });
+
+    return {
+      totalUnharvested,
+      isHarvestedToday: !anyUnharvested,
+      maxUnharvestedDays
+    };
+  }, [investments, simulatedTime, platformSettings.dailyWithdrawalWindowStart]);
+
+  // Claim daily accumulated returns (Harvest Yield)
+  // Rule: Can only harvest once per day. If missed 1 or multiple days, stacks up and harvests in a single click!
+  const claimDailyReturns = () => {
+    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
+    if (activeInvs.length === 0) {
+      return {
+        success: false,
+        alreadyHarvested: false,
+        message: 'No active plan investments to claim returns from.',
+        claimed: 0,
+        daysStacked: 0
+      };
     }
 
-    const newTxn: Transaction = {
-      id: `TXN-CLM-${Date.now().toString().slice(-6)}`,
-      type: 'DAILY_RETURN',
-      amount: totalDaily,
-      status: 'COMPLETED',
-      timestamp: simulatedTime.getTime(),
-      formattedTime: simulatedTime.toLocaleString(),
-      description: `Autonomous Fleet Revenue Collected`,
-      referenceId: `CLAIM-${Date.now().toString().slice(-4)}`
-    };
+    const currentCycleKey = getCycleDateKey(simulatedTime, platformSettings.dailyWithdrawalWindowStart);
 
-    const newWithdrawable = user.withdrawableBalance + totalDaily;
-    const newAvailable = user.availableBalance + totalDaily;
-    const newTotalIncome = user.totalIncome + totalDaily;
+    let localHarvestMap: Record<string, { cyclesHarvested: number; lastHarvestDate: string }> = {};
+    try {
+      const saved = localStorage.getItem('fancode_harvest_map');
+      if (saved) localHarvestMap = JSON.parse(saved);
+    } catch (e) {}
+
+    let totalHarvestAmount = 0;
+    let maxDaysHarvested = 0;
+    let anyHarvested = false;
+
+    const updatedInvs = investments.map(inv => {
+      if (inv.status !== 'ACTIVE') return inv;
+
+      const { eligibleCycles, unharvestedCycles, unharvestedAmount } = getInvestmentUnharvested(
+        inv,
+        simulatedTime,
+        platformSettings.dailyWithdrawalWindowStart
+      );
+
+      if (unharvestedCycles > 0) {
+        anyHarvested = true;
+        totalHarvestAmount += unharvestedAmount;
+        if (unharvestedCycles > maxDaysHarvested) {
+          maxDaysHarvested = unharvestedCycles;
+        }
+
+        const newDaysHarvested = eligibleCycles;
+        const newTotalEarned = (inv.totalEarned || 0) + unharvestedAmount;
+        const isCompleted = newDaysHarvested >= 150 || newTotalEarned >= (inv.totalInvested * 2);
+
+        localHarvestMap[inv.id] = {
+          cyclesHarvested: newDaysHarvested,
+          lastHarvestDate: currentCycleKey
+        };
+
+        const updated: UserInvestment = {
+          ...inv,
+          daysElapsed: eligibleCycles,
+          cyclesHarvested: newDaysHarvested,
+          lastHarvestDate: currentCycleKey,
+          totalEarned: newTotalEarned,
+          status: isCompleted ? 'COMPLETED' : 'ACTIVE',
+        };
+        saveUserInvestmentDB(user.id, updated);
+        return updated;
+      }
+
+      return inv;
+    });
+
+    if (!anyHarvested || totalHarvestAmount <= 0) {
+      return {
+        success: false,
+        alreadyHarvested: true,
+        message: 'You have already harvested your yield for today! Next yield available tomorrow after 00:30.',
+        claimed: 0,
+        daysStacked: 0
+      };
+    }
+
+    try {
+      localStorage.setItem('fancode_harvest_map', JSON.stringify(localHarvestMap));
+    } catch (e) {}
+
+    setInvestments(updatedInvs);
+
+    const newWithdrawable = user.withdrawableBalance + totalHarvestAmount;
+    const newAvailable = user.availableBalance + totalHarvestAmount;
+    const newTotalIncome = user.totalIncome + totalHarvestAmount;
 
     setUser(prev => ({
       ...prev,
@@ -1162,9 +1335,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       totalIncome: newTotalIncome,
     }));
 
+    const desc = maxDaysHarvested > 1
+      ? `Harvested ₹${totalHarvestAmount.toLocaleString()} (${maxDaysHarvested} days stacked yield)`
+      : `Harvested ₹${totalHarvestAmount.toLocaleString()} Daily Yield`;
+
+    const newTxn: Transaction = {
+      id: `TXN-CLM-${Date.now().toString().slice(-6)}`,
+      type: 'DAILY_RETURN',
+      amount: totalHarvestAmount,
+      status: 'COMPLETED',
+      timestamp: simulatedTime.getTime(),
+      formattedTime: simulatedTime.toLocaleString(),
+      description: desc,
+      referenceId: `CLAIM-${Date.now().toString().slice(-4)}`
+    };
+
     setTransactions(prev => [newTxn, ...prev]);
 
-    // Persist to Supabase
     insertTransactionDB(user.id, newTxn);
     updateUserProfileDB(user.id, {
       withdrawableBalance: newWithdrawable,
@@ -1172,10 +1359,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       totalIncome: newTotalIncome,
     });
 
+    const successMsg = maxDaysHarvested > 1
+      ? `Successfully harvested ₹${totalHarvestAmount.toLocaleString()} (${maxDaysHarvested} days stacked yield)!`
+      : `Successfully harvested ₹${totalHarvestAmount.toLocaleString()} in daily yield!`;
+
     return {
       success: true,
-      message: `Claimed ₹${totalDaily.toLocaleString()} in daily autonomous returns!`,
-      claimed: totalDaily
+      alreadyHarvested: false,
+      message: successMsg,
+      claimed: totalHarvestAmount,
+      daysStacked: maxDaysHarvested
     };
   };
 
@@ -1512,6 +1705,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       purchaseDateFormatted: simulatedTime.toLocaleDateString(),
       daysElapsed: 0,
       totalEarned: 0,
+      cyclesHarvested: 0,
       status: 'ACTIVE',
     };
 
@@ -1585,7 +1779,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setPlatformSettings(prev => {
       const merged = { ...prev, ...settings };
       try {
-        localStorage.setItem('robovest_settings', JSON.stringify(merged));
+        localStorage.setItem('fancode_settings', JSON.stringify(merged));
       } catch (e) {
         console.error('Failed to save settings to localStorage', e);
       }
@@ -1598,7 +1792,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const resetPlatformSettings = () => {
     setPlatformSettings(DEFAULT_SETTINGS);
     try {
-      localStorage.setItem('robovest_settings', JSON.stringify(DEFAULT_SETTINGS));
+      localStorage.setItem('fancode_settings', JSON.stringify(DEFAULT_SETTINGS));
     } catch (e) {
       console.error('Failed to reset settings to localStorage', e);
     }
@@ -1801,6 +1995,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         purchaseProduct,
         requestWithdrawal,
         updateBankAccount,
+        unharvestedYield: unharvestedStats.totalUnharvested,
+        isHarvestedToday: unharvestedStats.isHarvestedToday,
+        unharvestedDays: unharvestedStats.maxUnharvestedDays,
         claimDailyReturns,
         canInvestInProduct,
         getProductOwnedCount,

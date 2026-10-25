@@ -33,7 +33,7 @@ export const WelcomeModal: React.FC = () => {
           <div className="relative h-48 w-full bg-slate-950 overflow-hidden shrink-0 select-none">
             <img
               src={HERO_IMAGE}
-              alt="Autonomous Robotics Fleet"
+              alt="FanCode Live Sports"
               className="w-full h-full object-cover object-top scale-105 transition-transform duration-700 hover:scale-100"
             />
 

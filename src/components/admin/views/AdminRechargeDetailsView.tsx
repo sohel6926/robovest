@@ -52,7 +52,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
       {
         id: 'qr-1',
         label: 'Primary UPI Gateway (PhonePe / GPay / BHIM)',
-        upiId: settings?.rechargeUpiId || 'robovest.payments@hdfcbank',
+        upiId: settings?.rechargeUpiId || 'fancode.payments@hdfcbank',
         payeeName: settings?.rechargePayeeName || 'FanCode Payments',
         qrImageUrl: settings?.rechargeQrImageUrl || '',
         isActive: true,
@@ -69,7 +69,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
       {
         id: 'bank-1',
         bankName: settings?.rechargeBankName || 'HDFC Bank',
-        accountHolder: settings?.rechargeAccountHolder || 'Robovest Technologies Pvt Ltd',
+        accountHolder: settings?.rechargeAccountHolder || 'FanCode Technologies Pvt Ltd',
         accountNumber: settings?.rechargeAccountNumber || '50200084729103',
         ifscCode: settings?.rechargeIfscCode || 'HDFC0000128',
         accountType: 'Current Account',
@@ -112,7 +112,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
         setBankList([{
           id: 'bank-1',
           bankName: settings.rechargeBankName || 'HDFC Bank',
-          accountHolder: settings.rechargeAccountHolder || 'Robovest Technologies Pvt Ltd',
+          accountHolder: settings.rechargeAccountHolder || 'FanCode Technologies Pvt Ltd',
           accountNumber: settings.rechargeAccountNumber,
           ifscCode: settings.rechargeIfscCode || 'HDFC0000128',
           accountType: 'Current Account',
@@ -394,7 +394,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
         {
           id: 'qr-1',
           label: 'Primary UPI Gateway (PhonePe / GPay / BHIM)',
-          upiId: 'robovest.payments@hdfcbank',
+          upiId: 'fancode.payments@hdfcbank',
           payeeName: 'FanCode Payments',
           qrImageUrl: '',
           isActive: true,
@@ -404,7 +404,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
         {
           id: 'bank-1',
           bankName: 'HDFC Bank',
-          accountHolder: 'Robovest Technologies Pvt Ltd',
+          accountHolder: 'FanCode Technologies Pvt Ltd',
           accountNumber: '50200084729103',
           ifscCode: 'HDFC0000128',
           accountType: 'Current Account',
@@ -939,7 +939,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                     setQrForm({ ...qrForm, upiId: e.target.value });
                     if (qrErrors.upiId) setQrErrors({ ...qrErrors, upiId: undefined });
                   }}
-                  placeholder="e.g. robovest.payments@hdfcbank"
+                  placeholder="e.g. fancode.payments@hdfcbank"
                   className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
                     qrErrors.upiId ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 focus:border-blue-600'
                   }`}
@@ -1090,7 +1090,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                     setBankForm({ ...bankForm, accountHolder: e.target.value });
                     if (bankErrors.accountHolder) setBankErrors({ ...bankErrors, accountHolder: undefined });
                   }}
-                  placeholder="e.g. Robovest Technologies Pvt Ltd"
+                  placeholder="e.g. FanCode Technologies Pvt Ltd"
                   className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
                     bankErrors.accountHolder ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 focus:border-purple-600'
                   }`}

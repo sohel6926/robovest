@@ -44,7 +44,7 @@ export async function fetchPlatformSettings(): Promise<PlatformSettings | null> 
       telegramSupportUrl: data.telegram_support_url,
       telegramChannelUrl: data.telegram_channel_url,
       platformAnnouncement: data.platform_announcement,
-      rechargeUpiId: data.recharge_upi_id || 'robovest.payments@hdfcbank',
+      rechargeUpiId: data.recharge_upi_id || 'fancode.payments@hdfcbank',
       rechargePayeeName: data.recharge_payee_name || 'FanCode Payments',
       rechargeBankName: data.recharge_bank_name || 'HDFC Bank',
       rechargeQrImageUrl: data.recharge_qr_image_url || '',
@@ -246,7 +246,7 @@ export async function fetchUserProfile(userId: string = 'User5294'): Promise<{ u
       accountNumber: '50100492817264',
       ifscCode: 'HDFC0001234',
       bankName: 'HDFC Bank',
-      upiId: 'rahul.robo@okaxis',
+      upiId: 'rahul.fancode@okaxis',
       isBound: true
     };
 

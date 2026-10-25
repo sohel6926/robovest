@@ -7,7 +7,7 @@ export const InviteTab: React.FC = () => {
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
-  const inviteLink = `https://robovest.capital/join?ref=${user.inviteCode}`;
+  const inviteLink = `https://fancode.live/join?ref=${user.inviteCode}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(inviteLink);
@@ -22,7 +22,7 @@ export const InviteTab: React.FC = () => {
   };
 
   const handleShare = (platform: string) => {
-    const text = `Join RoboVest Autonomous AI Robotics investment platform! Earn daily payouts and automated returns. Use my invite code: ${user.inviteCode} -> ${inviteLink}`;
+    const text = `Join FanCode Sports & Live Events investment platform! Earn daily payouts and automated returns. Use my invite code: ${user.inviteCode} -> ${inviteLink}`;
     if (platform === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     } else if (platform === 'telegram') {
@@ -31,7 +31,7 @@ export const InviteTab: React.FC = () => {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
     } else {
       if (navigator.share) {
-        navigator.share({ title: 'RoboVest AI', text, url: inviteLink }).catch(() => {});
+        navigator.share({ title: 'FanCode', text, url: inviteLink }).catch(() => {});
       } else {
         handleCopyLink();
       }
@@ -236,7 +236,7 @@ export const InviteTab: React.FC = () => {
             <div>
               <h3 className="font-bold text-slate-900 text-xs">They register and buy a plan</h3>
               <p className="text-[11px] text-slate-600 mt-0.5">
-                Your friend signs up through your link and activates a robotics plan.
+                Your friend signs up through your link and activates a plan.
               </p>
             </div>
           </div>

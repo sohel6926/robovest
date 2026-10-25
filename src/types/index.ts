@@ -81,6 +81,8 @@ export interface UserInvestment {
   purchaseDateFormatted: string;
   daysElapsed: number;
   totalEarned: number;
+  cyclesHarvested?: number;
+  lastHarvestDate?: string;
   nextPayoutCountdown?: string;
   status: 'ACTIVE' | 'COMPLETED';
 }

@@ -25,7 +25,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
     {
       id: 'default-qr',
       label: 'Primary UPI Gateway',
-      upiId: platformSettings?.rechargeUpiId || 'robovest.payments@hdfcbank',
+      upiId: platformSettings?.rechargeUpiId || 'fancode.payments@hdfcbank',
       payeeName: platformSettings?.rechargePayeeName || 'FanCode Payments',
       qrImageUrl: platformSettings?.rechargeQrImageUrl || '',
       isActive: true,
@@ -39,7 +39,7 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
       {
         id: 'default-bank',
         bankName: platformSettings?.rechargeBankName || 'HDFC Bank',
-        accountHolder: platformSettings?.rechargeAccountHolder || 'Robovest Technologies Pvt Ltd',
+        accountHolder: platformSettings?.rechargeAccountHolder || 'FanCode Technologies Pvt Ltd',
         accountNumber: platformSettings?.rechargeAccountNumber || '50200084729103',
         ifscCode: platformSettings?.rechargeIfscCode || 'HDFC0000128',
         accountType: 'Current Account',
