@@ -42,7 +42,7 @@ export const InviteTab: React.FC = () => {
     <div className="pb-24 max-w-md mx-auto space-y-4 px-4 pt-2 text-slate-900">
       {/* Top Banner (Screenshot 8) */}
       <div className="flex items-center justify-between py-2">
-        <h1 className="text-xl font-black text-slate-900 font-['Space_Grotesk']">Invite & Earn</h1>
+        <h1 className="text-xl font-black text-slate-900 font-sans">Invite & Earn</h1>
         <button
           onClick={() => handleShare('native')}
           className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900"

@@ -663,7 +663,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center mx-auto mb-3 shadow-lg">
               <ShieldCheck className="w-8 h-8 text-blue-400" />
             </div>
-            <h2 className="text-xl font-black font-['Space_Grotesk'] tracking-wide">
+            <h2 className="text-xl font-black font-sans tracking-wide">
               ADMIN CONTROL PANEL
             </h2>
             <p className="text-xs text-slate-300 mt-1">
@@ -780,7 +780,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <span className="font-black italic text-white text-xs tracking-tight">FC</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-black italic text-white tracking-tight font-['Space_Grotesk'] leading-none">
+                <span className="text-xl font-black italic text-white tracking-tight font-sans leading-none">
                   FAN<span className="text-[#FF4A00]">CODE</span>
                 </span>
                 <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-orange-500/20 text-[#FF6E14] border border-orange-500/30 leading-none">
@@ -1043,7 +1043,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Top Navbar (Crisp White with Bell, Avatar & Back button) */}
           <header className="bg-white border-b border-slate-200 px-6 py-3 shrink-0 flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 font-['Space_Grotesk']">
+            <h2 className="text-base font-bold text-slate-900 font-sans">
               Admin Panel
             </h2>
 
@@ -1064,7 +1064,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               {showNotifications && (
                 <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-60 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   <div className="p-3.5 border-b border-slate-100 flex items-center justify-between bg-white">
-                    <h3 className="font-bold text-sm text-slate-900 font-['Space_Grotesk']">
+                    <h3 className="font-bold text-sm text-slate-900 font-sans">
                       Notifications
                     </h3>
                     <span className="px-2 py-0.5 rounded-full bg-[#70c028] text-slate-950 font-black text-[10px]">
@@ -1102,7 +1102,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] text-white font-black italic text-xs flex items-center justify-center shadow-xs">
                   FC
                 </div>
-                <span className="text-xs font-bold text-slate-900 hidden sm:inline font-['Space_Grotesk']">
+                <span className="text-xs font-bold text-slate-900 hidden sm:inline font-sans">
                   FanCode Admin
                 </span>
               </div>
@@ -1229,7 +1229,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             {activeTab === 'kyc' && (
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+                  <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
                     KYC Requests
                   </h1>
                   <p className="text-sm text-slate-500 mt-0.5">
@@ -1280,7 +1280,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Header Card */}
                 <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                    <h2 className="text-lg font-black text-slate-900 font-sans flex items-center gap-2">
                       <Users className="w-5 h-5 text-blue-600" />
                       <span>Referral Network & Downline Commission Hierarchy</span>
                     </h2>
@@ -1391,19 +1391,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Network Members</span>
-                    <span className="text-xl font-black text-slate-900 font-['Space_Grotesk']">{teamMembers.length} Members</span>
+                    <span className="text-xl font-black text-slate-900 font-sans">{teamMembers.length} Members</span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">3 Tier Multi-Level Team</span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Team Investment</span>
-                    <span className="text-xl font-black text-blue-600 font-['Space_Grotesk']">₹{totalNetworkInvestment.toLocaleString()}</span>
+                    <span className="text-xl font-black text-blue-600 font-sans">₹{totalNetworkInvestment.toLocaleString()}</span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">Across all downline levels</span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Commission Earned</span>
-                    <span className="text-xl font-black text-emerald-600 font-['Space_Grotesk']">
+                    <span className="text-xl font-black text-emerald-600 font-sans">
                       +₹{allCommissionsSum.toLocaleString()}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -1413,7 +1413,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Active Robot Fleet</span>
-                    <span className="text-xl font-black text-indigo-600 font-['Space_Grotesk']">
+                    <span className="text-xl font-black text-indigo-600 font-sans">
                       {totalActiveUnits} Units
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">Generating daily ROI</span>
@@ -2076,7 +2076,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               {/* Header */}
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <div>
-                  <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                  <h2 className="text-lg font-black text-slate-900 font-sans flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-emerald-600" />
                     <span>Daily Withdrawal Log & Payout Ledger</span>
                   </h2>
@@ -2272,7 +2272,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
                 <div>
-                  <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk']">
+                  <h2 className="text-lg font-black text-slate-900 font-sans">
                     FanCode Investment Plans Catalog
                   </h2>
                   <p className="text-xs text-slate-500">
@@ -2339,7 +2339,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <h3 className="font-black text-slate-900 text-sm truncate font-['Space_Grotesk']">
+                          <h3 className="font-black text-slate-900 text-sm truncate font-sans">
                             {plan.name}
                           </h3>
                           <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-black uppercase shrink-0">
@@ -2349,7 +2349,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         <p className="text-xs text-slate-500 truncate mt-0.5">{plan.robotModel}</p>
                         
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-base font-black text-blue-600 font-['Space_Grotesk']">
+                          <span className="text-base font-black text-blue-600 font-sans">
                             ₹{plan.price.toLocaleString()}
                           </span>
                           <span className="text-xs text-slate-400">
@@ -2453,7 +2453,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Header Card */}
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                    <h2 className="text-lg font-black text-slate-900 font-sans flex items-center gap-2">
                       <ArrowDownToLine className="w-5 h-5 text-emerald-600" />
                       <span>Payment & Top-Up Verification Hub</span>
                     </h2>
@@ -2732,7 +2732,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Header Card */}
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                    <h2 className="text-lg font-black text-slate-900 font-sans flex items-center gap-2">
                       <ArrowUpToLine className="w-5 h-5 text-blue-600" />
                       <span>Withdrawal Requests & Bank Settlement Hub</span>
                     </h2>
@@ -2987,12 +2987,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               {/* Bee Grow UserDetail 360 Inspection Card */}
               <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-5 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center font-black font-['Space_Grotesk'] text-xl text-blue-400">
+                  <div className="w-14 h-14 rounded-2xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center font-black font-sans text-xl text-blue-400">
                     VIP{user.vipLevel}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-black font-['Space_Grotesk']">
+                      <h3 className="text-base font-black font-sans">
                         {user.phone} · Master Account
                       </h3>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase">
@@ -3043,7 +3043,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                  <h3 className="text-base font-black text-slate-900 font-sans flex items-center gap-2">
                     <Wallet className="w-5 h-5 text-blue-600" />
                     <span>User Balance Direct Adjustment</span>
                   </h3>
@@ -3123,7 +3123,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               {/* Master Ledger Profile Form */}
               <form onSubmit={handleSaveUserProfile} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h3 className="text-base font-black text-slate-900 font-['Space_Grotesk'] flex items-center gap-2">
+                  <h3 className="text-base font-black text-slate-900 font-sans flex items-center gap-2">
                     <User className="w-5 h-5 text-blue-600" />
                     <span>User Profile & Banking Master Ledger</span>
                   </h3>
@@ -3302,7 +3302,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <div>
                       <div className="flex items-center gap-2">
                         <Zap className="w-5 h-5 text-amber-400" />
-                        <h3 className="text-base font-black font-['Space_Grotesk']">
+                        <h3 className="text-base font-black font-sans">
                           Automated Daily Yield & Commission Engine (FanCode dailyRoi)
                         </h3>
                         <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase">
@@ -3353,7 +3353,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Fleet Header */}
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk']">
+                    <h2 className="text-lg font-black text-slate-900 font-sans">
                       Active FanCode Plan Orders
                     </h2>
                     <p className="text-xs text-slate-500">
@@ -3386,7 +3386,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         <div className="flex justify-between items-start">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-black text-slate-900 text-sm font-['Space_Grotesk']">{inv.productName}</span>
+                              <span className="font-black text-slate-900 text-sm font-sans">{inv.productName}</span>
                               <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold text-[10px]">
                                 Qty: {inv.quantity}
                               </span>
@@ -3451,7 +3451,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <form onSubmit={handleSaveSettings} className="space-y-6">
               <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-black text-slate-900 font-['Space_Grotesk']">
+                  <h2 className="text-lg font-black text-slate-900 font-sans">
                     Platform Rules & Global Financial Policies
                   </h2>
                   <p className="text-xs text-slate-500">
@@ -3623,7 +3623,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white flex items-center justify-between shrink-0">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black font-['Space_Grotesk'] tracking-wide">
+                    <h3 className="text-base font-black font-sans tracking-wide">
                       {activeMember.phone} · Holdings Breakdown
                     </h3>
                     <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-black uppercase">
@@ -3670,7 +3670,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Plans Table */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-black text-slate-900 text-sm font-['Space_Grotesk'] flex items-center gap-1.5">
+                    <h4 className="font-black text-slate-900 text-sm font-sans flex items-center gap-1.5">
                       <Bot className="w-4 h-4 text-blue-600" />
                       <span>Purchased Plans & Day Elapsed Progression</span>
                     </h4>
@@ -3763,7 +3763,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {isAddingPlanToMember && (
                   <form onSubmit={handleAddPlanToMember} className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-3">
                     <div className="flex justify-between items-center">
-                      <h5 className="font-black text-blue-950 text-xs font-['Space_Grotesk']">
+                      <h5 className="font-black text-blue-950 text-xs font-sans">
                         Grant & Assign Plan to {activeMember.phone}
                       </h5>
                       <button
@@ -3824,7 +3824,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         <div className="fixed inset-0 z-60 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-gradient-to-r from-slate-900 to-blue-950 p-5 text-white flex items-center justify-between">
-              <h3 className="text-base font-black font-['Space_Grotesk']">Add New Referral Member</h3>
+              <h3 className="text-base font-black font-sans">Add New Referral Member</h3>
               <button
                 onClick={() => setIsAddMemberModalOpen(false)}
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
@@ -3930,7 +3930,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
           <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 animate-in zoom-in-95 duration-200">
             <div className="bg-gradient-to-r from-slate-900 to-blue-950 p-5 text-white flex items-center justify-between">
               <div>
-                <h3 className="text-base font-black font-['Space_Grotesk'] tracking-wide">
+                <h3 className="text-base font-black font-sans tracking-wide">
                   {editingPlanId ? `Edit Plan ${editingPlanId}` : 'Create New FanCode Investment Plan'}
                 </h3>
                 <p className="text-xs text-slate-300">
@@ -4155,7 +4155,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   {rechargeActionModal.action === 'approve' ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
                 </div>
                 <div>
-                  <h3 className="text-base font-black font-['Space_Grotesk']">
+                  <h3 className="text-base font-black font-sans">
                     {rechargeActionModal.action === 'approve' ? 'Approve & Credit Top-Up' : 'Reject Top-Up Submission'}
                   </h3>
                   <span className="text-xs text-slate-300 font-mono">Txn ID: {rechargeActionModal.txn.id}</span>
@@ -4264,7 +4264,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   {withdrawalActionModal.action === 'approve' ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />}
                 </div>
                 <div>
-                  <h3 className="text-base font-black font-['Space_Grotesk']">
+                  <h3 className="text-base font-black font-sans">
                     {withdrawalActionModal.action === 'approve' ? 'Approve & Settle Bank Payout' : 'Reject Withdrawal & Refund Wallet'}
                   </h3>
                   <span className="text-xs text-slate-300 font-mono">Request ID: {withdrawalActionModal.txn.id}</span>
@@ -4419,7 +4419,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <Zap className="w-5 h-5 fill-slate-950" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black font-['Space_Grotesk']">
+                  <h3 className="text-base font-black font-sans">
                     Execute Daily Yield & Commission Engine
                   </h3>
                   <span className="text-xs font-bold text-slate-900/80">FanCode dailyRoi Core Engine</span>
@@ -4521,7 +4521,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 p-5 text-white flex items-center justify-between">
               <div>
-                <h3 className="text-base font-black font-['Space_Grotesk']">
+                <h3 className="text-base font-black font-sans">
                   Direct Plan Assignment
                 </h3>
                 <p className="text-xs text-slate-300">Grant an active investment robot to {user.phone}</p>
@@ -4623,12 +4623,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             {/* Header Ribbon */}
             <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center font-black font-['Space_Grotesk'] text-lg text-blue-400">
+                <div className="w-12 h-12 rounded-2xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center font-black font-sans text-lg text-blue-400">
                   VIP{user.vipLevel}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black font-['Space_Grotesk']">
+                    <h3 className="text-base font-black font-sans">
                       {user.phone} · User 360° Profile
                     </h3>
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase">
@@ -4894,7 +4894,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-[#70c028]" />
-                <h3 className="font-bold text-base font-['Space_Grotesk']">Add Wallet Balance</h3>
+                <h3 className="font-bold text-base font-sans">Add Wallet Balance</h3>
               </div>
               <button
                 onClick={() => setIsAddBalanceModalOpen(false)}

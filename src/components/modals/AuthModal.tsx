@@ -43,7 +43,7 @@ export const AuthModal: React.FC = () => {
           <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] p-0.5 shadow-md shadow-orange-500/20 flex items-center justify-center">
             <span className="font-black italic text-white text-base tracking-tight">FC</span>
           </div>
-          <h2 className="text-xl font-black tracking-tight text-slate-900 font-['Space_Grotesk']">
+          <h2 className="text-xl font-black tracking-tight text-slate-900 font-sans">
             FAN<span className="text-[#FF4A00]">CODE</span>
           </h2>
           <p className="text-[11px] text-slate-500">

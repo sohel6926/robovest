@@ -262,7 +262,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+        <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
           Withdrawal Requests
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
@@ -278,7 +278,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             <Clock className="w-4 h-4 text-amber-500" />
             <span>Pending</span>
           </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#0B1536]">
+          <div className="text-3xl font-black font-sans text-[#0B1536]">
             {pendingCount}
           </div>
           <span className="text-[11px] text-slate-400 font-medium">
@@ -292,7 +292,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             <span>Processed</span>
           </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#0B1536]">
+          <div className="text-3xl font-black font-sans text-[#0B1536]">
             {processedCount.toLocaleString()}
           </div>
           <span className="text-[11px] text-emerald-600 font-medium">
@@ -306,7 +306,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             <XCircle className="w-4 h-4 text-rose-500" />
             <span>Rejected</span>
           </div>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#0B1536]">
+          <div className="text-3xl font-black font-sans text-[#0B1536]">
             {rejectedCount}
           </div>
           <span className="text-[11px] text-rose-500 font-medium">
@@ -396,7 +396,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                     <span className="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 font-mono font-bold text-xs">
                       #{item.serialNo}
                     </span>
-                    <h3 className="font-bold text-slate-900 text-sm font-['Space_Grotesk']">
+                    <h3 className="font-bold text-slate-900 text-sm font-sans">
                       {item.userName}
                     </h3>
                     <span className="font-mono text-xs font-semibold text-slate-400">
@@ -494,7 +494,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
         <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
-              <h3 className="font-bold text-base font-['Space_Grotesk']">
+              <h3 className="font-bold text-base font-sans">
                 Approve & Disburse Withdrawal
               </h3>
               <button
@@ -560,7 +560,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
         <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="bg-rose-950 px-6 py-4 text-white flex items-center justify-between">
-              <h3 className="font-bold text-base font-['Space_Grotesk']">
+              <h3 className="font-bold text-base font-sans">
                 Reject Withdrawal Request
               </h3>
               <button

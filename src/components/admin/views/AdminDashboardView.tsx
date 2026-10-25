@@ -55,7 +55,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
             Admin Dashboard
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -81,7 +81,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 block">Total Users</span>
-            <div className="text-3xl font-black text-[#0B1536] font-['Space_Grotesk'] tracking-tight mt-1">
+            <div className="text-3xl font-black text-[#0B1536] font-sans tracking-tight mt-1">
               {totalUsersCount.toLocaleString()}
             </div>
             <span className="text-[11px] text-slate-400 block mt-1">1 registered today</span>
@@ -95,7 +95,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 block">Total Wallet Balance</span>
-            <div className="text-2xl font-black text-[#0B1536] font-['Space_Grotesk'] tracking-tight mt-1">
+            <div className="text-2xl font-black text-[#0B1536] font-sans tracking-tight mt-1">
               ₹ {totalWalletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <span className="text-[11px] text-slate-400 block mt-1">Across all users</span>
@@ -109,7 +109,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 block">Pending Withdrawals</span>
-            <div className={`text-3xl font-black font-['Space_Grotesk'] tracking-tight mt-1 ${pendingWithdrawalsCount > 0 ? 'text-rose-600 animate-pulse' : 'text-[#0B1536]'}`}>
+            <div className={`text-3xl font-black font-sans tracking-tight mt-1 ${pendingWithdrawalsCount > 0 ? 'text-rose-600 animate-pulse' : 'text-[#0B1536]'}`}>
               {pendingWithdrawalsCount}
             </div>
             <span className="text-[11px] text-slate-400 block mt-1">₹ 2,21,99,913.94 total withdrawn</span>
@@ -123,7 +123,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 block">Pending Top-ups</span>
-            <div className={`text-3xl font-black font-['Space_Grotesk'] tracking-tight mt-1 ${pendingTopupsCount > 0 ? 'text-amber-600 animate-pulse' : 'text-[#0B1536]'}`}>
+            <div className={`text-3xl font-black font-sans tracking-tight mt-1 ${pendingTopupsCount > 0 ? 'text-amber-600 animate-pulse' : 'text-[#0B1536]'}`}>
               {pendingTopupsCount}
             </div>
             <span className="text-[11px] text-slate-400 block mt-1">Reinvestment requests</span>
@@ -140,7 +140,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
           <div>
             <span className="text-xs font-semibold text-slate-500 block">Pending KYC</span>
-            <div className="text-3xl font-black text-[#0B1536] font-['Space_Grotesk'] tracking-tight mt-1">
+            <div className="text-3xl font-black text-[#0B1536] font-sans tracking-tight mt-1">
               0
             </div>
             <span className="text-[11px] text-slate-400 block mt-1">All submissions verified</span>
@@ -175,7 +175,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-amber-500" />
-          <h2 className="text-lg font-bold text-slate-900 font-['Space_Grotesk']">
+          <h2 className="text-lg font-bold text-slate-900 font-sans">
             Pending Actions
           </h2>
         </div>
@@ -338,7 +338,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
       {/* ================= SECTION: QUICK ACTIONS ================= */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 font-['Space_Grotesk']">
+        <h2 className="text-lg font-bold text-slate-900 font-sans">
           Quick Actions
         </h2>
 
@@ -466,7 +466,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Total Invested
             </span>
-            <div className="text-xl sm:text-2xl font-black font-['Space_Grotesk'] text-white mt-1">
+            <div className="text-xl sm:text-2xl font-black font-sans text-white mt-1">
               ₹ 7,42,00,000
             </div>
           </div>
@@ -475,7 +475,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Total Withdrawn
             </span>
-            <div className="text-xl sm:text-2xl font-black font-['Space_Grotesk'] text-white mt-1">
+            <div className="text-xl sm:text-2xl font-black font-sans text-white mt-1">
               ₹ 2,21,99,913.94
             </div>
           </div>
@@ -484,7 +484,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Active Users
             </span>
-            <div className="text-xl sm:text-2xl font-black font-['Space_Grotesk'] text-emerald-400 mt-1">
+            <div className="text-xl sm:text-2xl font-black font-sans text-emerald-400 mt-1">
               557
             </div>
           </div>
@@ -493,7 +493,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Inactive Users
             </span>
-            <div className="text-xl sm:text-2xl font-black font-['Space_Grotesk'] text-slate-300 mt-1">
+            <div className="text-xl sm:text-2xl font-black font-sans text-slate-300 mt-1">
               136
             </div>
           </div>

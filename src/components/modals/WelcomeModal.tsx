@@ -67,7 +67,7 @@ export const WelcomeModal: React.FC = () => {
               {/* FANCODE Brand with High-Contrast Frosted Badge */}
               <div className="flex items-center justify-center mt-1">
                 <div className="inline-flex items-center justify-center px-5 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-sm">
-                  <span className="font-black italic text-2xl tracking-tight text-slate-900 font-['Space_Grotesk'] leading-none">
+                  <span className="font-black italic text-2xl tracking-tight text-slate-900 font-sans leading-none">
                     FAN<span className="text-[#FF4A00]">CODE</span>
                   </span>
                 </div>
@@ -132,7 +132,7 @@ export const WelcomeModal: React.FC = () => {
                 <div className="p-2.5 space-y-2">
                   <div className="text-center">
                     <span className="text-xs text-slate-500 font-medium">Invest </span>
-                    <span className="text-base font-black text-slate-900 font-['Space_Grotesk']">
+                    <span className="text-base font-black text-slate-900 font-sans">
                       ₹{plan1?.price || 520}
                     </span>
                   </div>
@@ -166,7 +166,7 @@ export const WelcomeModal: React.FC = () => {
                 <div className="p-2.5 space-y-2">
                   <div className="text-center">
                     <span className="text-xs text-slate-500 font-medium">Invest </span>
-                    <span className="text-base font-black text-slate-900 font-['Space_Grotesk']">
+                    <span className="text-base font-black text-slate-900 font-sans">
                       ₹{plan2?.price || 2100}
                     </span>
                   </div>
@@ -267,7 +267,7 @@ export const WelcomeModal: React.FC = () => {
                   <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center shadow-xs">
                     <Send className="w-4 h-4 fill-white -rotate-12" />
                   </div>
-                  <span className="tracking-wide font-['Space_Grotesk'] text-sm">Official Telegram Channel</span>
+                  <span className="tracking-wide font-sans text-sm">Official Telegram Channel</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-white/90 group-hover:translate-x-1 transition-transform relative z-10" />
               </button>

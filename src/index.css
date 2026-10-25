@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
 
 @layer base {
   *,
@@ -17,19 +22,40 @@
     outline: none !important;
   }
   
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  html, body {
+    font-family: var(--font-sans);
     background-color: #FFF7F2;
     color: #0F172A;
     overflow-x: hidden;
+    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  button, input, select, textarea {
+    font-family: inherit;
+  }
+}
+
+/* Ensure any Space_Grotesk references safely render in clean Plus Jakarta Sans */
+[class*="Space_Grotesk"],
+.font-grotesk {
+  font-family: var(--font-sans) !important;
+}
+
+/* Ultra-clear, eye-friendly numbers and identifiers (balances, user IDs, dates, phone numbers) */
+.font-mono,
+[class*="font-mono"] {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "zero" 1, "tnum" 1;
+  letter-spacing: -0.015em;
 }
 
 /* Tabular figures for numbers */
 .tabular-nums {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 /* Custom scrollbar */

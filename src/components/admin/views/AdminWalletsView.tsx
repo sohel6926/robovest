@@ -148,7 +148,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+        <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
           Wallet Management
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
@@ -163,7 +163,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
           <span className="text-xs font-semibold text-slate-500 block">
             Total Transactions
           </span>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#0B1536]">
+          <div className="text-3xl font-black font-sans text-[#0B1536]">
             10000
           </div>
         </div>
@@ -173,7 +173,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
           <span className="text-xs font-semibold text-slate-500 block">
             Total Credited
           </span>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#16a34a]">
+          <div className="text-3xl font-black font-sans text-[#16a34a]">
             ₹ 12,90,269.64
           </div>
         </div>
@@ -183,7 +183,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
           <span className="text-xs font-semibold text-slate-500 block">
             Total Debited
           </span>
-          <div className="text-3xl font-black font-['Space_Grotesk'] text-[#e11d48]">
+          <div className="text-3xl font-black font-sans text-[#e11d48]">
             ₹ 0
           </div>
         </div>

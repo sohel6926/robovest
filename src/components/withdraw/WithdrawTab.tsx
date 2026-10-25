@@ -87,7 +87,7 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
           <div className="text-[11px] font-bold text-blue-100 tracking-wider uppercase mb-1">
             WITHDRAWABLE BALANCE
           </div>
-          <div className="text-4xl font-black text-white tracking-tight tabular-nums font-['Space_Grotesk']">
+          <div className="text-4xl font-black text-white tracking-tight tabular-nums font-sans">
             ₹{user.withdrawableBalance.toLocaleString()}
           </div>
         </div>

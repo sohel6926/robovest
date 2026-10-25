@@ -39,7 +39,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
     <div className="pb-24 max-w-md mx-auto space-y-4 px-4 pt-2 text-slate-900">
       {/* Header with Settings Icon */}
       <div className="flex items-center justify-between py-2">
-        <h1 className="text-xl font-black text-slate-900 font-['Space_Grotesk']">Profile</h1>
+        <h1 className="text-xl font-black text-slate-900 font-sans">Profile</h1>
         <button
           onClick={() => setActiveSubModal('personal')}
           className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900"
@@ -79,7 +79,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider block">
             AVAILABLE BALANCE
           </span>
-          <div className="text-3xl font-black text-slate-900 tracking-tight tabular-nums font-['Space_Grotesk'] mt-0.5">
+          <div className="text-3xl font-black text-slate-900 tracking-tight tabular-nums font-sans mt-0.5">
             ₹{user.availableBalance.toLocaleString()}
           </div>
         </div>

@@ -125,7 +125,7 @@ export const BuyModal: React.FC = () => {
               </button>
 
               <div className="text-center">
-                <span className="text-2xl font-black text-blue-600 font-['Space_Grotesk'] tabular-nums">
+                <span className="text-2xl font-black text-blue-600 font-sans tabular-nums">
                   {quantity}
                 </span>
                 <span className="text-[10px] text-slate-500 block -mt-1">

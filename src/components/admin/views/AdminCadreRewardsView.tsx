@@ -17,7 +17,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+        <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
           Cadre Rewards Management
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
@@ -36,7 +36,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
             <Award className="w-5 h-5 text-slate-400" />
           </div>
           <div>
-            <h4 className="font-black text-slate-900 font-['Space_Grotesk'] text-base">Star Rank</h4>
+            <h4 className="font-black text-slate-900 font-sans text-base">Star Rank</h4>
             <p className="text-xs text-slate-400 mt-0.5">Standard Active Member</p>
           </div>
           <div className="pt-2 border-t border-slate-100 text-xs font-mono space-y-1">
@@ -63,7 +63,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
             <Gift className="w-5 h-5 text-purple-600" />
           </div>
           <div>
-            <h4 className="font-black text-slate-900 font-['Space_Grotesk'] text-base">AGM</h4>
+            <h4 className="font-black text-slate-900 font-sans text-base">AGM</h4>
             <p className="text-xs text-purple-700 font-bold mt-0.5">Gift: Worth Gold (₹1,25,000)</p>
           </div>
           <div className="pt-2 border-t border-slate-100 text-xs font-mono space-y-1">
@@ -87,7 +87,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
             <Award className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h4 className="font-black text-slate-900 font-['Space_Grotesk'] text-base">DGM</h4>
+            <h4 className="font-black text-slate-900 font-sans text-base">DGM</h4>
             <p className="text-xs text-blue-700 font-bold mt-0.5">Gift: Luxury Vehicle (₹3,50,000)</p>
           </div>
           <div className="pt-2 border-t border-slate-100 text-xs font-mono space-y-1">
@@ -111,7 +111,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
             <Award className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
-            <h4 className="font-black text-slate-900 font-['Space_Grotesk'] text-base">General Manager</h4>
+            <h4 className="font-black text-slate-900 font-sans text-base">General Manager</h4>
             <p className="text-xs text-emerald-700 font-bold mt-0.5">Gift: Luxury Villa (₹10,00,000)</p>
           </div>
           <div className="pt-2 border-t border-slate-100 text-xs font-mono space-y-1">
@@ -132,7 +132,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-purple-600" />
-            <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
+            <h3 className="font-bold text-base text-slate-900 font-sans">
               Cadre Reward Claims Queue
             </h3>
           </div>
@@ -160,7 +160,7 @@ export const AdminCadreRewardsView: React.FC<AdminCadreRewardsViewProps> = ({
                   <td className="px-4 py-3.5 font-mono text-slate-400 font-bold">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-3.5 font-bold font-['Space_Grotesk'] text-slate-900">
+                  <td className="px-4 py-3.5 font-bold font-sans text-slate-900">
                     {claim.name}
                   </td>
                   <td className="px-4 py-3.5">

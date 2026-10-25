@@ -19,7 +19,7 @@ export const Navbar: React.FC = () => {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="font-black italic text-[16px] sm:text-lg tracking-tight text-slate-950 font-['Space_Grotesk'] leading-none">
+              <span className="font-black italic text-[16px] sm:text-lg tracking-tight text-slate-950 font-sans leading-none">
                 FAN<span className="text-[#FF4A00]">CODE</span>
               </span>
               <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-orange-50 text-[#FF4A00] border border-orange-200 leading-none">

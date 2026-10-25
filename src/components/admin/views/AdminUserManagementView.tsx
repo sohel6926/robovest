@@ -335,7 +335,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
     <div className="space-y-6">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+        <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
           User Management
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
@@ -494,7 +494,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                       <td className="px-4 py-3.5 font-bold font-mono text-slate-900">
                         {user.userId}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-slate-900 font-['Space_Grotesk']">
+                      <td className="px-4 py-3.5 font-bold text-slate-900 font-sans">
                         {user.name}
                       </td>
                       <td className="px-4 py-3.5 font-mono text-slate-600">
@@ -649,7 +649,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
             <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-[#70c028]" />
-                <h3 className="font-bold text-base font-['Space_Grotesk']">Create New User</h3>
+                <h3 className="font-bold text-base font-sans">Create New User</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}

@@ -28,7 +28,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
     <div className="pb-24 max-w-md mx-auto space-y-4 px-4 pt-2 text-slate-900">
       {/* Top Header with Invite Code Badge */}
       <div className="flex items-center justify-between py-2">
-        <h1 className="text-xl font-black text-slate-900 font-['Space_Grotesk']">Team</h1>
+        <h1 className="text-xl font-black text-slate-900 font-sans">Team</h1>
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-mono font-bold">
           <span>📋</span>
           <span>{user.inviteCode}</span>
@@ -43,7 +43,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
             <Users className="w-3.5 h-3.5 text-blue-600" />
             <span>Team members</span>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 tabular-nums font-['Space_Grotesk']">
+          <div className="text-3xl font-extrabold text-slate-900 tabular-nums font-sans">
             {teamMembers.length}
           </div>
           <div className="text-[11px] text-blue-600 font-bold">
@@ -57,7 +57,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
             <Coins className="w-3.5 h-3.5 text-blue-600" />
             <span>Team recharge</span>
           </div>
-          <div className="text-3xl font-extrabold text-blue-600 tabular-nums font-['Space_Grotesk']">
+          <div className="text-3xl font-extrabold text-blue-600 tabular-nums font-sans">
             ₹{allRecharge.toLocaleString()}
           </div>
           <div className="text-[11px] text-slate-500 font-medium">
@@ -150,7 +150,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
           </div>
           <div>
             <span className="text-xs text-slate-500 block">Total income credited</span>
-            <span className="text-2xl font-black text-blue-600 tabular-nums font-['Space_Grotesk']">
+            <span className="text-2xl font-black text-blue-600 tabular-nums font-sans">
               ₹{user.totalIncome.toLocaleString()}
             </span>
           </div>

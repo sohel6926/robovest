@@ -150,7 +150,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 {/* Bottom Overlay: Bonus Pill Badge */}
                 <div className="absolute bottom-2 left-1.5 right-1.5 bg-white/95 backdrop-blur-xs py-1 px-1.5 rounded-full border border-slate-100 shadow-sm flex items-center justify-center gap-1">
                   <Gift className="w-3 h-3 text-[#FF4A00] shrink-0" />
-                  <span className="text-[#FF4A00] font-black text-[11px] sm:text-xs font-['Space_Grotesk'] truncate">
+                  <span className="text-[#FF4A00] font-black text-[11px] sm:text-xs font-sans truncate">
                     ₹{product.bonus} Bonus
                   </span>
                 </div>
@@ -161,7 +161,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 
                 {/* 1. Header Row: Product Name + POPULAR Crown Badge */}
                 <div className="flex items-center justify-between gap-1.5 min-w-0">
-                  <h3 className="font-black text-base sm:text-lg text-slate-900 font-['Space_Grotesk'] leading-tight truncate shrink min-w-0">
+                  <h3 className="font-black text-base sm:text-lg text-slate-900 font-sans leading-tight truncate shrink min-w-0">
                     {product.name}
                   </h3>
 
@@ -185,7 +185,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   <p className="text-[10px] text-slate-400 font-semibold leading-none">
                     Investment Amount
                   </p>
-                  <div className="text-[19px] sm:text-[22px] font-black text-[#FF4800] font-['Space_Grotesk'] leading-tight mt-0.5 truncate">
+                  <div className="text-[19px] sm:text-[22px] font-black text-[#FF4800] font-sans leading-tight mt-0.5 truncate">
                     ₹{product.price.toLocaleString()}
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                       </div>
                       <span className="truncate">Daily Payout</span>
                     </div>
-                    <div className="text-xs sm:text-[13px] font-black text-[#00B074] font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                    <div className="text-xs sm:text-[13px] font-black text-[#00B074] font-sans leading-tight mt-1 truncate">
                       ₹{product.dailyIncome.toLocaleString()}
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                       </div>
                       <span className="truncate">Duration</span>
                     </div>
-                    <div className="text-xs sm:text-[13px] font-black text-slate-800 font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                    <div className="text-xs sm:text-[13px] font-black text-slate-800 font-sans leading-tight mt-1 truncate">
                       {product.durationDays} Days
                     </div>
                   </div>
@@ -227,7 +227,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                       </div>
                       <span className="truncate">Total Payout</span>
                     </div>
-                    <div className={`font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-1 truncate tracking-tight ${
+                    <div className={`font-black text-[#FF4A00] font-sans leading-tight mt-1 truncate tracking-tight ${
                       product.totalReturn >= 1000000 
                         ? 'text-[11px] sm:text-xs' 
                         : 'text-xs sm:text-[13px]'
@@ -244,7 +244,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                       </div>
                       <span className="truncate">Bonus</span>
                     </div>
-                    <div className="text-xs sm:text-[13px] font-black text-[#FF4A00] font-['Space_Grotesk'] leading-tight mt-1 truncate">
+                    <div className="text-xs sm:text-[13px] font-black text-[#FF4A00] font-sans leading-tight mt-1 truncate">
                       ₹{product.bonus.toLocaleString()}
                     </div>
                   </div>

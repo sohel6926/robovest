@@ -84,7 +84,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+          <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
             Platform Settings
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -109,7 +109,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
+            <h3 className="font-bold text-base text-slate-900 font-sans">
               Withdrawal Settings
             </h3>
           </div>
@@ -178,7 +178,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Clock className="w-4 h-4 text-emerald-600" />
             </div>
-            <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
+            <h3 className="font-bold text-base text-slate-900 font-sans">
               Top-up Settings
             </h3>
           </div>
@@ -248,7 +248,7 @@ export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({
           <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-black">
             %
           </div>
-          <h3 className="font-bold text-base text-slate-900 font-['Space_Grotesk']">
+          <h3 className="font-bold text-base text-slate-900 font-sans">
             Tax & Deductions
           </h3>
         </div>

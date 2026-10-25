@@ -52,7 +52,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-black text-slate-900 font-['Space_Grotesk'] tracking-tight">
+            <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
               Top-up Management
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
@@ -132,7 +132,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
           <div className="w-16 h-16 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center mb-4">
             <Filter className="w-8 h-8 text-slate-500 stroke-[1.5]" />
           </div>
-          <h3 className="text-xl font-black text-slate-900 font-['Space_Grotesk']">
+          <h3 className="text-xl font-black text-slate-900 font-sans">
             No Requests Found
           </h3>
           <p className="text-xs text-slate-400 mt-1 font-medium">
