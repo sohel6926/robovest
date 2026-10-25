@@ -510,7 +510,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
               setDateFilter(e.target.value ? 'custom' : '');
               setCurrentPage(1);
             }}
-            className="bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-mono font-medium outline-none"
+            className="bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-sans font-medium outline-none"
           />
         </div>
 
@@ -558,19 +558,19 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                   const serialNumber = (currentPage - 1) * pageSize + index + 1;
                   return (
                     <tr key={user.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-4 py-3.5 font-mono text-slate-400 font-bold">
+                      <td className="px-4 py-3.5 font-sans text-slate-400 font-bold">
                         {serialNumber}
                       </td>
-                      <td className="px-4 py-3.5 font-bold font-mono text-slate-900">
+                      <td className="px-4 py-3.5 font-bold font-sans text-slate-900 tracking-tight">
                         {user.userId}
                       </td>
                       <td className="px-4 py-3.5 font-bold text-slate-900 font-sans">
                         {user.name}
                       </td>
-                      <td className="px-4 py-3.5 font-mono text-slate-600">
+                      <td className="px-4 py-3.5 font-sans font-semibold text-slate-700">
                         {user.mobile}
                       </td>
-                      <td className="px-4 py-3.5 font-mono font-bold text-slate-800">
+                      <td className="px-4 py-3.5 font-sans font-bold text-slate-800 tracking-tight">
                         {user.sponsorId}
                       </td>
                       <td className="px-4 py-3.5">
@@ -596,10 +596,10 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                           {user.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 font-bold font-mono text-slate-900">
+                      <td className="px-4 py-3.5 font-bold font-sans text-slate-900 tracking-tight">
                         ₹ {user.walletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="px-4 py-3.5 font-mono text-slate-500 text-[11px]">
+                      <td className="px-4 py-3.5 font-sans font-medium text-slate-500 text-[11px]">
                         {user.joined}
                       </td>
                       <td className="px-4 py-3.5 text-right">
@@ -750,7 +750,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                   placeholder="10-digit mobile number"
                   value={createForm.mobile}
                   onChange={(e) => setCreateForm({ ...createForm, mobile: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 
@@ -761,7 +761,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                   placeholder="e.g. B5294001 or Root"
                   value={createForm.sponsorId}
                   onChange={(e) => setCreateForm({ ...createForm, sponsorId: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 
@@ -773,7 +773,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                   placeholder="0"
                   value={createForm.initialBalance || ''}
                   onChange={(e) => setCreateForm({ ...createForm, initialBalance: Number(e.target.value) })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 

@@ -298,9 +298,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         <h1 className="text-2xl font-black text-slate-900 tracking-tight font-sans">
           {currentUser.name}
         </h1>
-        <p className="text-xs font-mono text-slate-500 mt-0.5">
+        <p className="text-xs font-sans text-slate-500 mt-0.5">
           User ID: <span className="font-bold text-slate-700">{currentUser.userId}</span> — Sponsor:{' '}
-          <span className="font-bold text-blue-600 font-mono">{currentUser.sponsorId}</span> — Member since{' '}
+          <span className="font-bold text-blue-600 font-sans">{currentUser.sponsorId}</span> — Member since{' '}
           <span className="font-bold text-slate-700">{currentUser.joined}</span>
         </p>
       </div>
@@ -317,7 +317,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <h2 className="text-xl font-bold font-sans text-white tracking-tight">
                 {currentUser.name}
               </h2>
-              <div className="text-xs text-slate-300 font-mono">
+              <div className="text-xs text-slate-300 font-sans">
                 {profileEmail} · {currentUser.mobile} · {profileCity}
               </div>
               <div className="flex items-center gap-2 pt-0.5">
@@ -382,42 +382,42 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 pt-1">
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Wallet Balance</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               ₹ {walletBal.toLocaleString('en-IN')}
             </span>
           </div>
 
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Total Earned</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               ₹ {totalEarned.toLocaleString('en-IN')}
             </span>
           </div>
 
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Total Invested</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               ₹ {totalInvested.toLocaleString('en-IN')}
             </span>
           </div>
 
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Active Plans</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               {activePlansCount}
             </span>
           </div>
 
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Direct Referrals</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               {directRefs}
             </span>
           </div>
 
           <div>
             <span className="text-[11px] text-slate-400 font-semibold block">Total Team</span>
-            <span className="font-mono font-black text-xl text-white mt-0.5 block">
+            <span className="font-sans font-black text-xl text-white mt-0.5 block">
               {totalTeam}
             </span>
           </div>
@@ -464,7 +464,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-500 block">Referral Income</span>
-                <span className="text-2xl font-black font-mono text-emerald-600">
+                <span className="text-2xl font-black font-sans text-emerald-600">
                   ₹ {referralIncome.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -476,7 +476,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-500 block">3-Tier Level Income</span>
-                <span className="text-2xl font-black font-mono text-[#0B1536]">
+                <span className="text-2xl font-black font-sans text-[#0B1536]">
                   ₹ {levelIncome.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -488,7 +488,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-500 block">Sports ROI Yield</span>
-                <span className="text-2xl font-black font-mono text-amber-500">
+                <span className="text-2xl font-black font-sans text-amber-500">
                   ₹ {roiIncome.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -500,7 +500,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-500 block">Total Earned</span>
-                <span className="text-2xl font-black font-mono text-emerald-600">
+                <span className="text-2xl font-black font-sans text-emerald-600">
                   ₹ {totalEarned.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -511,28 +511,28 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Direct Referrals (L1 - 22%)</span>
-              <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-blue-600 mt-1 block">
                 {directRefs}
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Indirect Downline (L2 & L3)</span>
-              <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-blue-600 mt-1 block">
                 {Math.max(0, totalTeam - directRefs)}
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Total Team Investment</span>
-              <span className="text-2xl font-black font-mono text-amber-500 mt-1 block">
+              <span className="text-2xl font-black font-sans text-amber-500 mt-1 block">
                 ₹ 0
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Team Commission</span>
-              <span className="text-2xl font-black font-mono text-emerald-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-emerald-600 mt-1 block">
                 ₹ 0
               </span>
             </div>
@@ -560,11 +560,11 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                         {inv.status}
                       </span>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400 mt-0.5 block">
+                    <span className="text-[11px] font-sans text-slate-400 mt-0.5 block">
                       ID: {inv.id} · Category: {inv.category}
                     </span>
                   </div>
-                  <span className="text-xs font-bold font-mono text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
+                  <span className="text-xs font-bold font-sans text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
                     {inv.monthlyReturn}
                   </span>
                 </div>
@@ -572,19 +572,19 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl text-xs">
                   <div>
                     <span className="text-slate-400 font-semibold block text-[10px]">Amount Invested</span>
-                    <span className="font-mono font-bold text-slate-900 text-sm">₹ {inv.amountInvested.toLocaleString('en-IN')}</span>
+                    <span className="font-sans font-bold text-slate-900 text-sm">₹ {inv.amountInvested.toLocaleString('en-IN')}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block text-[10px]">Total Return</span>
-                    <span className="font-mono font-bold text-emerald-600 text-sm">₹ {inv.totalReturn.toLocaleString('en-IN')}</span>
+                    <span className="font-sans font-bold text-emerald-600 text-sm">₹ {inv.totalReturn.toLocaleString('en-IN')}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block text-[10px]">Earned So Far</span>
-                    <span className="font-mono font-bold text-emerald-600 text-sm">₹ {inv.earnedSoFar.toLocaleString('en-IN')}</span>
+                    <span className="font-sans font-bold text-emerald-600 text-sm">₹ {inv.earnedSoFar.toLocaleString('en-IN')}</span>
                   </div>
                   <div>
                     <span className="text-slate-400 font-semibold block text-[10px]">Duration</span>
-                    <span className="font-mono font-bold text-slate-800 text-sm">{inv.duration}</span>
+                    <span className="font-sans font-bold text-slate-800 text-sm">{inv.duration}</span>
                   </div>
                 </div>
               </div>
@@ -618,7 +618,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                       {inv.status}
                     </span>
                   </div>
-                  <span className="text-xs font-mono text-slate-400 mt-0.5 block">
+                  <span className="text-xs font-sans text-slate-400 mt-0.5 block">
                     ID: {inv.id} · Category: {inv.category}
                   </span>
                 </div>
@@ -628,35 +628,35 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <span className="text-xs text-slate-500 font-bold block mb-1">Amount Invested</span>
-                  <span className="text-xl font-black font-mono text-slate-950">
+                  <span className="text-xl font-black font-sans text-slate-950">
                     ₹ {inv.amountInvested.toLocaleString('en-IN')}
                   </span>
                 </div>
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <span className="text-xs text-slate-500 font-bold block mb-1">Total Return</span>
-                  <span className="text-xl font-black font-mono text-emerald-600">
+                  <span className="text-xl font-black font-sans text-emerald-600">
                     ₹ {inv.totalReturn.toLocaleString('en-IN')}
                   </span>
                 </div>
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <span className="text-xs text-slate-500 font-bold block mb-1">Earned So Far</span>
-                  <span className="text-xl font-black font-mono text-emerald-600">
+                  <span className="text-xl font-black font-sans text-emerald-600">
                     ₹ {inv.earnedSoFar.toLocaleString('en-IN')}
                   </span>
                 </div>
 
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <span className="text-xs text-slate-500 font-bold block mb-1">Daily Yield</span>
-                  <span className="text-xl font-black font-mono text-amber-500">
+                  <span className="text-xl font-black font-sans text-amber-500">
                     {inv.monthlyReturn}
                   </span>
                 </div>
               </div>
 
               {/* Date Metadata Row */}
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-500 pt-2 border-t border-slate-100">
+              <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-slate-500 pt-2 border-t border-slate-100">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <span>Start: {inv.startDate}</span>
@@ -685,7 +685,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     style={{ width: `${Math.min(100, (inv.earnedSoFar / inv.totalReturn) * 100)}%` }}
                   />
                 </div>
-                <div className="text-right text-[11px] font-mono text-slate-400">
+                <div className="text-right text-[11px] font-sans text-slate-400">
                   {((inv.earnedSoFar / inv.totalReturn) * 100).toFixed(1)}% returned
                 </div>
               </div>
@@ -701,28 +701,28 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Direct Referrals (L1 - 22%)</span>
-              <span className="text-2xl font-black font-mono text-emerald-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-emerald-600 mt-1 block">
                 ₹ 0
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Indirect Downline (L2 & L3)</span>
-              <span className="text-2xl font-black font-mono text-blue-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-blue-600 mt-1 block">
                 ₹ 0
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Total Team Investment</span>
-              <span className="text-2xl font-black font-mono text-amber-500 mt-1 block">
+              <span className="text-2xl font-black font-sans text-amber-500 mt-1 block">
                 ₹ 0
               </span>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
               <span className="text-xs font-bold text-slate-500 block">Commission Earned</span>
-              <span className="text-2xl font-black font-mono text-emerald-600 mt-1 block">
+              <span className="text-2xl font-black font-sans text-emerald-600 mt-1 block">
                 ₹ 0
               </span>
             </div>
@@ -751,7 +751,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     </div>
 
                     <div className="text-right">
-                      <span className="font-mono font-bold text-slate-700 text-xs block">₹ {item.vol.toLocaleString('en-IN')}</span>
+                      <span className="font-sans font-bold text-slate-700 text-xs block">₹ {item.vol.toLocaleString('en-IN')}</span>
                       <span className="text-[10px] font-bold text-emerald-600">{item.members} members</span>
                     </div>
                   </div>
@@ -814,10 +814,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 18:30</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 18:30</td>
                   <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">Product B (Formula 1 Grand Prix)</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 500.00</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -825,10 +825,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 14:15</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 14:15</td>
                   <td className="px-4 py-3 font-bold text-blue-600">Level 1 Referral Bonus (22%)</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">Direct Partner: B994821</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 462.00</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Direct Partner: B994821</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 462.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -836,10 +836,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-24 18:30</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-24 18:30</td>
                   <td className="px-4 py-3 font-bold text-amber-600">Daily Sports ROI Yield</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">Product B (Formula 1 Grand Prix)</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 500.00</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">Product B (Formula 1 Grand Prix)</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -847,10 +847,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:45</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:45</td>
                   <td className="px-4 py-3 font-bold text-emerald-600">Welcome Activation Bonus</td>
-                  <td className="px-4 py-3 font-mono text-slate-600">FanCode Platform Tier</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 100.00</td>
+                  <td className="px-4 py-3 font-sans text-slate-600">FanCode Platform Tier</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 100.00</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Settled
@@ -868,7 +868,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 animate-in fade-in-50 duration-150">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-slate-900 text-base font-sans">User Transaction History</h3>
-            <span className="text-xs font-mono font-bold text-slate-500">
+            <span className="text-xs font-sans font-bold text-slate-500">
               Current Available: ₹ {walletBal.toLocaleString('en-IN')}
             </span>
           </div>
@@ -887,11 +887,11 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-DEP-9921</td>
+                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-DEP-9921</td>
                   <td className="px-4 py-3 font-bold text-blue-600">RECHARGE</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 5,00,000</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 5,00,000</td>
                   <td className="px-4 py-3 text-slate-600">Bank Transfer / UPI (Ref: UTR884920491)</td>
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:43</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:43</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Completed
@@ -899,11 +899,11 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-INV-4412</td>
+                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-INV-4412</td>
                   <td className="px-4 py-3 font-bold text-indigo-600">SPORTS_CONTRACT</td>
-                  <td className="px-4 py-3 font-mono font-bold text-slate-800">-₹ 5,00,000</td>
+                  <td className="px-4 py-3 font-sans font-bold text-slate-800">-₹ 5,00,000</td>
                   <td className="px-4 py-3 text-slate-600">Subscribed Product B (Formula 1 Velocity Grand Prix)</td>
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-23 20:44</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:44</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Completed
@@ -911,11 +911,11 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   </td>
                 </tr>
                 <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-mono font-bold text-slate-800">TXN-YLD-1102</td>
+                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-YLD-1102</td>
                   <td className="px-4 py-3 font-bold text-amber-600">DAILY_YIELD</td>
-                  <td className="px-4 py-3 font-mono font-bold text-emerald-600">+₹ 2,220</td>
+                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 2,220</td>
                   <td className="px-4 py-3 text-slate-600">FanCode Automated Daily Sports Yield Cycle</td>
-                  <td className="px-4 py-3 font-mono text-slate-500">2026-10-25 18:30</td>
+                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 18:30</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                       Completed
@@ -959,7 +959,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Mobile</span>
-                  <span className="font-mono font-bold text-slate-900">{currentUser.mobile}</span>
+                  <span className="font-sans font-bold text-slate-900">{currentUser.mobile}</span>
                 </div>
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
@@ -969,22 +969,22 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Password</span>
-                  <span className="font-mono font-bold text-slate-900">{profilePassword}</span>
+                  <span className="font-sans font-bold text-slate-900">{profilePassword}</span>
                 </div>
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Security PIN</span>
-                  <span className="font-mono font-bold text-slate-900">{profilePin}</span>
+                  <span className="font-sans font-bold text-slate-900">{profilePin}</span>
                 </div>
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Sponsor ID</span>
-                  <span className="font-mono font-bold text-slate-900">{currentUser.sponsorId}</span>
+                  <span className="font-sans font-bold text-slate-900">{currentUser.sponsorId}</span>
                 </div>
 
                 <div className="flex justify-between md:justify-start md:gap-16 items-center">
                   <span className="text-slate-500 font-semibold w-28">Joined</span>
-                  <span className="font-mono font-bold text-slate-900">{currentUser.joined}</span>
+                  <span className="font-sans font-bold text-slate-900">{currentUser.joined}</span>
                 </div>
               </div>
 
@@ -1045,7 +1045,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={profileMobile}
                     onChange={(e) => setProfileMobile(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1065,7 +1065,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={profilePassword}
                     onChange={(e) => setProfilePassword(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1076,7 +1076,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     maxLength={4}
                     value={profilePin}
                     onChange={(e) => setProfilePin(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1172,12 +1172,12 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                 <div>
                   <span className="text-slate-500 font-semibold block mb-1">Aadhaar Number</span>
-                  <span className="font-mono text-slate-700">{aadhaarNum}</span>
+                  <span className="font-sans text-slate-700">{aadhaarNum}</span>
                 </div>
 
                 <div>
                   <span className="text-slate-500 font-semibold block mb-1">PAN Number</span>
-                  <span className="font-mono text-slate-700">{panNum}</span>
+                  <span className="font-sans text-slate-700">{panNum}</span>
                 </div>
               </div>
 
@@ -1193,12 +1193,12 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
 
                   <div>
                     <span className="text-slate-500 font-semibold block mb-1">Account No</span>
-                    <span className="font-mono text-slate-700">{bankAccountNum}</span>
+                    <span className="font-sans text-slate-700">{bankAccountNum}</span>
                   </div>
 
                   <div>
                     <span className="text-slate-500 font-semibold block mb-1">IFSC Code</span>
-                    <span className="font-mono text-slate-700">{bankIfsc}</span>
+                    <span className="font-sans text-slate-700">{bankIfsc}</span>
                   </div>
 
                   <div>
@@ -1245,7 +1245,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={aadhaarNum}
                     onChange={(e) => setAadhaarNum(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1255,7 +1255,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={panNum}
                     onChange={(e) => setPanNum(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1275,7 +1275,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={bankAccountNum}
                     onChange={(e) => setBankAccountNum(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1285,7 +1285,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                     type="text"
                     value={bankIfsc}
                     onChange={(e) => setBankIfsc(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -1340,7 +1340,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
             </div>
             <div className="text-right">
               <span className="text-[11px] text-slate-400 font-semibold block">Current Balance</span>
-              <span className="font-mono font-black text-xl text-emerald-600">
+              <span className="font-sans font-black text-xl text-emerald-600">
                 ₹ {walletBal.toLocaleString('en-IN')}
               </span>
             </div>
@@ -1377,7 +1377,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   key={amt}
                   type="button"
                   onClick={() => setAddAmount(amt.toString())}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 font-mono font-bold text-xs text-slate-700 transition"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 font-sans font-bold text-xs text-slate-700 transition"
                 >
                   ₹{amt.toLocaleString('en-IN')}
                 </button>
@@ -1393,7 +1393,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 placeholder="0.00"
                 value={addAmount}
                 onChange={(e) => setAddAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-base outline-hidden focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-sans font-bold text-base outline-hidden focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
@@ -1457,7 +1457,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   key={tier.amt}
                   type="button"
                   onClick={() => setTopupAmount(tier.amt.toString())}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 font-mono font-bold text-xs text-slate-700 transition"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 font-sans font-bold text-xs text-slate-700 transition"
                 >
                   {tier.label}
                 </button>
@@ -1476,7 +1476,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 placeholder="Enter top-up amount"
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-mono font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white font-sans font-bold text-sm text-slate-900 placeholder:text-slate-400 placeholder:font-normal outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                 required
               />
             </div>
@@ -1540,7 +1540,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   type="number"
                   value={newPlanAmount}
                   onChange={(e) => setNewPlanAmount(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -1550,13 +1550,13 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                   type="text"
                   value={newPlanRoi}
                   onChange={(e) => setNewPlanRoi(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-[11px]">
-                <span>Contract Duration: <strong className="text-slate-900 font-mono">150 Days</strong></span>
-                <span className="block mt-0.5">Payout Frequency: <strong className="text-emerald-600 font-mono">Daily at 18:30 IST</strong></span>
+                <span>Contract Duration: <strong className="text-slate-900 font-sans">150 Days</strong></span>
+                <span className="block mt-0.5">Payout Frequency: <strong className="text-emerald-600 font-sans">Daily at 18:30 IST</strong></span>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">

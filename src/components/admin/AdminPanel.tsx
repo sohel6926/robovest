@@ -667,7 +667,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     value={pinInput}
                     onChange={(e) => setPinInput(e.target.value)}
                     placeholder="Enter admin PIN (default: admin888)"
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 text-sm font-mono tracking-wider outline-hidden"
+                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 text-sm font-sans tracking-wider outline-hidden"
                     autoFocus
                   />
                 </div>
@@ -994,7 +994,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 Reset
               </button>
             </div>
-            <div className="font-mono text-xs font-bold text-amber-300">
+            <div className="font-sans text-xs font-bold text-amber-300">
               {simulatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </div>
             <div className="text-[10px] text-slate-400">
@@ -1250,7 +1250,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </p>
                 </div>
 
-                <div className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs font-mono">
+                <div className="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs font-sans">
                   All-Time Payouts: ₹{allWithdrawalsSum.toLocaleString()}
                 </div>
               </div>
@@ -1259,19 +1259,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Requested (Gross)</span>
-                  <span className="text-xl font-black text-slate-900 font-mono">₹{allWithdrawalsSum.toLocaleString()}</span>
+                  <span className="text-xl font-black text-slate-900 font-sans">₹{allWithdrawalsSum.toLocaleString()}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">10% Platform Fees Retained</span>
-                  <span className="text-xl font-black text-blue-600 font-mono">₹{allFeesSum.toLocaleString()}</span>
+                  <span className="text-xl font-black text-blue-600 font-sans">₹{allFeesSum.toLocaleString()}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Net Money Disbursed</span>
-                  <span className="text-xl font-black text-emerald-600 font-mono">₹{(allWithdrawalsSum - allFeesSum).toLocaleString()}</span>
+                  <span className="text-xl font-black text-emerald-600 font-sans">₹{(allWithdrawalsSum - allFeesSum).toLocaleString()}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Pending Review</span>
-                  <span className={`text-xl font-black font-mono ${pendingWithdrawals.length > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                  <span className={`text-xl font-black font-sans ${pendingWithdrawals.length > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
                     ₹{pendingWithdrawals.reduce((s, t) => s + Math.abs(t.amount), 0).toLocaleString()} ({pendingWithdrawals.length})
                   </span>
                 </div>
@@ -1299,29 +1299,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         return (
                           <React.Fragment key={log.date}>
                             <tr className="hover:bg-slate-50/70 transition">
-                              <td className="p-3.5 font-bold font-mono text-slate-900">
+                              <td className="p-3.5 font-bold font-sans text-slate-900">
                                 <div className="flex items-center gap-1.5">
                                   <Calendar className="w-3.5 h-3.5 text-blue-600" />
                                   <span>{log.formattedDate}</span>
                                 </div>
                                 <span className="text-[10px] text-slate-400 block font-normal">{log.date}</span>
                               </td>
-                              <td className="p-3.5 font-bold font-mono">
+                              <td className="p-3.5 font-bold font-sans">
                                 <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[11px]">
                                   {log.totalRequests} {log.totalRequests === 1 ? 'request' : 'requests'}
                                 </span>
                               </td>
-                              <td className="p-3.5 font-black font-mono text-slate-900 text-sm">
+                              <td className="p-3.5 font-black font-sans text-slate-900 text-sm">
                                 ₹{log.totalRequested.toLocaleString()}
                               </td>
-                              <td className="p-3.5 font-mono text-blue-600 font-bold">
+                              <td className="p-3.5 font-sans text-blue-600 font-bold">
                                 ₹{log.totalFees.toLocaleString()}
                               </td>
-                              <td className="p-3.5 font-mono text-emerald-600 font-black text-sm">
+                              <td className="p-3.5 font-sans text-emerald-600 font-black text-sm">
                                 ₹{log.totalNet.toLocaleString()}
                               </td>
                               <td className="p-3.5">
-                                <div className="flex items-center gap-1.5 text-[11px] font-mono">
+                                <div className="flex items-center gap-1.5 text-[11px] font-sans">
                                   {log.completedAmount > 0 && (
                                     <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
                                       Done: ₹{log.completedAmount.toLocaleString()}
@@ -1368,7 +1368,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                         >
                                           <div>
                                             <div className="flex items-center gap-2">
-                                              <span className="font-mono font-bold text-slate-900">{txn.id}</span>
+                                              <span className="font-sans font-bold text-slate-900">{txn.id}</span>
                                               <span className={`px-2 py-0.2 rounded-full text-[9px] font-black uppercase ${
                                                 txn.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
                                                 txn.status === 'PROCESSING' ? 'bg-amber-100 text-amber-800' :
@@ -1378,14 +1378,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                               </span>
                                             </div>
                                             <p className="text-[11px] text-slate-500 mt-0.5">{txn.description}</p>
-                                            <span className="text-[10px] text-slate-400 font-mono">{txn.formattedTime}</span>
+                                            <span className="text-[10px] text-slate-400 font-sans">{txn.formattedTime}</span>
                                           </div>
 
                                           <div className="text-right">
-                                            <div className="font-black text-sm text-slate-900 font-mono">
+                                            <div className="font-black text-sm text-slate-900 font-sans">
                                               ₹{Math.abs(txn.amount).toLocaleString()}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 font-mono">
+                                            <div className="text-[10px] text-slate-400 font-sans">
                                               Net: ₹{(txn.netAmount || (Math.abs(txn.amount) - (txn.fee || 0))).toLocaleString()}
                                             </div>
 
@@ -1527,19 +1527,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <div className="p-4 space-y-2 text-xs bg-slate-50/50">
                       <div className="flex justify-between items-center">
                         <span className="text-slate-500">Daily Revenue:</span>
-                        <span className="font-black text-emerald-600 font-mono">
+                        <span className="font-black text-emerald-600 font-sans">
                           ₹{plan.dailyIncome.toLocaleString()} / day
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-slate-500">Total Return:</span>
-                        <span className="font-black text-blue-600 font-mono">
+                        <span className="font-black text-blue-600 font-sans">
                           ₹{(plan.totalReturn || plan.dailyIncome * plan.durationDays).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-slate-500">Instant Bonus:</span>
-                        <span className="font-bold text-amber-600 font-mono">
+                        <span className="font-bold text-amber-600 font-sans">
                           ₹{plan.bonus.toLocaleString()}
                         </span>
                       </div>
@@ -1671,41 +1671,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* 4 Summary Stat Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Pending Verification</span>
-                    <span className={`text-xl font-black font-mono ${pendingRecharges.length > 0 ? 'text-amber-600 animate-pulse' : 'text-slate-900'}`}>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-sans">Pending Verification</span>
+                    <span className={`text-xl font-black font-sans tracking-tight ${pendingRecharges.length > 0 ? 'text-amber-600 animate-pulse' : 'text-slate-900'}`}>
                       {pendingRecharges.length} Requests
                     </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-sans">
                       ₹{pendingRecharges.reduce((s, t) => s + Math.abs(t.amount), 0).toLocaleString()} awaiting
                     </span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Approved Volume</span>
-                    <span className="text-xl font-black text-emerald-600 font-mono">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-sans">Approved Volume</span>
+                    <span className="text-xl font-black text-emerald-600 font-sans tracking-tight">
                       ₹{totalRechargeVol.toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-sans">
                       {completedRecharges.length} recharges verified
                     </span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Rejected Attempts</span>
-                    <span className="text-xl font-black text-rose-600 font-mono">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-sans">Rejected Attempts</span>
+                    <span className="text-xl font-black text-rose-600 font-sans tracking-tight">
                       {rejectedRecharges.length}
                     </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-sans">
                       Flagged fraudulent/invalid
                     </span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Top-Up Records</span>
-                    <span className="text-xl font-black text-slate-900 font-mono">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-sans">Total Top-Up Records</span>
+                    <span className="text-xl font-black text-slate-900 font-sans tracking-tight">
                       {rechargeTxns.length}
                     </span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-sans">
                       100% Supabase ledger logged
                     </span>
                   </div>
@@ -1714,8 +1714,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 {/* Top-Ups Verification Table */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-black">
+                    <table className="w-full text-left text-xs font-sans">
+                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider text-[10px] font-black font-sans">
                         <tr>
                           <th className="p-3.5">Txn ID / Time</th>
                           <th className="p-3.5">User Phone / ID</th>
@@ -1742,26 +1742,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             return (
                               <tr key={txn.id} className="hover:bg-slate-50/70 transition">
                                 <td className="p-3.5">
-                                  <span className="font-mono font-bold text-slate-900 block">{txn.id}</span>
-                                  <span className="text-[10px] text-slate-400">{txn.formattedTime || txn.timestamp}</span>
+                                  <span className="font-sans font-bold text-slate-900 block">{txn.id}</span>
+                                  <span className="text-[10px] text-slate-400 font-sans">{txn.formattedTime || txn.timestamp}</span>
                                 </td>
 
                                 <td className="p-3.5">
-                                  <span className="font-mono font-bold text-slate-800 block">
+                                  <span className="font-sans font-bold text-slate-800 block">
                                     {txn.userPhone || user.phone}
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-mono">
+                                  <span className="text-[10px] text-slate-400 font-sans">
                                     User: {txn.userId || user.id || 'User5294'}
                                   </span>
                                 </td>
 
-                                <td className="p-3.5 font-bold font-mono text-emerald-600 text-sm">
+                                <td className="p-3.5 font-extrabold font-sans text-emerald-600 text-sm tracking-tight">
                                   +₹{Math.abs(txn.amount).toLocaleString()}
                                 </td>
 
                                 <td className="p-3.5">
                                   <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 w-fit">
-                                    <span className="font-mono font-black text-slate-800 text-[11px]">{utr}</span>
+                                    <span className="font-sans font-bold text-slate-800 text-[11px] tracking-tight">{utr}</span>
                                     {utr !== 'N/A' && (
                                       <button
                                         onClick={() => {
@@ -1951,7 +1951,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Pending Bank Payouts</span>
-                    <span className={`text-xl font-black font-mono ${pendingWithdrawalsList.length > 0 ? 'text-amber-600 animate-pulse' : 'text-slate-900'}`}>
+                    <span className={`text-xl font-black font-sans ${pendingWithdrawalsList.length > 0 ? 'text-amber-600 animate-pulse' : 'text-slate-900'}`}>
                       {pendingWithdrawalsList.length} Requests
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -1961,7 +1961,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Net Funds Disbursed</span>
-                    <span className="text-xl font-black text-emerald-600 font-mono">
+                    <span className="text-xl font-black text-emerald-600 font-sans">
                       ₹{totalNetDisbursed.toLocaleString()}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -1971,7 +1971,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">10% Platform Fee</span>
-                    <span className="text-xl font-black text-blue-600 font-mono">
+                    <span className="text-xl font-black text-blue-600 font-sans">
                       ₹{totalFeesAll.toLocaleString()}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -1981,7 +1981,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                   <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Rejected & Refunded</span>
-                    <span className="text-xl font-black text-rose-600 font-mono">
+                    <span className="text-xl font-black text-rose-600 font-sans">
                       {rejectedWithdrawalsList.length}
                     </span>
                     <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -2024,15 +2024,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             return (
                               <tr key={txn.id} className="hover:bg-slate-50/70 transition">
                                 <td className="p-3.5">
-                                  <span className="font-mono font-bold text-slate-900 block">{txn.id}</span>
+                                  <span className="font-sans font-bold text-slate-900 block">{txn.id}</span>
                                   <span className="text-[10px] text-slate-400">{txn.formattedTime || txn.timestamp}</span>
                                 </td>
 
                                 <td className="p-3.5">
-                                  <span className="font-mono font-bold text-slate-800 block">
+                                  <span className="font-sans font-bold text-slate-800 block">
                                     {txn.userPhone || user.phone}
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-mono">
+                                  <span className="text-[10px] text-slate-400 font-sans">
                                     User ID: {txn.userId || user.id || 'User5294'}
                                   </span>
                                 </td>
@@ -2042,7 +2042,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                   <div className="font-bold text-slate-900 flex items-center gap-1">
                                     <span>{user.bankAccount.accountHolder || 'User Beneficiary'}</span>
                                   </div>
-                                  <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-600">
+                                  <div className="flex items-center gap-1.5 font-sans text-[11px] text-slate-600">
                                     <span>{user.bankAccount.bankName || 'HDFC Bank'}</span>
                                     <span>·</span>
                                     <span>{user.bankAccount.accountNumber || '••••••••'}</span>
@@ -2059,7 +2059,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                       </button>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400">
+                                  <div className="flex items-center gap-2 font-sans text-[10px] text-slate-400">
                                     <span>IFSC: {user.bankAccount.ifscCode || 'HDFC0001234'}</span>
                                     {user.bankAccount.upiId && (
                                       <span>UPI: {user.bankAccount.upiId}</span>
@@ -2067,15 +2067,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                   </div>
                                 </td>
 
-                                <td className="p-3.5 font-mono font-bold text-slate-800">
+                                <td className="p-3.5 font-sans font-bold text-slate-800">
                                   ₹{gross.toLocaleString()}
                                 </td>
 
-                                <td className="p-3.5 font-mono text-blue-600">
+                                <td className="p-3.5 font-sans text-blue-600">
                                   ₹{fee.toLocaleString()}
                                 </td>
 
-                                <td className="p-3.5 font-mono font-black text-emerald-600 text-sm">
+                                <td className="p-3.5 font-sans font-black text-emerald-600 text-sm">
                                   ₹{net.toLocaleString()}
                                 </td>
 
@@ -2091,11 +2091,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
                                 <td className="p-3.5 text-slate-500 max-w-xs truncate text-[11px]">
                                   {txn.referenceId ? (
-                                    <span className="font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-200">
+                                    <span className="font-sans font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-200">
                                       Ref: {txn.referenceId}
                                     </span>
                                   ) : txn.rejectionReason ? (
-                                    <span className="font-mono text-rose-600">
+                                    <span className="font-sans text-rose-600">
                                       Reason: {txn.rejectionReason}
                                     </span>
                                   ) : (
@@ -2164,7 +2164,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         {user.status || 'Active'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 mt-0.5 font-mono">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       User ID: {user.id || 'User5294'} · Security PIN: {user.pin || '1234'} · Bank Lock: {user.bankDetailsLocked ? 'LOCKED' : 'UNLOCKED'}
                     </p>
                   </div>
@@ -2212,7 +2212,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <Wallet className="w-5 h-5 text-blue-600" />
                     <span>User Balance Direct Adjustment</span>
                   </h3>
-                  <span className="text-xs font-mono bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200">
+                  <span className="text-xs font-sans bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200">
                     Current: ₹{user.availableBalance.toLocaleString()}
                   </span>
                 </div>
@@ -2259,7 +2259,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     placeholder="Enter custom amount (₹)"
                     value={balanceAmount}
                     onChange={(e) => setBalanceAmount(e.target.value)}
-                    className="w-full sm:w-56 px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full sm:w-56 px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="text"
@@ -2310,7 +2310,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={userFormData.phone}
                         onChange={(e) => setUserFormData({ ...userFormData, phone: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2319,7 +2319,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={userFormData.inviteCode}
                         onChange={(e) => setUserFormData({ ...userFormData, inviteCode: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2330,7 +2330,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         max={10}
                         value={userFormData.vipLevel}
                         onChange={(e) => setUserFormData({ ...userFormData, vipLevel: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2340,7 +2340,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         maxLength={4}
                         value={userFormData.pin}
                         onChange={(e) => setUserFormData({ ...userFormData, pin: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-blue-600 outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans font-bold text-blue-600 outline-hidden bg-white"
                       />
                     </div>
                     <div className="pt-2 flex items-center justify-between border-t border-slate-200">
@@ -2365,7 +2365,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="number"
                         value={userFormData.availableBalance}
                         onChange={(e) => setUserFormData({ ...userFormData, availableBalance: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-blue-600 outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans font-bold text-blue-600 outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2374,7 +2374,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="number"
                         value={userFormData.withdrawableBalance}
                         onChange={(e) => setUserFormData({ ...userFormData, withdrawableBalance: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-emerald-600 outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans font-bold text-emerald-600 outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2383,7 +2383,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="number"
                         value={userFormData.totalRecharge}
                         onChange={(e) => setUserFormData({ ...userFormData, totalRecharge: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2392,7 +2392,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="number"
                         value={userFormData.totalIncome}
                         onChange={(e) => setUserFormData({ ...userFormData, totalIncome: Number(e.target.value) })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                   </div>
@@ -2423,7 +2423,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={userFormData.accountNumber}
                         onChange={(e) => setUserFormData({ ...userFormData, accountNumber: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2432,7 +2432,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={userFormData.ifscCode}
                         onChange={(e) => setUserFormData({ ...userFormData, ifscCode: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                     <div>
@@ -2441,7 +2441,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={userFormData.upiId}
                         onChange={(e) => setUserFormData({ ...userFormData, upiId: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono outline-hidden bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-sans outline-hidden bg-white"
                       />
                     </div>
                   </div>
@@ -2492,22 +2492,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/5 p-3.5 rounded-2xl border border-white/10">
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Active Robot Nodes</span>
-                      <span className="font-black text-lg text-white font-mono">{activeNodes.length} Units</span>
+                      <span className="font-black text-lg text-white font-sans">{activeNodes.length} Units</span>
                       <span className="text-[10px] text-slate-400 block">Cap: Duration check active</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Expected Node Yield</span>
-                      <span className="font-black text-lg text-emerald-400 font-mono">₹{totalDailyExpectedYield.toLocaleString()}</span>
+                      <span className="font-black text-lg text-emerald-400 font-sans">₹{totalDailyExpectedYield.toLocaleString()}</span>
                       <span className="text-[10px] text-slate-400 block">Direct into user wallet</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Downline Referral Comm.</span>
-                      <span className="font-black text-lg text-blue-400 font-mono">₹{totalEstimatedCommissions.toLocaleString()}</span>
+                      <span className="font-black text-lg text-blue-400 font-sans">₹{totalEstimatedCommissions.toLocaleString()}</span>
                       <span className="text-[10px] text-slate-400 block">L1 10% · L2 5% · L3 2%</span>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Payout Volume</span>
-                      <span className="font-black text-lg text-amber-400 font-mono">
+                      <span className="font-black text-lg text-amber-400 font-sans">
                         ₹{(totalDailyExpectedYield + totalEstimatedCommissions).toLocaleString()}
                       </span>
                       <span className="text-[10px] text-slate-400 block">Simulated Time Synced</span>
@@ -2565,7 +2565,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl text-xs font-mono">
+                        <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl text-xs font-sans">
                           <div>
                             <span className="text-[10px] text-slate-400 block">Invested</span>
                             <span className="font-bold text-slate-800">₹{inv.totalInvested.toLocaleString()}</span>
@@ -2584,14 +2584,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         <div className="space-y-1.5 pt-1">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-400 text-[11px] font-mono">
+                              <span className="text-slate-400 text-[11px] font-sans">
                                 Purchased: {inv.purchaseDateFormatted}
                               </span>
                               <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">
                                 {daysActive} {daysActive === 1 ? 'day' : 'days'} active (Day {daysActive}/150)
                               </span>
                             </div>
-                            <span className="text-[10px] font-mono text-slate-400">
+                            <span className="text-[10px] font-sans text-slate-400">
                               {remainingDays}d remaining
                             </span>
                           </div>
@@ -2672,7 +2672,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       type="number"
                       value={settingsFormData.minRecharge}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, minRecharge: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-[10px] text-slate-400 mt-0.5 block">Standard rule default: ₹520</span>
                   </div>
@@ -2685,7 +2685,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       type="number"
                       value={settingsFormData.minWithdrawal}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, minWithdrawal: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-[10px] text-slate-400 mt-0.5 block">Standard rule default: ₹150</span>
                   </div>
@@ -2698,7 +2698,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       type="number"
                       value={settingsFormData.withdrawalFeePercent}
                       onChange={(e) => setSettingsFormData({ ...settingsFormData, withdrawalFeePercent: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                     <span className="text-[10px] text-slate-400 mt-0.5 block">Standard deduction: 10% fee</span>
                   </div>
@@ -2719,7 +2719,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={settingsFormData.dailyWithdrawalWindowStart}
                         onChange={(e) => setSettingsFormData({ ...settingsFormData, dailyWithdrawalWindowStart: e.target.value })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="text-[10px] text-slate-400 mt-0.5 block">Default: 00:30 (12:30 AM)</span>
                     </div>
@@ -2732,7 +2732,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                         type="text"
                         value={settingsFormData.dailyWithdrawalWindowEnd}
                         onChange={(e) => setSettingsFormData({ ...settingsFormData, dailyWithdrawalWindowEnd: e.target.value })}
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                       />
                       <span className="text-[10px] text-slate-400 mt-0.5 block">Default: 17:00 (5:00 PM)</span>
                     </div>
@@ -2814,19 +2814,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Self Investment</span>
-                    <span className="font-black text-slate-900 font-mono text-sm">₹{activeMember.rechargeAmount.toLocaleString()}</span>
+                    <span className="font-black text-slate-900 font-sans text-sm">₹{activeMember.rechargeAmount.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Team Volume</span>
-                    <span className="font-black text-blue-600 font-mono text-sm">₹{activeMember.teamInvested.toLocaleString()}</span>
+                    <span className="font-black text-blue-600 font-sans text-sm">₹{activeMember.teamInvested.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Commission Generated</span>
-                    <span className="font-black text-emerald-600 font-mono text-sm">₹{activeMember.commissionGenerated.toLocaleString()}</span>
+                    <span className="font-black text-emerald-600 font-sans text-sm">₹{activeMember.commissionGenerated.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 font-bold uppercase block">Active Plan Units</span>
-                    <span className="font-black text-indigo-600 font-mono text-sm">
+                    <span className="font-black text-indigo-600 font-sans text-sm">
                       {(activeMember.plans || []).reduce((s, p) => s + p.quantity, 0)} Units
                     </span>
                   </div>
@@ -2877,18 +2877,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                     <span className="block font-black">{p.planName}</span>
                                     <span className="text-[10px] text-slate-400">{p.robotModel}</span>
                                   </td>
-                                  <td className="p-3 font-mono font-bold">
+                                  <td className="p-3 font-sans font-bold">
                                     {p.quantity} {p.quantity === 1 ? 'unit' : 'units'}
                                   </td>
-                                  <td className="p-3 font-mono font-bold text-blue-600">
+                                  <td className="p-3 font-sans font-bold text-blue-600">
                                     ₹{p.totalInvested.toLocaleString()}
                                   </td>
-                                  <td className="p-3 font-mono font-bold text-emerald-600">
+                                  <td className="p-3 font-sans font-bold text-emerald-600">
                                     ₹{p.dailyYield.toLocaleString()}/day
                                   </td>
                                   <td className="p-3">
                                     <div className="space-y-1">
-                                      <div className="flex items-center justify-between text-[10px] font-mono">
+                                      <div className="flex items-center justify-between text-[10px] font-sans">
                                         <span className="font-bold text-emerald-700">Day {p.daysElapsed}</span>
                                         <span className="text-slate-400">{remainingDays}d left</span>
                                       </div>
@@ -2900,7 +2900,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="p-3 font-mono font-bold text-emerald-600">
+                                  <td className="p-3 font-sans font-bold text-emerald-600">
                                     ₹{p.totalEarned.toLocaleString()}
                                   </td>
                                 </tr>
@@ -2916,7 +2916,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                           <span>Days passed and daily returns update automatically every day after the night reset time (00:30 AM).</span>
                         </div>
-                        <span className="font-mono text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 font-bold text-slate-700">
+                        <span className="font-sans text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 font-bold text-slate-700">
                           Auto Night Reset Active
                         </span>
                       </div>
@@ -2964,7 +2964,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           max={10}
                           value={newPlanForMember.quantity}
                           onChange={(e) => setNewPlanForMember({ ...newPlanForMember, quantity: Number(e.target.value) })}
-                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold bg-white outline-hidden"
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans font-bold bg-white outline-hidden"
                         />
                       </div>
                     </div>
@@ -3005,7 +3005,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   type="text"
                   value={newMemberForm.id}
                   onChange={(e) => setNewMemberForm({ ...newMemberForm, id: e.target.value })}
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold"
+                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans font-bold"
                   required
                 />
               </div>
@@ -3017,7 +3017,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   value={newMemberForm.phone}
                   onChange={(e) => setNewMemberForm({ ...newMemberForm, phone: e.target.value })}
                   placeholder="+91 98..."
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold"
+                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans font-bold"
                   required
                 />
               </div>
@@ -3042,7 +3042,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="text"
                     value={newMemberForm.inviterId}
                     onChange={(e) => setNewMemberForm({ ...newMemberForm, inviterId: e.target.value })}
-                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono text-xs"
+                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans text-xs"
                   />
                 </div>
               </div>
@@ -3054,7 +3054,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={newMemberForm.inviteCount}
                     onChange={(e) => setNewMemberForm({ ...newMemberForm, inviteCount: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold"
+                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans font-bold"
                   />
                 </div>
 
@@ -3064,7 +3064,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={newMemberForm.rechargeAmount}
                     onChange={(e) => setNewMemberForm({ ...newMemberForm, rechargeAmount: Number(e.target.value) })}
-                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold text-blue-600"
+                    className="w-full px-3 py-1.5 rounded-xl border border-slate-300 font-sans font-bold text-blue-600"
                   />
                 </div>
               </div>
@@ -3120,7 +3120,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     value={planFormData.id}
                     onChange={(e) => setPlanFormData({ ...planFormData, id: e.target.value.toUpperCase() })}
                     placeholder="e.g. H, TITAN-01"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 disabled:bg-slate-100 font-mono font-bold uppercase outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 disabled:bg-slate-100 font-sans font-bold uppercase outline-hidden focus:ring-2 focus:ring-blue-500"
                     required
                   />
                   <span className="text-[10px] text-slate-400">Unique identifier for this plan</span>
@@ -3167,7 +3167,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={planFormData.price}
                     onChange={(e) => setPlanFormData({ ...planFormData, price: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -3178,7 +3178,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={planFormData.dailyIncome}
                     onChange={(e) => setPlanFormData({ ...planFormData, dailyIncome: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-emerald-600 outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans font-bold text-emerald-600 outline-hidden focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -3189,7 +3189,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={planFormData.durationDays}
                     onChange={(e) => setPlanFormData({ ...planFormData, durationDays: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans outline-hidden focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -3200,7 +3200,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="number"
                     value={planFormData.bonus}
                     onChange={(e) => setPlanFormData({ ...planFormData, bonus: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-amber-600 outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans font-bold text-amber-600 outline-hidden focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -3323,7 +3323,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <h3 className="text-base font-black font-sans">
                     {rechargeActionModal.action === 'approve' ? 'Approve & Credit Top-Up' : 'Reject Top-Up Submission'}
                   </h3>
-                  <span className="text-xs text-slate-300 font-mono">Txn ID: {rechargeActionModal.txn.id}</span>
+                  <span className="text-xs text-slate-300 font-sans">Txn ID: {rechargeActionModal.txn.id}</span>
                 </div>
               </div>
               <button
@@ -3338,17 +3338,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Member Phone:</span>
-                  <span className="font-mono font-bold text-slate-800">{rechargeActionModal.txn.userPhone || user.phone}</span>
+                  <span className="font-sans font-bold text-slate-800">{rechargeActionModal.txn.userPhone || user.phone}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Deposit Amount:</span>
-                  <span className="font-mono font-black text-emerald-600 text-sm">
+                  <span className="font-sans font-black text-emerald-600 text-sm">
                     +₹{Math.abs(rechargeActionModal.txn.amount).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">12-Digit Bank UTR:</span>
-                  <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                  <span className="font-sans font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
                     {rechargeActionModal.txn.referenceId || 'N/A'}
                   </span>
                 </div>
@@ -3432,7 +3432,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <h3 className="text-base font-black font-sans">
                     {withdrawalActionModal.action === 'approve' ? 'Approve & Settle Bank Payout' : 'Reject Withdrawal & Refund Wallet'}
                   </h3>
-                  <span className="text-xs text-slate-300 font-mono">Request ID: {withdrawalActionModal.txn.id}</span>
+                  <span className="text-xs text-slate-300 font-sans">Request ID: {withdrawalActionModal.txn.id}</span>
                 </div>
               </div>
               <button
@@ -3453,21 +3453,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 uppercase font-bold block">Bank & Account</span>
-                    <span className="font-mono font-bold text-slate-800">
+                    <span className="font-sans font-bold text-slate-800">
                       {user.bankAccount.bankName} · {user.bankAccount.accountNumber}
                     </span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 uppercase font-bold block">IFSC Code</span>
-                    <span className="font-mono font-bold text-blue-700">{user.bankAccount.ifscCode}</span>
+                    <span className="font-sans font-bold text-blue-700">{user.bankAccount.ifscCode}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 uppercase font-bold block">UPI ID</span>
-                    <span className="font-mono font-bold text-slate-800">{user.bankAccount.upiId || 'N/A'}</span>
+                    <span className="font-sans font-bold text-slate-800">{user.bankAccount.upiId || 'N/A'}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-center">
+                <div className="grid grid-cols-3 gap-2 pt-1 font-sans text-center">
                   <div className="bg-white p-2 rounded-xl border border-slate-200">
                     <span className="text-[10px] text-slate-400 block">Gross Request</span>
                     <span className="font-bold text-slate-800">₹{Math.abs(withdrawalActionModal.txn.amount).toLocaleString()}</span>
@@ -3496,7 +3496,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       value={bankReferenceInput}
                       onChange={(e) => setBankReferenceInput(e.target.value)}
                       placeholder="e.g. IMPS529482019481 or CMS123498"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500 text-xs"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans font-bold text-blue-600 outline-hidden focus:ring-2 focus:ring-blue-500 text-xs"
                       required
                     />
                   </div>
@@ -3606,25 +3606,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Active Deployed Nodes:</span>
-                  <span className="font-bold font-mono text-slate-800">
+                  <span className="font-bold font-sans text-slate-800">
                     {investments.filter(i => i.status === 'ACTIVE').length} Units
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Robot Yield to Disburse:</span>
-                  <span className="font-bold font-mono text-emerald-600">
+                  <span className="font-bold font-sans text-emerald-600">
                     ₹{investments.filter(i => i.status === 'ACTIVE').reduce((s, i) => s + i.dailyIncome, 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Downline Commissions (L1/L2/L3):</span>
-                  <span className="font-bold font-mono text-blue-600">
+                  <span className="font-bold font-sans text-blue-600">
                     ₹{Math.round(investments.filter(i => i.status === 'ACTIVE').reduce((s, i) => s + i.dailyIncome, 0) * 0.17).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-slate-200 font-bold">
                   <span className="text-slate-800">Contract Days Elapsed:</span>
-                  <span className="text-indigo-600 font-mono">+1 Day Advanced</span>
+                  <span className="text-indigo-600 font-sans">+1 Day Advanced</span>
                 </div>
               </div>
 
@@ -3723,7 +3723,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   max={20}
                   value={assignPlanQuantity}
                   onChange={(e) => setAssignPlanQuantity(Math.max(1, Number(e.target.value)))}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono font-bold outline-hidden focus:ring-2 focus:ring-emerald-500 text-xs"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-sans font-bold outline-hidden focus:ring-2 focus:ring-emerald-500 text-xs"
                 />
               </div>
 
@@ -3741,15 +3741,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Total Contract Value:</span>
-                      <span className="font-mono font-bold text-slate-800">₹{totalCost.toLocaleString()}</span>
+                      <span className="font-sans font-bold text-slate-800">₹{totalCost.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Daily Revenue Yield:</span>
-                      <span className="font-mono font-bold text-emerald-600">₹{dailyRev.toLocaleString()}/day</span>
+                      <span className="font-sans font-bold text-emerald-600">₹{dailyRev.toLocaleString()}/day</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Instant Welcome Bonus:</span>
-                      <span className="font-mono font-bold text-amber-600">+₹{totalBonus.toLocaleString()}</span>
+                      <span className="font-sans font-bold text-amber-600">+₹{totalBonus.toLocaleString()}</span>
                     </div>
                   </div>
                 );
@@ -3800,7 +3800,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       {user.status || 'Active'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-0.5 font-mono">
+                  <p className="text-xs text-slate-300 mt-0.5 font-sans">
                     ID: {user.id || 'User5294'} · Invite Code: {user.inviteCode} · Joined: {user.joinDate || '2026-03-12'}
                   </p>
                 </div>
@@ -3846,19 +3846,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Available Balance</span>
-                      <span className="font-mono font-black text-xl text-blue-600">₹{user.availableBalance.toLocaleString()}</span>
+                      <span className="font-sans font-black text-xl text-blue-600">₹{user.availableBalance.toLocaleString()}</span>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Withdrawable Balance</span>
-                      <span className="font-mono font-black text-xl text-emerald-600">₹{user.withdrawableBalance.toLocaleString()}</span>
+                      <span className="font-sans font-black text-xl text-emerald-600">₹{user.withdrawableBalance.toLocaleString()}</span>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Recharged</span>
-                      <span className="font-mono font-black text-xl text-slate-800">₹{user.totalRecharge.toLocaleString()}</span>
+                      <span className="font-sans font-black text-xl text-slate-800">₹{user.totalRecharge.toLocaleString()}</span>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Income</span>
-                      <span className="font-mono font-black text-xl text-indigo-600">₹{user.totalIncome.toLocaleString()}</span>
+                      <span className="font-sans font-black text-xl text-indigo-600">₹{user.totalIncome.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -3876,15 +3876,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-400 block">Account Number:</span>
-                        <span className="font-mono font-bold text-slate-800">{user.bankAccount.accountNumber || 'Not bound'}</span>
+                        <span className="font-sans font-bold text-slate-800">{user.bankAccount.accountNumber || 'Not bound'}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-400 block">IFSC Code:</span>
-                        <span className="font-mono font-bold text-blue-600">{user.bankAccount.ifscCode || 'Not bound'}</span>
+                        <span className="font-sans font-bold text-blue-600">{user.bankAccount.ifscCode || 'Not bound'}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-400 block">UPI ID:</span>
-                        <span className="font-mono font-bold text-slate-800">{user.bankAccount.upiId || 'Not bound'}</span>
+                        <span className="font-sans font-bold text-slate-800">{user.bankAccount.upiId || 'Not bound'}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-400 block">Binding Status:</span>
@@ -3915,7 +3915,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             maxLength={4}
                             value={securityPinInput}
                             onChange={(e) => setSecurityPinInput(e.target.value)}
-                            className="px-3.5 py-2 rounded-xl border border-slate-300 font-mono font-bold text-sm text-blue-600 outline-hidden w-36"
+                            className="px-3.5 py-2 rounded-xl border border-slate-300 font-sans font-bold text-sm text-blue-600 outline-hidden w-36"
                           />
                           <button
                             onClick={async () => {
@@ -3981,9 +3981,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       <div key={inv.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                         <div className="flex justify-between">
                           <span className="font-bold text-slate-900">{inv.productName} (Qty: {inv.quantity})</span>
-                          <span className="font-mono text-emerald-600 font-bold">₹{inv.dailyIncome}/day</span>
+                          <span className="font-sans text-emerald-600 font-bold">₹{inv.dailyIncome}/day</span>
                         </div>
-                        <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+                        <div className="flex justify-between text-[11px] text-slate-500 font-sans">
                           <span>Invested: ₹{inv.totalInvested.toLocaleString()}</span>
                           <span>Active: {inv.daysElapsed} days</span>
                         </div>
@@ -4003,12 +4003,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     {teamMembers.map(m => (
                       <div key={m.id} className="p-3 flex justify-between items-center hover:bg-slate-50">
                         <div>
-                          <span className="font-mono font-bold text-slate-800 block">{m.phone}</span>
+                          <span className="font-sans font-bold text-slate-800 block">{m.phone}</span>
                           <span className="text-[10px] text-slate-400">Level {m.level} · Joined {m.joinDate}</span>
                         </div>
                         <div className="text-right">
-                          <span className="font-mono font-bold text-blue-600 block">₹{m.rechargeAmount.toLocaleString()}</span>
-                          <span className="text-[10px] text-emerald-600 font-bold font-mono">
+                          <span className="font-sans font-bold text-blue-600 block">₹{m.rechargeAmount.toLocaleString()}</span>
+                          <span className="text-[10px] text-emerald-600 font-bold font-sans">
                             +₹{m.commissionGenerated.toLocaleString()} comm
                           </span>
                         </div>
@@ -4029,7 +4029,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       <div key={t.id} className="p-3 flex justify-between items-center hover:bg-slate-50">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-800">{t.id}</span>
+                            <span className="font-sans font-bold text-slate-800">{t.id}</span>
                             <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase bg-slate-100 text-slate-700">
                               {t.type}
                             </span>
@@ -4037,7 +4037,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           <span className="text-[10px] text-slate-400">{t.formattedTime || t.timestamp} · {t.description}</span>
                         </div>
                         <div className="text-right">
-                          <span className={`font-mono font-bold text-xs ${t.amount < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          <span className={`font-sans font-bold text-xs ${t.amount < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                             {t.amount < 0 ? '-' : '+'}₹{Math.abs(t.amount).toLocaleString()}
                           </span>
                           <span className="text-[10px] text-slate-400 block font-bold">{t.status}</span>
@@ -4093,7 +4093,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   placeholder="Enter amount (e.g. 1000)"
                   value={quickBalanceAmt}
                   onChange={(e) => setQuickBalanceAmt(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 

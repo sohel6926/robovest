@@ -272,17 +272,17 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
               ) : (
                 filteredRecords.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-3.5 font-mono text-slate-400 font-bold">
+                    <td className="px-4 py-3.5 font-sans text-slate-400 font-bold">
                       {item.serialNo}
                     </td>
-                    <td className="px-4 py-3.5 font-mono text-slate-500 text-[11px]">
+                    <td className="px-4 py-3.5 font-sans font-medium text-slate-500 text-[11px]">
                       {item.date}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="font-bold text-slate-900 block">
+                      <span className="font-bold text-slate-900 block font-sans">
                         {item.userName}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-400">
+                      <span className="text-[10px] font-sans text-slate-400">
                         {item.userId}
                       </span>
                     </td>
@@ -295,12 +295,12 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
                         {item.type}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold">
+                    <td className="px-4 py-3.5 font-sans font-extrabold tracking-tight">
                       <span className={item.type === 'Credit' ? 'text-emerald-600' : 'text-rose-600'}>
                         {item.type === 'Credit' ? '+' : '-'} ₹ {item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold text-slate-900">
+                    <td className="px-4 py-3.5 font-sans font-bold text-slate-900 tracking-tight">
                       ₹ {item.balanceAfter.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3.5 text-slate-600">

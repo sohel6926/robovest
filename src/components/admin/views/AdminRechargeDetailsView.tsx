@@ -607,7 +607,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                       <div className="space-y-1 min-w-0 flex-1">
                         <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">UPI ID (VPA)</span>
                         <div className="flex items-center justify-between gap-1 bg-white px-2 py-1 rounded-md border border-slate-200">
-                          <span className="font-mono text-xs font-bold text-slate-900 truncate">
+                          <span className="font-sans text-xs font-bold text-slate-900 truncate">
                             {item.upiId}
                           </span>
                           <button
@@ -738,7 +738,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                       <div className="flex items-center justify-between pt-1 border-t border-slate-200/50">
                         <div>
                           <span className="text-[10px] text-slate-400 block font-medium">Account Number</span>
-                          <span className="font-mono font-bold text-slate-900 text-xs">
+                          <span className="font-sans font-bold text-slate-900 text-xs">
                             {item.accountNumber}
                           </span>
                         </div>
@@ -758,7 +758,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                       <div className="flex items-center justify-between pt-1 border-t border-slate-200/50">
                         <div>
                           <span className="text-[10px] text-slate-400 block font-medium">IFSC Code</span>
-                          <span className="font-mono font-bold text-slate-900 text-xs">
+                          <span className="font-sans font-bold text-slate-900 text-xs">
                             {item.ifscCode}
                           </span>
                         </div>
@@ -855,7 +855,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                 value={quickAmounts}
                 onChange={(e) => setQuickAmounts(e.target.value)}
                 placeholder="520, 1999, 2100, 5999, 8200, 17960"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 transition"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-sans font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 transition"
               />
               <p className="text-[11px] text-slate-400">
                 Comma-separated values shown as 1-tap preset chips on the deposit screen.
@@ -940,7 +940,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                     if (qrErrors.upiId) setQrErrors({ ...qrErrors, upiId: undefined });
                   }}
                   placeholder="e.g. fancode.payments@hdfcbank"
-                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
+                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-sans font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
                     qrErrors.upiId ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 focus:border-blue-600'
                   }`}
                 />
@@ -1111,7 +1111,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                     if (bankErrors.accountNumber) setBankErrors({ ...bankErrors, accountNumber: undefined });
                   }}
                   placeholder="e.g. 50200084729103"
-                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
+                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-sans font-bold text-slate-900 focus:bg-white focus:outline-none transition ${
                     bankErrors.accountNumber ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 focus:border-purple-600'
                   }`}
                 />
@@ -1131,7 +1131,7 @@ export const AdminRechargeDetailsView: React.FC<AdminRechargeDetailsViewProps> =
                     if (bankErrors.ifscCode) setBankErrors({ ...bankErrors, ifscCode: undefined });
                   }}
                   placeholder="e.g. HDFC0000128"
-                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 uppercase focus:bg-white focus:outline-none transition ${
+                  className={`w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-sans font-bold text-slate-900 uppercase focus:bg-white focus:outline-none transition ${
                     bankErrors.ifscCode ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 focus:border-purple-600'
                   }`}
                 />

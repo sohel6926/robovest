@@ -393,13 +393,13 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                 <div className="space-y-1.5 flex-1">
                   {/* Row 1: ID, Name, User Code, Badge */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 font-mono font-bold text-xs">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 font-sans font-bold text-xs">
                       #{item.serialNo}
                     </span>
                     <h3 className="font-bold text-slate-900 text-sm font-sans">
                       {item.userName}
                     </h3>
-                    <span className="font-mono text-xs font-semibold text-slate-400">
+                    <span className="font-sans text-xs font-semibold text-slate-400">
                       {item.userId}
                     </span>
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -414,25 +414,25 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                   </div>
 
                   {/* Row 2: Requested on date */}
-                  <div className="text-[11px] text-slate-500 font-medium">
+                  <div className="text-[11px] text-slate-500 font-medium font-sans">
                     Requested on {item.requestedDate}
                   </div>
 
                   {/* Row 3: Amount, TDS, Net */}
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-mono font-semibold pt-0.5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-sans font-medium pt-0.5">
                     <span className="text-slate-800">
-                      Amount: <span className="font-bold">₹ {item.amount.toLocaleString()}</span>
+                      Amount: <span className="font-bold text-slate-900 tracking-tight">₹ {item.amount.toLocaleString()}</span>
                     </span>
-                    <span className="text-amber-600">
+                    <span className="text-amber-600 font-semibold">
                       TDS ({item.tdsPercent}%): - ₹ {item.tdsAmount.toLocaleString()}
                     </span>
-                    <span className="text-emerald-600 font-bold">
+                    <span className="text-emerald-600 font-extrabold tracking-tight">
                       Net: ₹ {item.netAmount.toLocaleString()}
                     </span>
                   </div>
 
                   {/* Row 4: Bank Details */}
-                  <div className="text-[11px] text-slate-500 font-mono flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5">
+                  <div className="text-[11px] text-slate-500 font-sans flex flex-wrap items-center gap-x-4 gap-y-1 pt-0.5">
                     <span>Bank: <span className="text-slate-700 font-semibold">{item.bankName}</span></span>
                     <span>A/C: <span className="text-slate-700 font-semibold">{item.accountNumber}</span></span>
                     <span>IFSC: <span className="text-slate-700 font-semibold">{item.ifscCode}</span></span>
@@ -440,13 +440,13 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                   </div>
 
                   {item.utrReference && (
-                    <div className="text-[10px] font-mono text-slate-400 pt-0.5">
+                    <div className="text-[10px] font-sans text-slate-400 pt-0.5">
                       Bank Reference / UTR: <span className="text-slate-700 font-bold">{item.utrReference}</span>
                     </div>
                   )}
 
                   {item.rejectReason && (
-                    <div className="text-[11px] font-mono text-rose-600 pt-0.5">
+                    <div className="text-[11px] font-sans text-rose-600 pt-0.5">
                       Reason: <span className="font-bold">{item.rejectReason}</span>
                     </div>
                   )}
@@ -506,14 +506,14 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
             </div>
 
             <div className="p-6 space-y-4">
-              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1 text-xs font-mono">
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1 text-xs font-sans">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Beneficiary:</span>
                   <span className="font-bold text-slate-900">{approveModalItem.userName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Net Disbursal:</span>
-                  <span className="font-bold text-emerald-700 text-sm">₹ {approveModalItem.netAmount.toLocaleString()}</span>
+                  <span className="font-extrabold text-emerald-700 text-sm tracking-tight">₹ {approveModalItem.netAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Bank Account:</span>
@@ -530,7 +530,7 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
                   placeholder="e.g. UTR2026101908291"
                   value={utrInput}
                   onChange={(e) => setUtrInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
                 />
               </div>
 

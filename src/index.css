@@ -2,7 +2,7 @@
 
 :root {
   --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-mono: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 @layer base {
@@ -43,13 +43,12 @@
   font-family: var(--font-sans) !important;
 }
 
-/* Ultra-clear, eye-friendly numbers and identifiers (balances, user IDs, dates, phone numbers) */
+/* Ensure numbers and identifiers render in the clean, modern Plus Jakarta Sans style */
 .font-mono,
 [class*="font-mono"] {
-  font-family: var(--font-mono) !important;
-  font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: "zero" 1, "tnum" 1;
-  letter-spacing: -0.015em;
+  font-family: var(--font-sans) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 /* Tabular figures for numbers */

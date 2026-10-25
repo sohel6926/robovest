@@ -153,7 +153,7 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-slate-900 text-sm">{t.id}</span>
+                    <span className="font-sans font-bold text-slate-900 text-sm tracking-tight">{t.id}</span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       t.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
                       t.status === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
@@ -163,9 +163,9 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium">{t.description}</p>
-                  <p className="text-[11px] font-mono text-slate-400">{t.formattedTime || t.timestamp}</p>
+                  <p className="text-[11px] font-sans text-slate-400">{t.formattedTime || t.timestamp}</p>
                   {(t.proofReference || t.paymentReference) && (
-                    <p className="text-xs font-mono font-bold text-[#FF4A00]">
+                    <p className="text-xs font-sans font-bold text-[#FF4A00] tracking-tight">
                       UTR: {t.proofReference || t.paymentReference}
                     </p>
                   )}
@@ -173,9 +173,9 @@ export const AdminTopupsView: React.FC<AdminTopupsViewProps> = ({
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="text-right font-mono">
-                  <span className="text-xs text-slate-400 block">Amount</span>
-                  <span className="text-lg font-bold text-emerald-600">₹{t.amount.toLocaleString()}</span>
+                <div className="text-right font-sans">
+                  <span className="text-xs text-slate-400 block font-medium">Amount</span>
+                  <span className="text-lg font-extrabold text-emerald-600 tracking-tight">₹{t.amount.toLocaleString()}</span>
                 </div>
 
                 {t.proofImage && (
