@@ -337,7 +337,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </span>
 
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-extrabold tracking-wide uppercase border border-blue-500/30">
-                  {currentUser.vipLevel || currentUser.cadre || 'VIP 1'}
+                  {currentUser.vipLevel || 'VIP 1'}
                 </span>
 
                 {currentUser.profileLocked && (

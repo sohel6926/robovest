@@ -53,7 +53,7 @@ import {
   QrCode
 } from 'lucide-react';
 
-import { AdminDashboardView, CadreClaimItem } from './views/AdminDashboardView';
+import { AdminDashboardView } from './views/AdminDashboardView';
 import { AdminUserManagementView, AdminUserItem } from './views/AdminUserManagementView';
 import { AdminUserDetailView } from './views/AdminUserDetailView';
 import { AdminWalletsView } from './views/AdminWalletsView';
@@ -135,25 +135,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     'dashboard' | 'users' | 'referrals' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'orders' | 'network' | 'dailyWithdrawals'
   >('dashboard');
   const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
-
-  // Cadre Reward Claims State (from Bee Grow live admin console)
-  const [cadreClaims, setCadreClaims] = useState<CadreClaimItem[]>([
-    { id: 'cc-1', name: 'B SRAVANI', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
-    { id: 'cc-2', name: 'Vadarevu Sujatha', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
-    { id: 'cc-3', name: 'GUDLA NARESH', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
-    { id: 'cc-4', name: 'Rongali Anusha', role: 'ASSISTANT GEN MANAGER (AGM)', gift: 'GIFT: WORTH GOLD', amount: 125000, isCredited: false },
-  ]);
-
-  const handleCreditCadreReward = (claimId: string) => {
-    setCadreClaims(prev => prev.map(c => {
-      if (c.id === claimId) {
-        adjustUserBalance(c.amount, `Cadre Milestone Reward: ${c.role} (${c.gift})`);
-        showToast(`₹${c.amount.toLocaleString()} credited successfully for ${c.name}!`);
-        return { ...c, isCredited: true };
-      }
-      return c;
-    }));
-  };
 
   // Quick Balance Modal
   const [isAddBalanceModalOpen, setIsAddBalanceModalOpen] = useState(false);
@@ -1142,8 +1123,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onOpenAddBalanceModal={() => setIsAddBalanceModalOpen(true)}
                 pendingWithdrawalsCount={pendingWithdrawals.length}
                 pendingTopupsCount={pendingRecharges.length}
-                cadreClaims={cadreClaims}
-                onCreditCadreReward={handleCreditCadreReward}
               />
             )}
 

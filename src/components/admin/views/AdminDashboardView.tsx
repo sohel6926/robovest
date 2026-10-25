@@ -19,23 +19,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-export interface CadreClaimItem {
-  id: string;
-  name: string;
-  role: string;
-  gift: string;
-  amount: number;
-  isCredited: boolean;
-}
-
 interface AdminDashboardViewProps {
   onTriggerDailyROI: () => void;
   onNavigate: (tab: string) => void;
   onOpenAddBalanceModal: () => void;
   pendingWithdrawalsCount: number;
   pendingTopupsCount: number;
-  cadreClaims?: CadreClaimItem[];
-  onCreditCadreReward?: (claimId: string) => void;
   totalUsersCount?: number;
   totalWalletBalance?: number;
 }

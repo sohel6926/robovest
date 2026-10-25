@@ -25,7 +25,6 @@ export interface AdminUserItem {
   city?: string;
   sponsorId: string;
   kycStatus: 'UNFILLED' | 'APPROVED' | 'PENDING' | 'REJECTED';
-  cadre?: string;
   vipLevel?: string;
   status: 'Active' | 'InActive';
   walletBalance: number;
@@ -74,7 +73,6 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     city: 'Amadalavalasa',
     sponsorId: 'B9776636',
     kycStatus: 'UNFILLED',
-    cadre: 'VIP 1',
     vipLevel: 'VIP 1',
     status: 'Active',
     walletBalance: 2220,
@@ -112,7 +110,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '8688344830',
     sponsorId: 'B6176059',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -126,7 +124,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '8688951464',
     sponsorId: 'B9418694',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -140,7 +138,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '6302507044',
     sponsorId: 'B6677949',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -154,7 +152,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '8328109953',
     sponsorId: 'B1734794',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -168,7 +166,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '9014362717',
     sponsorId: 'B2895816',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -182,7 +180,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '7093626362',
     sponsorId: 'B3822517',
     kycStatus: 'APPROVED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'Active',
     walletBalance: 80.01,
     totalEarned: 1250,
@@ -196,7 +194,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '9441121206',
     sponsorId: 'B3822517',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -210,7 +208,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '7702676850',
     sponsorId: 'B3822517',
     kycStatus: 'UNFILLED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'InActive',
     walletBalance: 0,
     totalEarned: 0,
@@ -224,7 +222,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '7780477960',
     sponsorId: 'B7638923',
     kycStatus: 'APPROVED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'Active',
     walletBalance: 666.66,
     totalEarned: 4500,
@@ -238,7 +236,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '8185835615',
     sponsorId: 'B3434967',
     kycStatus: 'APPROVED',
-    cadre: 'Star',
+    vipLevel: 'VIP 1',
     status: 'Active',
     walletBalance: 5146.67,
     totalEarned: 18200,
@@ -252,7 +250,7 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
     mobile: '9876543210',
     sponsorId: 'Root',
     kycStatus: 'APPROVED',
-    cadre: 'AGM',
+    vipLevel: 'VIP 3',
     status: 'Active',
     walletBalance: 12450.00,
     totalEarned: 52400,
@@ -371,7 +369,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       mobile: createForm.mobile,
       sponsorId: createForm.sponsorId || 'Root',
       kycStatus: 'UNFILLED',
-      cadre: 'Star',
+      vipLevel: 'VIP 1',
       status: 'Active',
       walletBalance: Number(createForm.initialBalance) || 0,
       totalEarned: 0,
@@ -395,7 +393,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
       u.mobile,
       u.sponsorId,
       u.kycStatus,
-      u.vipLevel || u.cadre || 'VIP 1',
+      u.vipLevel || 'VIP 1',
       u.status,
       u.walletBalance,
       u.joined
@@ -586,7 +584,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                       </td>
                       <td className="px-4 py-3.5">
                         <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold">
-                          {user.vipLevel || user.cadre || 'VIP 1'}
+                          {user.vipLevel || 'VIP 1'}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
