@@ -49,12 +49,14 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
         id: t.id,
         serialNo: idx + 1,
         date: t.formattedTime || (typeof t.timestamp === 'number' ? new Date(t.timestamp).toLocaleDateString('en-IN') : String(t.timestamp)),
-        userName: t.bankDetails?.accountHolder || t.userPhone || 'Member Account',
-        userId: t.userId ? (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId) : `FC-${t.id.slice(-6).toUpperCase()}`,
+        userName: (t.bankDetails?.accountHolder || t.userPhone || 'Member Account').replace(/User5294/gi, 'Member'),
+        userId: (!t.userId || t.userId === 'User5294')
+          ? (t.userPhone || (`FC-${t.id.slice(-6).toUpperCase()}`))
+          : (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId),
         type: isCredit ? 'Credit' : 'Debit',
         amount: Math.abs(t.amount),
         balanceAfter: 0,
-        description: t.description || `${t.type} transaction`,
+        description: (t.description || `${t.type} transaction`).replace(/User5294/gi, 'Member'),
         source: src,
       };
     });
@@ -65,6 +67,15 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
   React.useEffect(() => {
     setRecords(mapTransactionsToWalletRecords(transactions));
   }, [transactions]);
+
+  const totalCredited = useMemo(() => {
+    return transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
+
+  const totalDebited = useMemo(() => {
+    return transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  }, [transactions]);
+
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
@@ -133,7 +144,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             Total Transactions
           </span>
           <div className="text-3xl font-black font-sans text-[#0B1536]">
-            10000
+            {records.length}
           </div>
         </div>
 
@@ -143,7 +154,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             Total Credited
           </span>
           <div className="text-3xl font-black font-sans text-[#16a34a]">
-            ₹ 12,90,269.64
+            ₹ {totalCredited.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
@@ -153,7 +164,7 @@ export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
             Total Debited
           </span>
           <div className="text-3xl font-black font-sans text-[#e11d48]">
-            ₹ 0
+            ₹ {totalDebited.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
       </div>

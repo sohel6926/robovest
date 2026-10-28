@@ -67,8 +67,10 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
         return {
           id: t.id,
           serialNo: idx + 1,
-          userName: t.bankDetails?.accountHolder || t.userPhone || 'Member Account',
-          userId: t.userId ? (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId) : `FC-${t.id.slice(-6).toUpperCase()}`,
+          userName: (t.bankDetails?.accountHolder || t.userPhone || 'Member Account').replace(/User5294/gi, 'Member'),
+          userId: (!t.userId || t.userId === 'User5294')
+            ? (t.userPhone || (`FC-${t.id.slice(-6).toUpperCase()}`))
+            : (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId),
           requestedDate: t.formattedTime || (typeof t.timestamp === 'number' ? new Date(t.timestamp).toLocaleDateString('en-IN') : String(t.timestamp)),
           amount: Math.abs(t.amount),
           tdsPercent: feePercent,
@@ -106,8 +108,8 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
 
   // Counts
   const pendingCount = items.filter(i => i.status === 'PENDING').length;
-  const processedCount = 1893 + items.filter(i => i.status === 'PROCESSED' && i.id.startsWith('live-')).length;
-  const rejectedCount = 4 + items.filter(i => i.status === 'REJECTED' && i.id.startsWith('live-')).length;
+  const processedCount = items.filter(i => i.status === 'PROCESSED').length;
+  const rejectedCount = items.filter(i => i.status === 'REJECTED').length;
   const pendingTotal = items.filter(i => i.status === 'PENDING').reduce((s, i) => s + i.amount, 0);
 
   // Filtered List

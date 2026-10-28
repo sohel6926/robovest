@@ -390,7 +390,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                         {user.mobile}
                       </td>
                       <td className="px-4 py-3.5 font-sans font-bold text-slate-800 tracking-tight">
-                        {user.sponsorId}
+                        {user.sponsorId === 'TOP_ADMIN' ? 'Root' : user.sponsorId}
                       </td>
                       <td className="px-4 py-3.5">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${

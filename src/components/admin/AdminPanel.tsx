@@ -583,7 +583,67 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   };
 
   // Calculations for summary metrics with defensive array guards
-  const dailyWithdrawalLogs = typeof getDailyWithdrawalLogs === 'function' ? (getDailyWithdrawalLogs() || []) : [];
+  const dailyWithdrawalLogs = React.useMemo(() => {
+    const withdrawalTxns = allConsolidatedTransactions.filter(t => t.type === 'WITHDRAWAL');
+    const dayMap = new Map<string, {
+      date: string;
+      formattedDate: string;
+      totalRequested: number;
+      totalFees: number;
+      totalNet: number;
+      totalRequests: number;
+      completedAmount: number;
+      processingAmount: number;
+      rejectedAmount: number;
+      transactions: Transaction[];
+    }>();
+
+    withdrawalTxns.forEach(txn => {
+      const d = new Date(txn.timestamp);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const formattedDate = d.toLocaleDateString('en-IN', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      const requested = Math.abs(txn.amount);
+      const fee = txn.fee !== undefined ? txn.fee : Math.round(requested * 0.1);
+      const net = txn.netAmount !== undefined ? txn.netAmount : (requested - fee);
+
+      if (!dayMap.has(dateKey)) {
+        dayMap.set(dateKey, {
+          date: dateKey,
+          formattedDate,
+          totalRequested: 0,
+          totalFees: 0,
+          totalNet: 0,
+          totalRequests: 0,
+          completedAmount: 0,
+          processingAmount: 0,
+          rejectedAmount: 0,
+          transactions: []
+        });
+      }
+
+      const log = dayMap.get(dateKey)!;
+      log.totalRequested += requested;
+      log.totalFees += fee;
+      log.totalNet += net;
+      log.totalRequests += 1;
+      log.transactions.push(txn);
+
+      if (txn.status === 'COMPLETED') {
+        log.completedAmount += requested;
+      } else if (txn.status === 'PROCESSING') {
+        log.processingAmount += requested;
+      } else {
+        log.rejectedAmount += requested;
+      }
+    });
+
+    return Array.from(dayMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+  }, [allConsolidatedTransactions]);
   const pendingRecharges = allConsolidatedTransactions.filter(t => t.type === 'RECHARGE' && (t.status === 'PROCESSING' || t.status === 'PENDING'));
   const pendingWithdrawals = allConsolidatedTransactions.filter(t => t.type === 'WITHDRAWAL' && (t.status === 'PROCESSING' || t.status === 'PENDING'));
   const activeNodes = (investments || []).filter(i => i.status === 'ACTIVE');
@@ -1022,9 +1082,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 title="Notifications"
               >
                 <Bell className="w-4 h-4" />
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
-                  21
-                </span>
+                {notificationsList.filter(n => n.unread).length > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
+                    {notificationsList.filter(n => n.unread).length}
+                  </span>
+                )}
               </div>
 
               {/* Notifications Dropdown (Bee Grow Screenshot 5) */}
@@ -1035,7 +1097,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                       Notifications
                     </h3>
                     <span className="px-2 py-0.5 rounded-full bg-[#FF4A00] text-white font-bold text-[10px]">
-                      50 new
+                      {notificationsList.filter(n => n.unread).length} new
                     </span>
                   </div>
 

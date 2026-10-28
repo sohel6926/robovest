@@ -1217,7 +1217,7 @@ export async function fetchAllUserProfilesDB(): Promise<any[]> {
         mobile: p.phone || p.email || 'N/A',
         email: p.email || '',
         city: 'Verified Member',
-        sponsorId: p.inviter_code || 'Root',
+        sponsorId: (p.inviter_code && p.inviter_code !== 'TOP_ADMIN') ? p.inviter_code : 'Root',
         kycStatus: bank?.is_bound ? 'APPROVED' : 'UNFILLED',
         vipLevel: `VIP ${p.vip_level || 1}`,
         status: p.is_logged_in !== false ? 'Active' : 'InActive',
