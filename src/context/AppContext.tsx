@@ -31,7 +31,10 @@ import {
   saveTeamMemberDB,
   deleteTeamMemberDB,
   saveMemberPlanHoldingDB,
-  deleteMemberPlanHoldingDB
+  deleteMemberPlanHoldingDB,
+  getAuthSession,
+  signOutUser,
+  ensureUserProfile
 } from '../lib/supabase';
 
 interface AppContextType {
@@ -129,17 +132,19 @@ interface AppContextType {
   getDailyWithdrawalLogs: () => DailyWithdrawalLog[];
   navigateToRecharge: () => void;
   setNavigateToRechargeFn: (fn: () => void) => void;
+  refreshUserData?: (userId?: string) => Promise<void>;
+  logoutUser: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const INITIAL_BANK: BankAccount = {
-  accountHolder: 'Rahul Sharma',
-  accountNumber: '50100492817264',
-  ifscCode: 'HDFC0001234',
-  bankName: 'HDFC Bank',
-  upiId: 'rahul.fancode@okaxis',
-  isBound: true,
+  accountHolder: '',
+  accountNumber: '',
+  ifscCode: '',
+  bankName: '',
+  upiId: '',
+  isBound: false,
 };
 
 const INITIAL_TEAM: TeamMember[] = [
@@ -557,64 +562,50 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Simulated Time
   const [simulatedTime, setSimulatedTime] = useState<Date>(new Date());
 
-  // User Profile backed by Supabase
+  // Guest User template
+  const GUEST_USER: UserProfile = {
+    id: '',
+    email: '',
+    phone: '',
+    inviteCode: '',
+    vipLevel: 1,
+    availableBalance: 0,
+    withdrawableBalance: 0,
+    totalRecharge: 0,
+    totalIncome: 0,
+    isLoggedIn: false,
+    bankAccount: INITIAL_BANK,
+  };
+
+  // User Profile backed by Supabase Auth
   const [user, setUser] = useState<UserProfile>(() => {
     try {
-      const saved = localStorage.getItem('fancode_user') || localStorage.getItem('robovest_user');
-      if (saved) return JSON.parse(saved);
+      const saved = localStorage.getItem('fancode_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.id && parsed.id !== 'User5294') return parsed;
+      }
     } catch (e) {
       console.error('Failed to parse user from storage', e);
     }
-    return {
-      id: 'User5294',
-      phone: '+91 98452 77192',
-      inviteCode: '203C03',
-      vipLevel: 1,
-      availableBalance: 4000,
-      withdrawableBalance: 850,
-      totalRecharge: 4000,
-      totalIncome: 1357.6,
-      isLoggedIn: true,
-      bankAccount: INITIAL_BANK,
-    };
+    return GUEST_USER;
   });
 
   // Investments backed by Supabase
   const [investments, setInvestments] = useState<UserInvestment[]>(() => {
     try {
-      const saved = localStorage.getItem('fancode_investments') || localStorage.getItem('robovest_investments');
+      const saved = localStorage.getItem('fancode_investments');
       if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error('Failed to parse investments from storage', e);
-    }
-    return [
-      {
-        id: 'INV-A-01',
-        productId: 'A',
-        productName: 'Product A',
-        robotModel: 'Nao Core Micro Assistant',
-        quantity: 1,
-        unitPrice: 520,
-        totalInvested: 520,
-        dailyIncome: 130,
-        bonusReceived: 50,
-        purchaseTimestamp: Date.now() - 86400000 * 2,
-        purchaseDateFormatted: new Date(Date.now() - 86400000 * 2).toLocaleDateString(),
-        daysElapsed: 2,
-        totalEarned: 260,
-        status: 'ACTIVE',
-      }
-    ];
+    } catch (e) {}
+    return [];
   });
 
   // Transactions backed by Supabase
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
-      const saved = localStorage.getItem('fancode_transactions') || localStorage.getItem('robovest_transactions');
+      const saved = localStorage.getItem('fancode_transactions');
       if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error('Failed to parse transactions from storage', e);
-    }
+    } catch (e) {}
     return [];
   });
 
@@ -632,27 +623,49 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return INITIAL_TEAM;
   });
 
+  const refreshUserData = async (targetUserId?: string) => {
+    try {
+      const userId = targetUserId || user.id;
+      if (!userId) return;
+
+      const [profileRes, userInvs, userTxns] = await Promise.all([
+        fetchUserProfile(userId),
+        fetchUserInvestments(userId),
+        fetchTransactions(userId)
+      ]);
+
+      if (profileRes) {
+        setUser(profileRes.user);
+      }
+      setInvestments(userInvs || []);
+      setTransactions(userTxns || []);
+    } catch (err) {
+      console.error('refreshUserData error:', err);
+    }
+  };
+
+  const logoutUser = async () => {
+    await signOutUser();
+    setUser(GUEST_USER);
+    setInvestments([]);
+    setTransactions([]);
+    localStorage.removeItem('fancode_user');
+    localStorage.removeItem('fancode_investments');
+    localStorage.removeItem('fancode_transactions');
+  };
+
   // ---------------------------------------------------------------------------
   // SUPABASE DATA FETCHING & REALTIME SYNCHRONIZATION
   // ---------------------------------------------------------------------------
   useEffect(() => {
     let isMounted = true;
 
-    async function loadDataFromSupabase() {
+    async function initializeApp() {
       try {
-        const [
-          remoteSettings,
-          remoteProducts,
-          remoteUserData,
-          remoteInvestments,
-          remoteTransactions,
-          remoteTeam
-        ] = await Promise.all([
+        // 1. Fetch public platform settings and catalog
+        const [remoteSettings, remoteProducts, remoteTeam] = await Promise.all([
           fetchPlatformSettings(),
           fetchInvestmentProducts(),
-          fetchUserProfile('User5294'),
-          fetchUserInvestments('User5294'),
-          fetchTransactions('User5294'),
           fetchTeamMembersWithPlans()
         ]);
 
@@ -672,54 +685,143 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               : (prev.rechargeBankList && prev.rechargeBankList.length > 0 ? prev.rechargeBankList : DEFAULT_SETTINGS.rechargeBankList),
           }));
         }
+
         if (remoteProducts && remoteProducts.length > 0) {
           const resolved = remoteProducts.map(p => ({
             ...p,
             image: resolveProductImage(p.id, p.image)
           }));
           setCatalog(resolved);
-          try {
-            localStorage.setItem('fancode_catalog_v3', JSON.stringify(resolved));
-          } catch (e) {
-            console.error('Failed to sync catalog to localStorage', e);
-          }
         }
-        if (remoteUserData) {
-          setUser(remoteUserData.user);
-        }
-        if (remoteInvestments && remoteInvestments.length > 0) {
-          setInvestments(remoteInvestments);
-        }
-        if (remoteTransactions && remoteTransactions.length > 0) {
-          setTransactions(remoteTransactions);
-        }
+
         if (remoteTeam && remoteTeam.length > 0) {
           setTeamMembers(remoteTeam);
         }
+
+        // 2. Check active Supabase Auth session
+        const { session } = await getAuthSession();
+        if (session?.user && isMounted) {
+          const profileRes = await ensureUserProfile(
+            session.user.id, 
+            session.user.email!, 
+            session.user.user_metadata
+          );
+
+          if (profileRes && isMounted) {
+            setUser(profileRes.user);
+          }
+
+          const [userInvs, userTxns] = await Promise.all([
+            fetchUserInvestments(session.user.id),
+            fetchTransactions(session.user.id)
+          ]);
+
+          if (isMounted) {
+            setInvestments(userInvs || []);
+            setTransactions(userTxns || []);
+          }
+        }
       } catch (err) {
-        console.error('Failed to load initial data from Supabase:', err);
+        console.error('Failed to initialize app from Supabase:', err);
       }
     }
 
-    loadDataFromSupabase();
+    initializeApp();
 
-    // Listen to real-time changes across public schema tables
-    const subscription = supabase
-      .channel('public_schema_changes')
+    // 3. Listen to Supabase Auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          const profileRes = await ensureUserProfile(session.user.id, session.user.email!, session.user.user_metadata);
+          if (profileRes && isMounted) {
+            setUser(profileRes.user);
+          }
+          const [userInvs, userTxns] = await Promise.all([
+            fetchUserInvestments(session.user.id),
+            fetchTransactions(session.user.id)
+          ]);
+          if (isMounted) {
+            setInvestments(userInvs || []);
+            setTransactions(userTxns || []);
+          }
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(GUEST_USER);
+        setInvestments([]);
+        setTransactions([]);
+        localStorage.removeItem('fancode_user');
+        localStorage.removeItem('fancode_investments');
+        localStorage.removeItem('fancode_transactions');
+      }
+    });
+
+    // 4. Real-time subscriptions across public catalog and settings
+    const publicSubscription = supabase
+      .channel('public_platform_changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public' },
-        () => {
-          loadDataFromSupabase();
+        { event: '*', schema: 'public', table: 'platform_settings' },
+        async () => {
+          const s = await fetchPlatformSettings();
+          if (s && isMounted) setPlatformSettings(prev => ({ ...prev, ...s }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'investment_products' },
+        async () => {
+          const p = await fetchInvestmentProducts();
+          if (p && p.length > 0 && isMounted) {
+            setCatalog(p.map(x => ({ ...x, image: resolveProductImage(x.id, x.image) })));
+          }
         }
       )
       .subscribe();
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(subscription);
+      authListener?.subscription.unsubscribe();
+      supabase.removeChannel(publicSubscription);
     };
   }, []);
+
+  // 5. User-specific real-time listener (when user is logged in)
+  useEffect(() => {
+    if (!user.isLoggedIn || !user.id) return;
+
+    const userChannel = supabase
+      .channel(`user_realtime_${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` },
+        async () => {
+          const updated = await fetchTransactions(user.id);
+          setTransactions(updated);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_profiles', filter: `id=eq.${user.id}` },
+        async () => {
+          const updated = await fetchUserProfile(user.id);
+          if (updated) setUser(updated.user);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_investments', filter: `user_id=eq.${user.id}` },
+        async () => {
+          const updated = await fetchUserInvestments(user.id);
+          setInvestments(updated);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(userChannel);
+    };
+  }, [user.id, user.isLoggedIn]);
 
   // Sync to localStorage as offline cache
   useEffect(() => {
@@ -1010,6 +1112,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Wallet recharge action
   const rechargeWallet = (amount: number, utr: string) => {
+    if (!user.isLoggedIn || !user.id) {
+      setShowAuthModal(true);
+      return { success: false, message: 'Please sign in or register to recharge your account.' };
+    }
+
     if (amount < platformSettings.minRecharge) {
       return { success: false, message: `Minimum recharge amount is ₹${platformSettings.minRecharge.toLocaleString()}.` };
     }
@@ -1048,6 +1155,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Product purchase action
   const purchaseProduct = (productId: string, quantity: number) => {
+    if (!user.isLoggedIn || !user.id) {
+      setShowAuthModal(true);
+      return { success: false, message: 'Please sign in or register to purchase plans.' };
+    }
+
     const product = catalog.find(p => p.id === productId);
     if (!product) return { success: false, message: 'Invalid product selected.' };
 
@@ -1154,6 +1266,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Withdrawal action
   const requestWithdrawal = (amount: number) => {
+    if (!user.isLoggedIn || !user.id) {
+      setShowAuthModal(true);
+      return { success: false, message: 'Please sign in or register to request withdrawals.' };
+    }
+
     if (!user.bankAccount.isBound) {
       return { success: false, message: 'Please bind your Bank Account or UPI details first.' };
     }
@@ -1217,6 +1334,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Bank account binding
   const updateBankAccount = (bank: BankAccount) => {
+    if (!user.isLoggedIn || !user.id) {
+      setShowAuthModal(true);
+      return;
+    }
+
     const updatedBank = { ...bank, isBound: true };
     setUser(prev => ({
       ...prev,
@@ -1262,6 +1384,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Claim daily accumulated returns (Harvest Yield)
   // Rule: Can only harvest once per day. If missed 1 or multiple days, stacks up and harvests in a single click!
   const claimDailyReturns = () => {
+    if (!user.isLoggedIn || !user.id) {
+      setShowAuthModal(true);
+      return {
+        success: false,
+        alreadyHarvested: false,
+        message: 'Please sign in or register to claim daily returns.',
+        claimed: 0,
+        daysStacked: 0
+      };
+    }
+
     const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
     if (activeInvs.length === 0) {
       return {
@@ -2051,6 +2184,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         getDailyWithdrawalLogs,
         navigateToRecharge,
         setNavigateToRechargeFn,
+        refreshUserData,
+        logoutUser,
       }}
     >
       {children}

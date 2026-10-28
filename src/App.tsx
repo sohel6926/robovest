@@ -40,14 +40,20 @@ const AppContent: React.FC = () => {
   const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>('none');
 
   React.useEffect(() => {
-    const checkAdminHash = () => {
-      if (window.location.hash.toLowerCase() === '#admin' || window.location.search.toLowerCase().includes('admin')) {
+    const checkAdminRoute = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/') || hash === '#admin') {
         setShowAdminPanel(true);
       }
     };
-    checkAdminHash();
-    window.addEventListener('hashchange', checkAdminHash);
-    return () => window.removeEventListener('hashchange', checkAdminHash);
+    checkAdminRoute();
+    window.addEventListener('hashchange', checkAdminRoute);
+    window.addEventListener('popstate', checkAdminRoute);
+    return () => {
+      window.removeEventListener('hashchange', checkAdminRoute);
+      window.removeEventListener('popstate', checkAdminRoute);
+    };
   }, [setShowAdminPanel]);
 
   const handleOpenRecharge = () => {
@@ -127,19 +133,16 @@ const AppContent: React.FC = () => {
         <AuthModal />
       </div>
 
-      {/* Floating Discrete Admin Trigger (Always accessible anywhere) */}
-      <button
-        onClick={() => setShowAdminPanel(true)}
-        title="Open Admin Control Panel"
-        className="fixed bottom-4 right-4 z-45 bg-slate-950/80 hover:bg-slate-900 text-amber-400 hover:text-amber-300 border border-slate-700/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg text-xs font-bold flex items-center gap-1.5 transition active:scale-95"
-      >
-        <Key className="w-3.5 h-3.5 text-amber-400" />
-        <span className="hidden sm:inline">Admin Panel</span>
-      </button>
-
-      {/* Full Admin Master Console Modal */}
+      {/* Full Admin Master Console Modal (Only accessible via /admin) */}
       {showAdminPanel && (
-        <AdminPanel onClose={() => setShowAdminPanel(false)} />
+        <AdminPanel onClose={() => {
+          setShowAdminPanel(false);
+          if (window.location.pathname.toLowerCase() === '/admin') {
+            window.history.pushState(null, '', '/');
+          } else if (window.location.hash.toLowerCase() === '#admin') {
+            window.history.pushState(null, '', window.location.pathname);
+          }
+        }} />
       )}
     </div>
   );

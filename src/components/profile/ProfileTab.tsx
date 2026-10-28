@@ -28,7 +28,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   onNavigateToBank, 
   onNavigateToContact 
 }) => {
-  const { user, transactions, setShowAuthModal, setShowAdminPanel } = useApp();
+  const { user, transactions, setShowAuthModal, logoutUser } = useApp();
   const [activeSubModal, setActiveSubModal] = useState<
     'personal' | 'balanceDetails' | 'withdrawalDetails' | 'notifications' | 'about' | null
   >(null);
@@ -41,7 +41,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       <div className="flex items-center justify-between py-2">
         <h1 className="text-xl font-black text-slate-900 font-sans">Profile</h1>
         <button
-          onClick={() => setActiveSubModal('personal')}
+          onClick={() => {
+            if (user.isLoggedIn) {
+              setActiveSubModal('personal');
+            } else {
+              setShowAuthModal(true);
+            }
+          }}
           className="w-8 h-8 rounded-full bg-white shadow-xs border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900"
         >
           <Settings className="w-4 h-4" />
@@ -49,28 +55,52 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </div>
 
       {/* User Info Hero Card */}
-      <div className="rounded-3xl p-5 bg-white border border-slate-200 shadow-sm flex items-center gap-3.5">
-        {/* Avatar with FanCode Emblem */}
-        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] p-0.5 shadow-md shadow-orange-500/20 shrink-0 flex items-center justify-center">
-          <span className="font-black italic text-white text-2xl tracking-tight">FC</span>
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center border-2 border-white">
-            <Crown className="w-3 h-3 fill-amber-400 text-amber-400" />
+      <div className="rounded-3xl p-5 bg-white border border-slate-200 shadow-sm flex items-center justify-between gap-3.5">
+        <div className="flex items-center gap-3.5 min-w-0">
+          {/* Avatar with FanCode Emblem */}
+          <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF4500] to-[#FF6E14] p-0.5 shadow-md shadow-orange-500/20 shrink-0 flex items-center justify-center">
+            <span className="font-black italic text-white text-2xl tracking-tight">FC</span>
+            {user.isLoggedIn && (
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center border-2 border-white">
+                <Crown className="w-3 h-3 fill-amber-400 text-amber-400" />
+              </div>
+            )}
+          </div>
+
+          {/* User Details */}
+          <div className="space-y-1 min-w-0">
+            {user.isLoggedIn ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-sm sm:text-base text-slate-900 truncate">
+                    {user.email || user.id.slice(0, 10)}
+                  </span>
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-black uppercase tracking-wider shrink-0">
+                    <Crown className="w-3 h-3 fill-blue-700" />
+                    VIP{user.vipLevel}
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500 font-mono flex items-center gap-2">
+                  <span>Code: {user.inviteCode || 'N/A'}</span>
+                </div>
+              </>
+            ) : (
+              <div>
+                <span className="font-extrabold text-base text-slate-900 block">Guest Investor</span>
+                <span className="text-xs text-slate-400">Sign in to sync wallet and yields</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* User Details */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-base text-slate-900">{user.id}</span>
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-black uppercase tracking-wider">
-              <Crown className="w-3 h-3 fill-blue-700" />
-              VIP{user.vipLevel}
-            </span>
-          </div>
-          <div className="text-xs text-slate-500 font-mono">
-            ID {user.phone.slice(0, 6)}***{user.phone.slice(-4)}
-          </div>
-        </div>
+        {!user.isLoggedIn && (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 shadow-sm active:scale-95 transition"
+          >
+            Sign In
+          </button>
+        )}
       </div>
 
       {/* Available Balance Box */}
@@ -222,44 +252,40 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <ChevronRight className="w-4 h-4 text-slate-400" />
           </button>
 
-          {/* Admin Control Center */}
-          <button
-            onClick={() => setShowAdminPanel(true)}
-            className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition text-left border-b border-slate-100 bg-gradient-to-r from-blue-50/60 to-indigo-50/40"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs">
-                <ShieldCheck className="w-5 h-5 text-amber-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-sm text-slate-900">Admin Control Panel</h3>
-                  <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 text-[9px] font-black uppercase">
-                    Master
-                  </span>
+          {/* Account Authentication Action (Login or Logout) */}
+          {user.isLoggedIn ? (
+            <button
+              onClick={() => logoutUser()}
+              className="w-full p-4 flex items-center justify-between hover:bg-rose-50/50 transition text-left text-rose-600"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <LogOut className="w-5 h-5" />
                 </div>
-                <p className="text-[11px] text-slate-500">Edit plans, balances, approve withdrawals & settings</p>
+                <div>
+                  <h3 className="font-bold text-sm text-rose-600">Logout</h3>
+                  <p className="text-[11px] text-rose-500">Sign out of this device</p>
+                </div>
               </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400" />
-          </button>
-
-          {/* Logout */}
-          <button
-            onClick={() => setShowAuthModal(true)}
-            className="w-full p-4 flex items-center justify-between hover:bg-rose-50/50 transition text-left text-rose-600"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                <LogOut className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 text-rose-400" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full p-4 flex items-center justify-between hover:bg-blue-50/50 transition text-left text-blue-600"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <LogOut className="w-5 h-5 rotate-180" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-blue-600">Sign In / Register</h3>
+                  <p className="text-[11px] text-blue-500">Connect to your account & wallet</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-sm text-rose-600">Logout</h3>
-                <p className="text-[11px] text-rose-500">Sign out of this device</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-rose-400" />
-          </button>
+              <ChevronRight className="w-4 h-4 text-blue-400" />
+            </button>
+          )}
         </div>
       </div>
 

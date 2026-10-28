@@ -348,19 +348,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const handleAdminLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const isValid = await verifyAdminPinDB(pinInput);
-    if (isValid || pinInput === 'admin888' || pinInput === 'admin' || pinInput === '1234') {
+    if (isValid || pinInput === 'Sri@2026') {
       setIsAdminAuthenticated(true);
       setPinError('');
       showToast('Admin Console Unlocked! Welcome Administrator.');
     } else {
-      setPinError('Invalid passcode. Hint: Use default PIN "admin888" or click Quick Access.');
+      setPinError('Invalid administrator password.');
     }
-  };
-
-  const handleQuickDemoAccess = () => {
-    setIsAdminAuthenticated(true);
-    setPinError('');
-    showToast('Admin Console Unlocked via Quick Access.');
   };
 
   const handleLogoutAdmin = () => {
@@ -675,7 +669,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     type="password"
                     value={pinInput}
                     onChange={(e) => setPinInput(e.target.value)}
-                    placeholder="Enter admin PIN (default: admin888)"
+                    placeholder="Enter Administrator Password"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 text-sm font-sans tracking-wider outline-hidden"
                     autoFocus
                   />
@@ -696,20 +690,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <span>Authorize & Access Admin Panel</span>
               </button>
             </form>
-
-            <div className="relative flex py-1 items-center">
-              <div className="grow border-t border-slate-200"></div>
-              <span className="shrink mx-3 text-[11px] text-slate-400 font-bold uppercase tracking-wider">or</span>
-              <div className="grow border-t border-slate-200"></div>
-            </div>
-
-            <button
-              onClick={handleQuickDemoAccess}
-              className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-800 font-bold text-xs border border-slate-200 transition flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>One-Click Quick Access (No PIN Required)</span>
-            </button>
 
             <button
               onClick={onClose}
