@@ -9,6 +9,10 @@ import {
   Smartphone,
   Shield,
   ChevronRight,
+  Hash,
+  Clipboard,
+  X,
+  Info,
 } from 'lucide-react';
 
 interface QrEntry {
@@ -74,6 +78,39 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
     if (type === 'upi') { setCopiedUpi(true); setTimeout(() => setCopiedUpi(false), 2000); }
     if (type === 'acc') { setCopiedAccount(true); setTimeout(() => setCopiedAccount(false), 2000); }
     if (type === 'ifsc') { setCopiedIfsc(true); setTimeout(() => setCopiedIfsc(false), 2000); }
+  };
+
+  // Authentic 12-Digit UPI UTR formatting & helpers
+  const cleanUtrDigits = (utrNumber || '').replace(/\D/g, '').slice(0, 12);
+  const isUtrComplete = cleanUtrDigits.length === 12;
+
+  const formatUtrDisplay = (digits: string) => {
+    const parts = [];
+    for (let i = 0; i < digits.length; i += 4) {
+      parts.push(digits.slice(i, i + 4));
+    }
+    return parts.join(' ');
+  };
+
+  const handleUtrInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 12);
+    onUtrChange(digits);
+  };
+
+  const handlePasteUtr = async () => {
+    try {
+      const clipText = await navigator.clipboard.readText();
+      const digits = clipText.replace(/\D/g, '').slice(0, 12);
+      if (digits) {
+        onUtrChange(digits);
+      }
+    } catch (err) {
+      console.warn('Clipboard read error', err);
+    }
+  };
+
+  const handleClearUtr = () => {
+    onUtrChange('');
   };
 
   return (
@@ -305,20 +342,130 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
           </div>
         )}
 
-        {/* ── UTR Input ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-2">
-          <label className="text-xs font-bold text-slate-700 block">
-            12-Digit UTR / Transaction Reference
-          </label>
-          <input
-            type="text"
-            value={utrNumber}
-            onChange={(e) => onUtrChange(e.target.value.replace(/[^0-9A-Za-z]/g, ''))}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-sm font-mono text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition placeholder:text-slate-400"
-            placeholder="Enter 12-digit UTR number"
-            maxLength={20}
-          />
-          <p className="text-[10px] text-slate-400">Found in your bank app's transaction receipt after payment</p>
+        {/* ── Authentic 12-Digit UPI UTR Input Card ── */}
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-3.5">
+          {/* Card Header & Validation Badge */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/80 text-[#FF4A00] flex items-center justify-center shrink-0">
+                <Hash className="w-4 h-4" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-800 block">
+                  12-Digit UPI UTR / Ref No
+                </label>
+                <p className="text-[10px] text-slate-400 font-medium">
+                  Unique Transaction Reference from UPI receipt
+                </p>
+              </div>
+            </div>
+
+            {/* Real-time Status Badge */}
+            {isUtrComplete ? (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>12 Digits Verified</span>
+              </span>
+            ) : cleanUtrDigits.length > 0 ? (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                <span>{cleanUtrDigits.length} / 12 Digits</span>
+              </span>
+            ) : (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500">
+                12 Digits Required
+              </span>
+            )}
+          </div>
+
+          {/* Formatted Input Field */}
+          <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl p-1.5 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition">
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={formatUtrDisplay(cleanUtrDigits)}
+              onChange={handleUtrInputChange}
+              placeholder="e.g. 4301 2849 1823"
+              maxLength={14}
+              className="w-full bg-transparent py-2.5 px-3 text-base sm:text-lg font-mono font-black tracking-widest text-slate-950 placeholder:text-slate-300 placeholder:font-normal placeholder:tracking-normal focus:outline-none"
+            />
+            
+            <div className="flex items-center gap-1 pr-1.5 shrink-0">
+              {cleanUtrDigits.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearUtr}
+                  className="w-7 h-7 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                  title="Clear UTR"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handlePasteUtr}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200/80 transition active:scale-95 cursor-pointer"
+                title="Paste 12-digit UTR from clipboard"
+              >
+                <Clipboard className="w-3.5 h-3.5" />
+                <span>Paste</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 12-Segment Micro Progress Indicator */}
+          <div className="space-y-1">
+            <div className="grid grid-cols-12 gap-1 px-1">
+              {Array.from({ length: 12 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`h-1.5 rounded-full transition-all duration-200 ${
+                    idx < cleanUtrDigits.length
+                      ? isUtrComplete
+                        ? 'bg-emerald-500 shadow-xs'
+                        : 'bg-blue-600'
+                      : 'bg-slate-200'
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="flex justify-between items-center text-[10px] text-slate-400 px-1 pt-0.5">
+              <span>Standard UPI Format: 12 Numeric Digits</span>
+              <span className={isUtrComplete ? 'text-emerald-600 font-bold' : ''}>
+                {isUtrComplete ? '✓ Ready to Submit' : `${12 - cleanUtrDigits.length} digits remaining`}
+              </span>
+            </div>
+          </div>
+
+          {/* Authentic Bank App Guide (Where to find UTR) */}
+          <div className="pt-2 border-t border-slate-100">
+            <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/60 space-y-2">
+              <p className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <span>Where to find the 12-digit UTR on your receipt:</span>
+              </p>
+              
+              <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
+                <div className="p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+                  <p className="font-extrabold text-indigo-600">PhonePe</p>
+                  <p className="text-slate-500 mt-0.5">Look for <strong className="text-slate-800">UTR:</strong></p>
+                  <span className="font-mono text-[9px] text-slate-600 block bg-slate-50 rounded px-1 mt-0.5">12 Digits</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+                  <p className="font-extrabold text-blue-600">Google Pay</p>
+                  <p className="text-slate-500 mt-0.5"><strong className="text-slate-800">UPI txn ID</strong></p>
+                  <span className="font-mono text-[9px] text-slate-600 block bg-slate-50 rounded px-1 mt-0.5">12 Digits</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+                  <p className="font-extrabold text-sky-600">Paytm / BHIM</p>
+                  <p className="text-slate-500 mt-0.5"><strong className="text-slate-800">UPI Ref / RRN</strong></p>
+                  <span className="font-mono text-[9px] text-slate-600 block bg-slate-50 rounded px-1 mt-0.5">12 Digits</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Success Banner ── */}
@@ -340,9 +487,13 @@ export const PaymentPage: React.FC<PaymentPageProps> = ({
         </button>
         <button
           onClick={onConfirm}
-          className="flex-[2] py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-extrabold text-sm shadow-lg shadow-orange-400/25 active:scale-[0.98] transition flex items-center justify-center gap-2"
+          className={`flex-[2] py-3.5 rounded-xl font-extrabold text-sm active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer ${
+            isUtrComplete
+              ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg shadow-orange-400/25'
+              : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+          }`}
         >
-          Confirm Payment &amp; Submit UTR
+          <span>{isUtrComplete ? 'Confirm Payment & Submit UTR' : `Enter 12-Digit UTR (${cleanUtrDigits.length}/12)`}</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

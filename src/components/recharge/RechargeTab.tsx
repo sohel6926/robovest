@@ -101,11 +101,16 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const handleConfirmPayment = () => {
-    if (!utrNumber.trim() || utrNumber.trim().length < 6) {
-      alert('Please enter a valid 12-digit UTR or Transaction Reference Number.');
+    const cleanUtr = utrNumber.replace(/\D/g, '');
+    if (!cleanUtr || cleanUtr.length !== 12) {
+      alert(`Authentic UPI UTR must be exactly 12 numeric digits. (Currently entered: ${cleanUtr.length}/12 digits)`);
       return;
     }
-    const result = rechargeWallet(selectedAmount, utrNumber);
+    if (/^(\d)\1{11}$/.test(cleanUtr)) {
+      alert('Please enter a real, authentic 12-digit transaction UTR from your bank or UPI transaction receipt.');
+      return;
+    }
+    const result = rechargeWallet(selectedAmount, cleanUtr);
     if (result.success) {
       setPaymentSuccessMsg(result.message);
       setTimeout(() => {
