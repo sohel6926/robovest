@@ -272,8 +272,13 @@ export const AuthModal: React.FC = () => {
     e.preventDefault();
     resetFormState();
 
-    if (!otpToken.trim() || !password.trim()) {
-      setErrorMessage('Please provide the verification code and your new password.');
+    if (!email.trim()) {
+      setErrorMessage('Please provide your registered email.');
+      return;
+    }
+
+    if (!otpToken.trim()) {
+      setErrorMessage('Please enter the recovery OTP code.');
       return;
     }
 
@@ -673,9 +678,29 @@ export const AuthModal: React.FC = () => {
             <div className="text-center space-y-1">
               <p className="font-bold text-slate-800 text-sm">Enter Recovery Code</p>
               <p className="text-[11px] text-slate-500">
-                Check your Gmail inbox for the OTP recovery code.
+                {email ? (
+                  <>Code sent to <span className="font-semibold text-slate-800">{email}</span></>
+                ) : (
+                  <>Check your Gmail inbox for the OTP recovery code.</>
+                )}
               </p>
             </div>
+
+            {!email && (
+              <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white transition">
+                <span className="pl-3.5 text-slate-400">
+                  <Mail className="w-4 h-4" />
+                </span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter Registered Email"
+                  className="w-full bg-transparent py-3 px-3 text-slate-900 focus:outline-none"
+                  required
+                />
+              </div>
+            )}
 
             <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white transition">
               <span className="pl-3.5 text-slate-400">
@@ -683,10 +708,11 @@ export const AuthModal: React.FC = () => {
               </span>
               <input
                 type="text"
+                maxLength={10}
                 value={otpToken}
                 onChange={(e) => setOtpToken(e.target.value)}
-                placeholder="Recovery OTP Code"
-                className="w-full bg-transparent py-3 px-3 text-slate-900 font-mono focus:outline-none"
+                placeholder="Enter Recovery OTP Code"
+                className="w-full bg-transparent py-3 px-3 text-center text-slate-900 font-mono text-base tracking-widest focus:outline-none"
                 required
               />
             </div>
