@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, CreditCard, Clock } from 'lucide-react';
+import { ArrowLeft, CreditCard, Clock, LogIn } from 'lucide-react';
 
 interface WithdrawTabProps {
   onBack: () => void;
@@ -16,6 +16,7 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
     advanceTimeToNextDayAfter1230,
     resetSimulatedTime,
     platformSettings,
+    setShowAuthModal,
   } = useApp();
 
   const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
@@ -44,6 +45,11 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
   };
 
   const handleWithdrawSubmit = () => {
+    if (!user.isLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
+
     if (withdrawAmount < minWth) {
       setStatusMessage({ text: `Minimum withdrawal amount is ₹${minWth.toLocaleString()}.`, isError: true });
       return;
@@ -315,17 +321,27 @@ export const WithdrawTab: React.FC<WithdrawTabProps> = ({ onBack, onSwitchToRech
         )}
 
         {/* Continue Button */}
-        <button
-          onClick={handleWithdrawSubmit}
-          disabled={!eligibility.isEligible}
-          className={`w-full py-3.5 rounded-xl font-black text-base shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 ${
-            eligibility.isEligible
-              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-          }`}
-        >
-          <span>Continue ₹{withdrawAmount.toLocaleString()}</span>
-        </button>
+        {!user.isLoggedIn ? (
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="w-full py-3.5 rounded-xl font-black text-base shadow-lg shadow-orange-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white cursor-pointer"
+          >
+            <LogIn className="w-5 h-5" />
+            <span>Sign In to Withdraw</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleWithdrawSubmit}
+            disabled={!eligibility.isEligible}
+            className={`w-full py-3.5 rounded-xl font-black text-base shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 ${
+              eligibility.isEligible
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            }`}
+          >
+            <span>Continue ₹{withdrawAmount.toLocaleString()}</span>
+          </button>
+        )}
       </div>
     </div>
   );

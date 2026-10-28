@@ -3,11 +3,13 @@ import { useApp } from '../../context/AppContext';
 import { Share2, Copy, Check, QrCode, MessageCircle, Send, Facebook, Twitter, MoreHorizontal } from 'lucide-react';
 
 export const InviteTab: React.FC = () => {
-  const { user } = useApp();
+  const { user, setShowAuthModal } = useApp();
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
-  const inviteLink = `https://fancode.live/join?ref=${user.inviteCode}`;
+  const inviteLink = user.inviteCode 
+    ? `https://robovest-git-main-sohel6926.vercel.app/join?ref=${user.inviteCode}`
+    : 'https://robovest-git-main-sohel6926.vercel.app/';
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(inviteLink);
@@ -55,6 +57,21 @@ export const InviteTab: React.FC = () => {
         Let your friend scan the code — you earn on every plan they buy.
       </p>
 
+      {!user.isLoggedIn && (
+        <div className="rounded-2xl p-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md flex items-center justify-between">
+          <div>
+            <div className="font-bold text-sm">Sign in to get your Invite Link</div>
+            <div className="text-xs text-orange-100">Earn up to 22% commissions on referrals</div>
+          </div>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-4 py-2 rounded-xl bg-white text-orange-600 font-extrabold text-xs shadow-xs active:scale-95 transition cursor-pointer"
+          >
+            Sign In
+          </button>
+        </div>
+      )}
+
       {/* QR Code Crisp Card */}
       <div className="rounded-3xl bg-white text-slate-900 p-6 shadow-sm border border-slate-200 flex flex-col items-center text-center space-y-4">
         {/* QR Code Container */}
@@ -68,11 +85,11 @@ export const InviteTab: React.FC = () => {
 
         {/* Invite Code Pill in Crisp Cobalt */}
         <button
-          onClick={handleCopyCode}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 font-mono font-bold text-base transition active:scale-95 shadow-xs"
+          onClick={user.isLoggedIn ? handleCopyCode : () => setShowAuthModal(true)}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 font-mono font-bold text-base transition active:scale-95 shadow-xs cursor-pointer"
         >
           <span>📋</span>
-          <span>{user.inviteCode}</span>
+          <span>{user.isLoggedIn ? user.inviteCode : 'Sign In to View Code'}</span>
           {copiedCode ? <Check className="w-4 h-4 text-blue-600" /> : <Copy className="w-4 h-4 text-blue-600" />}
         </button>
       </div>

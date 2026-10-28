@@ -7,7 +7,7 @@ interface TeamTabProps {
 }
 
 export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
-  const { user, teamMembers } = useApp();
+  const { user, teamMembers, setShowAuthModal } = useApp();
   const [selectedLevel, setSelectedLevel] = useState<1 | 2 | 3>(1);
   const [showMembersModal, setShowMembersModal] = useState<boolean>(false);
 
@@ -31,9 +31,24 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
         <h1 className="text-xl font-black text-slate-900 font-sans">Team</h1>
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-mono font-bold">
           <span>📋</span>
-          <span>{user.inviteCode}</span>
+          <span>{user.isLoggedIn ? user.inviteCode : 'Guest'}</span>
         </div>
       </div>
+
+      {!user.isLoggedIn && (
+        <div className="rounded-2xl p-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md flex items-center justify-between">
+          <div>
+            <div className="font-bold text-sm">Guest Session</div>
+            <div className="text-xs text-orange-100">Sign in to track your team network & commissions</div>
+          </div>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="px-4 py-2 rounded-xl bg-white text-orange-600 font-extrabold text-xs shadow-xs active:scale-95 transition cursor-pointer"
+          >
+            Sign In
+          </button>
+        </div>
+      )}
 
       {/* Top 2 Summary Cards */}
       <div className="grid grid-cols-2 gap-3">

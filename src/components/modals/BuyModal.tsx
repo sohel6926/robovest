@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { resolveProductImage } from '../../data/products';
-import { X, Zap, Gift, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
+import { X, Zap, Gift, ShieldAlert, CheckCircle2, Clock, LogIn } from 'lucide-react';
 
 export const BuyModal: React.FC = () => {
   const { 
@@ -13,6 +13,7 @@ export const BuyModal: React.FC = () => {
     getProductOwnedCount,
     setShowOrdersModal,
     navigateToRecharge,
+    setShowAuthModal,
   } = useApp();
 
   const [quantity, setQuantity] = useState<number>(1);
@@ -111,7 +112,9 @@ export const BuyModal: React.FC = () => {
             <div className="flex justify-between items-center text-xs">
               <span className="font-semibold text-slate-700">Purchase Quantity</span>
               <span className="text-blue-600 font-bold">
-                Owned: {currentOwned}/10 (Max 10 total)
+                {user.isLoggedIn
+                  ? `Owned: ${currentOwned}/10 (Max 10 total)`
+                  : 'Max 10 units total'}
               </span>
             </div>
 
@@ -183,9 +186,15 @@ export const BuyModal: React.FC = () => {
         {/* Wallet Balance Check */}
         <div className="flex justify-between items-center text-xs px-1">
           <span className="text-slate-500">Your Wallet Balance:</span>
-          <span className={`font-bold ${user.availableBalance >= totalCost ? 'text-slate-900' : 'text-rose-600'}`}>
-            ₹{user.availableBalance.toLocaleString()}
-          </span>
+          {user.isLoggedIn ? (
+            <span className={`font-bold ${user.availableBalance >= totalCost ? 'text-slate-900' : 'text-rose-600'}`}>
+              ₹{user.availableBalance.toLocaleString()}
+            </span>
+          ) : (
+            <span className="text-xs font-semibold text-orange-600 flex items-center gap-1">
+              Sign in to view (₹0)
+            </span>
+          )}
         </div>
 
         {purchaseSuccess && (
@@ -196,7 +205,17 @@ export const BuyModal: React.FC = () => {
         )}
 
         {/* Purchase CTA */}
-        {!prereqCheck.allowed ? (
+        {!user.isLoggedIn ? (
+          <button
+            onClick={() => {
+              setShowAuthModal(true);
+            }}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white font-black text-sm shadow-lg shadow-orange-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Sign In to Purchase Plan</span>
+          </button>
+        ) : !prereqCheck.allowed ? (
           <button
             disabled
             className="w-full py-3.5 rounded-2xl bg-slate-100 text-slate-400 font-bold text-xs cursor-not-allowed border border-slate-200"
@@ -209,7 +228,7 @@ export const BuyModal: React.FC = () => {
               setShowBuyModal(null);
               navigateToRecharge();
             }}
-            className="w-full py-3.5 rounded-2xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition flex items-center justify-center gap-2 cursor-pointer"
           >
             Insufficient Balance — Recharge
           </button>

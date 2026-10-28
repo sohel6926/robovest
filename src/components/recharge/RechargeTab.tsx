@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, LogIn } from 'lucide-react';
 import { PaymentPage } from './PaymentPage';
 
 interface RechargeTabProps {
@@ -9,7 +9,7 @@ interface RechargeTabProps {
 }
 
 export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWithdraw }) => {
-  const { user, rechargeWallet, platformSettings } = useApp();
+  const { user, rechargeWallet, platformSettings, setShowAuthModal } = useApp();
 
   // Dynamic values configured from Admin Panel
   const minRec = platformSettings?.minRecharge || 520;
@@ -85,6 +85,10 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
   };
 
   const handleContinue = () => {
+    if (!user.isLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
     if (!isGatewayActive) {
       alert('The recharge gateway is temporarily offline for scheduled system maintenance. Please try again later.');
       return;
@@ -280,14 +284,25 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
         {/* Continue Button */}
         <button
           onClick={handleContinue}
-          disabled={!isGatewayActive}
+          disabled={user.isLoggedIn && !isGatewayActive}
           className={`w-full py-3.5 rounded-xl font-extrabold text-base transition-all flex items-center justify-center gap-2 ${
-            isGatewayActive
+            !user.isLoggedIn
+              ? 'bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white shadow-lg shadow-orange-500/25 active:scale-[0.99] cursor-pointer'
+              : isGatewayActive
               ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 active:scale-[0.99] cursor-pointer'
               : 'bg-slate-300 text-slate-500 cursor-not-allowed'
           }`}
         >
-          {isGatewayActive ? 'Continue to Pay' : 'Gateway Offline'}
+          {!user.isLoggedIn ? (
+            <>
+              <LogIn className="w-5 h-5" />
+              <span>Sign In to Recharge</span>
+            </>
+          ) : isGatewayActive ? (
+            'Continue to Pay'
+          ) : (
+            'Gateway Offline'
+          )}
         </button>
       </div>
 
