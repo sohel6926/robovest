@@ -219,15 +219,7 @@ INSERT INTO platform_settings (id, min_recharge, min_withdrawal, withdrawal_fee_
 VALUES ('default', 520, 150, 10, '00:30', '17:00', true, 'https://t.me/fancode_support', 'https://t.me/fancode_official', 'FanCode Official Sports Investment Platform. Daily yields processing 24/7.')
 ON CONFLICT (id) DO NOTHING;
 
--- SEED USER PROFILE
-INSERT INTO user_profiles (id, phone, password, invite_code, inviter_code, vip_level, available_balance, withdrawable_balance, total_recharge, total_income, is_logged_in)
-VALUES ('User5294', '+91 98452 77192', 'password123', '203C03', 'TOP_ADMIN', 1, 4000, 850, 4000, 1357.6, true)
-ON CONFLICT (id) DO NOTHING;
-
--- SEED BANK ACCOUNT
-INSERT INTO bank_accounts (id, user_id, account_holder, account_number, ifsc_code, bank_name, upi_id, is_bound)
-VALUES ('bank_main', 'User5294', 'Rahul Sharma', '50100492817264', 'HDFC0001234', 'HDFC Bank', 'rahul.fancode@okaxis', true)
-ON CONFLICT (id) DO NOTHING;
+-- ADMIN SETTINGS SEED (Preserve Admin Access)
 
 -- SEED ADMIN SETTINGS
 INSERT INTO admin_settings (id, admin_pin, backup_pins)
@@ -254,44 +246,7 @@ ON CONFLICT (id) DO UPDATE SET
   bonus = EXCLUDED.bonus,
   specs = EXCLUDED.specs;
 
--- SEED INITIAL INVESTMENTS
-INSERT INTO user_investments (id, user_id, product_id, product_name, robot_model, quantity, unit_price, total_invested, daily_income, bonus_received, purchase_timestamp, purchase_date_formatted, days_elapsed, total_earned, status)
-VALUES
-('INV-A-01', 'User5294', 'A', 'Product A', 'Nao Core Micro Assistant', 1, 520, 520, 130, 50, EXTRACT(EPOCH FROM NOW() - INTERVAL '2 days') * 1000, TO_CHAR(NOW() - INTERVAL '2 days', 'YYYY-MM-DD'), 2, 260, 'ACTIVE')
-ON CONFLICT (id) DO NOTHING;
-
--- SEED TEAM MEMBERS
-INSERT INTO team_members (id, user_id, phone, join_date, level, inviter_id, invite_count, recharge_amount, team_invested, commission_generated, status)
-VALUES
-('TM-101', 'User5294', '+91 98234 11029', '2026-10-02', 1, 'User5294 (You)', 4, 4000, 12500, 880, 'ACTIVE'),
-('TM-102', 'User5294', '+91 97112 88472', '2026-10-04', 1, 'User5294 (You)', 2, 2100, 4200, 462, 'ACTIVE'),
-('TM-103', 'User5294', '+91 88390 44910', '2026-10-06', 2, 'TM-101', 1, 1040, 520, 20.8, 'ACTIVE'),
-('TM-104', 'User5294', '+91 91456 22091', '2026-10-07', 3, 'TM-103', 0, 520, 0, 5.2, 'ACTIVE'),
-('TM-105', 'User5294', '+91 96541 77290', '2026-10-08', 1, 'User5294 (You)', 3, 8200, 6000, 1804, 'ACTIVE'),
-('TM-106', 'User5294', '+91 81230 99401', '2026-10-09', 2, 'TM-102', 0, 2100, 0, 42, 'ACTIVE')
-ON CONFLICT (id) DO NOTHING;
-
--- SEED MEMBER PLANS
-INSERT INTO member_plan_holdings (id, member_id, plan_id, plan_name, robot_model, quantity, unit_price, total_invested, daily_yield, purchase_date, days_elapsed, duration_days, total_earned, status)
-VALUES
-('MP-101-A', 'TM-101', 'C', 'Product C', 'ASIMO-V Precision Service Biped', 1, 4000, 4000, 950, '2026-10-02', 8, 150, 7600, 'ACTIVE'),
-('MP-102-A', 'TM-102', 'B', 'Product B', 'Spot-X Quadruped Patrol Bot', 1, 2100, 2100, 500, '2026-10-04', 6, 150, 3000, 'ACTIVE'),
-('MP-103-A', 'TM-103', 'A', 'Product A', 'Nao Core Micro Assistant', 2, 520, 1040, 260, '2026-10-06', 4, 150, 1040, 'ACTIVE'),
-('MP-104-A', 'TM-104', 'A', 'Product A', 'Nao Core Micro Assistant', 1, 520, 520, 130, '2026-10-07', 3, 150, 390, 'ACTIVE'),
-('MP-105-A', 'TM-105', 'D', 'Product D', 'Atlas Prime AI Diagnostics Android', 1, 8200, 8200, 2000, '2026-10-08', 2, 150, 4000, 'ACTIVE'),
-('MP-106-A', 'TM-106', 'B', 'Product B', 'Spot-X Quadruped Patrol Bot', 1, 2100, 2100, 500, '2026-10-09', 1, 150, 500, 'ACTIVE')
-ON CONFLICT (id) DO NOTHING;
-
--- SEED INITIAL TRANSACTIONS
-INSERT INTO transactions (id, user_id, type, amount, status, timestamp, formatted_time, description, reference_id, fee, net_amount)
-VALUES
-('TXN-WTH-1001', 'User5294', 'WITHDRAWAL', -2100, 'PROCESSING', EXTRACT(EPOCH FROM NOW() - INTERVAL '2 hours') * 1000, TO_CHAR(NOW() - INTERVAL '2 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to HDFC Bank (A/C ...7264)', 'PO-88192019', 210, 1890),
-('TXN-WTH-1002', 'User5294', 'WITHDRAWAL', -520, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '6 hours') * 1000, TO_CHAR(NOW() - INTERVAL '6 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to HDFC Bank (A/C ...7264)', 'PO-88192018', 52, 468),
-('TXN-WTH-0901', 'User5294', 'WITHDRAWAL', -4000, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '28 hours') * 1000, TO_CHAR(NOW() - INTERVAL '28 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to ICICI Bank (A/C ...9102)', 'PO-77291048', 400, 3600),
-('TXN-WTH-0902', 'User5294', 'WITHDRAWAL', -1500, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '32 hours') * 1000, TO_CHAR(NOW() - INTERVAL '32 hours', 'YYYY-MM-DD HH:MI AM'), 'Withdrawal to State Bank of India (A/C ...4410)', 'PO-77291049', 150, 1350),
-('TXN-RCG-001', 'User5294', 'RECHARGE', 4000, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '3 days') * 1000, TO_CHAR(NOW() - INTERVAL '3 days', 'YYYY-MM-DD HH:MI AM'), 'Wallet Recharge via UPI', 'UTR-849201827401', 0, 4000),
-('TXN-BNS-001', 'User5294', 'SIGNUP_BONUS', 100, 'COMPLETED', EXTRACT(EPOCH FROM NOW() - INTERVAL '3 days') * 1000, TO_CHAR(NOW() - INTERVAL '3 days', 'YYYY-MM-DD HH:MI AM'), 'New Member Welcome Bonus', 'SYS-WELCOME', 0, 100)
-ON CONFLICT (id) DO NOTHING;
+-- Clean production schema initialized without dummy seed data
 `;
 
 async function runMigration() {

@@ -39,11 +39,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   onOpenAddBalanceModal,
   pendingWithdrawalsCount,
   pendingTopupsCount,
-  totalUsersCount = 1,
+  totalUsersCount = 0,
   totalWalletBalance = 0,
   totalInvested = 0,
   totalWithdrawn = 0,
-  activeUsersCount = 1,
+  activeUsersCount = 0,
   inactiveUsersCount = 0,
 }) => {
 
@@ -128,9 +128,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Row 2 of Metric Cards: Pending KYC & Recharge Details */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-        {/* 5. Pending KYC */}
+      {/* Row 2 of Metric Cards: Recharge Details (KYC commented out per requirement) */}
+      <div className="grid grid-cols-1 gap-4">
+        {/* Commented out Pending KYC per requirement (only banking info collected, no Aadhaar/PAN)
         <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
             <ShieldCheck className="w-5 h-5" />
@@ -143,8 +143,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <span className="text-[11px] text-slate-400 block mt-1">All submissions verified</span>
           </div>
         </div>
+        */}
 
-        {/* 7. Recharge Details (UPI & QR) */}
+        {/* Recharge Details (UPI & QR) */}
         <div 
           onClick={() => onNavigate('rechargeGateway')}
           className="bg-white rounded-2xl p-5 border border-orange-200/80 hover:border-orange-400 shadow-xs flex flex-col justify-between space-y-3 cursor-pointer transition group"
@@ -352,7 +353,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
           </button>
 
-          {/* Tile 2: KYC Management */}
+          {/* Tile 2: KYC Management (Commented out per user requirement)
           <button
             onClick={() => onNavigate('kyc')}
             className="text-left bg-[#4338ca] hover:bg-[#4f46e5] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px]"
@@ -363,6 +364,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               <span className="text-xs text-indigo-200 block mt-0.5">0 pending requests</span>
             </div>
           </button>
+          */}
 
           {/* Tile 3: Top-up Requests */}
           <button
@@ -418,18 +420,6 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <div>
               <span className="font-bold text-sm block">Plan Interests</span>
               <span className="text-xs text-purple-200 block mt-0.5">0 pending callback requests</span>
-            </div>
-          </button>
-
-          {/* Tile 6: Recharge Details */}
-          <button
-            onClick={() => onNavigate('rechargeGateway')}
-            className="text-left bg-[#4f46e5] hover:bg-[#6366f1] text-white p-5 rounded-2xl shadow-sm transition-all duration-200 active:scale-98 flex flex-col justify-between min-h-[110px] cursor-pointer"
-          >
-            <QrCode className="w-5 h-5 text-indigo-200" />
-            <div>
-              <span className="font-bold text-sm block">Recharge Details</span>
-              <span className="text-xs text-indigo-200 block mt-0.5">UPI & Bank Gateway setup</span>
             </div>
           </button>
 

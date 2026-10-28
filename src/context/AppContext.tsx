@@ -422,7 +422,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [investments, setInvestments] = useState<UserInvestment[]>(() => {
     try {
       const saved = localStorage.getItem('fancode_investments');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.filter((i: any) => i && i.userId !== 'User5294');
+      }
     } catch (e) {}
     return [];
   });
@@ -431,7 +434,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
       const saved = localStorage.getItem('fancode_transactions');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.filter((t: any) => t && t.userId !== 'User5294');
+      }
     } catch (e) {}
     return [];
   });

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp, calculateDaysPassed } from '../../context/AppContext';
 import { InvestmentProduct, Transaction, PlatformSettings, TeamMember, MemberPlanHolding, DailyWithdrawalLog } from '../../types';
-import { verifyAdminPinDB, fetchAllTransactionsDB, fetchAllUserProfilesDB } from '../../lib/supabase';
+import { verifyAdminPinDB, fetchAllTransactionsDB, fetchAllUserProfilesDB, updateUserProfileDB, insertTransactionDB } from '../../lib/supabase';
 import { 
   Shield, 
   ShieldCheck, 
@@ -172,6 +172,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Quick Balance Modal
   const [isAddBalanceModalOpen, setIsAddBalanceModalOpen] = useState(false);
+  const [creditTargetUserId, setCreditTargetUserId] = useState('');
   const [quickBalanceAmt, setQuickBalanceAmt] = useState('');
   const [quickBalanceNote, setQuickBalanceNote] = useState('');
 
@@ -964,7 +965,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 </span>
               </button>
 
-              {/* KYC Requests */}
+              {/* KYC Requests (Commented out per user requirement: only bank info collected)
               <button
                 onClick={() => setActiveTab('kyc')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
@@ -976,6 +977,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <ShieldCheck className="w-4 h-4 shrink-0" />
                 <span>KYC Requests</span>
               </button>
+              */}
 
               {/* Settings */}
               <button
@@ -1163,15 +1165,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <AdminDashboardView
                 onTriggerDailyROI={() => setIsYieldConfirmOpen(true)}
                 onNavigate={(tab) => setActiveTab(tab as any)}
-                onOpenAddBalanceModal={() => setIsAddBalanceModalOpen(true)}
+                onOpenAddBalanceModal={() => {
+                  setCreditTargetUserId(liveUsersList[0]?.id || '');
+                  setIsAddBalanceModalOpen(true);
+                }}
                 pendingWithdrawalsCount={pendingWithdrawals.length}
                 pendingTopupsCount={pendingRecharges.length}
-                totalUsersCount={liveUsersList.length > 0 ? liveUsersList.length : (teamMembers.length + 1)}
-                totalWalletBalance={liveUsersList.length > 0 ? liveUsersList.reduce((acc, u) => acc + (u.walletBalance || 0), 0) : user.availableBalance}
-                totalInvested={liveUsersList.length > 0 ? liveUsersList.reduce((acc, u) => acc + (u.totalInvested || 0), 0) : user.totalRecharge}
+                totalUsersCount={liveUsersList.length}
+                totalWalletBalance={liveUsersList.reduce((acc, u) => acc + (u.walletBalance || 0), 0)}
+                totalInvested={liveUsersList.reduce((acc, u) => acc + (u.totalInvested || 0), 0)}
                 totalWithdrawn={allWithdrawalsSum}
-                activeUsersCount={liveUsersList.length > 0 ? liveUsersList.filter(u => u.status === 'Active').length : 1}
-                inactiveUsersCount={liveUsersList.length > 0 ? liveUsersList.filter(u => u.status !== 'Active').length : 0}
+                activeUsersCount={liveUsersList.filter(u => u.status === 'Active').length}
+                inactiveUsersCount={liveUsersList.filter(u => u.status !== 'Active').length}
               />
             )}
 
@@ -1181,6 +1186,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onInspectUser={(u) => setSelectedAdminUser(u)}
                 onOpenAddMoneyForUser={(u) => {
                   setSelectedAdminUser(u);
+                  setCreditTargetUserId(u.id);
+                  setIsAddBalanceModalOpen(true);
                 }}
                 onExportCSV={exportToCSV}
                 showToast={showToast}
@@ -1210,7 +1217,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   adjustUserBalance(amt, note);
                   showToast(`Balance adjusted: ₹${amt.toLocaleString()}`);
                 }}
-                onOpenAddMoneyModal={() => setIsAddBalanceModalOpen(true)}
+                onOpenAddMoneyModal={() => {
+                  setCreditTargetUserId(liveUsersList[0]?.id || '');
+                  setIsAddBalanceModalOpen(true);
+                }}
                 onExportCSV={exportToCSV}
                 showToast={showToast}
               />
@@ -1275,8 +1285,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               />
             )}
 
-            {/* TAB 7: KYC REQUESTS */}
-            {activeTab === 'kyc' && (
+            {/* TAB 7: KYC REQUESTS (Commented out per user requirement)
+            activeTab === 'kyc' && (
               <div className="space-y-6">
                 <div>
                   <h1 className="text-2xl font-black text-slate-900 font-sans tracking-tight">
@@ -1296,7 +1306,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   </p>
                 </div>
               </div>
-            )}
+            )
+            */}
 
           {/* ================= SECTION 2: DAILY WITHDRAWAL LOGS TABLE (NEW) ================= */}
           {activeTab === 'dailyWithdrawals' && (
@@ -3714,17 +3725,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         </div>
       )}
 
-      {/* Quick Add Balance Modal */}
+      {/* Quick Add Balance Modal with Target User Selection */}
       {isAddBalanceModalOpen && (
         <div className="fixed inset-0 z-60 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="bg-[#0B1536] px-6 py-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-[#FF4A00]" />
-                <h3 className="font-bold text-base font-sans">Add Wallet Balance</h3>
+                <h3 className="font-bold text-base font-sans">Credit User Wallet Balance</h3>
               </div>
               <button
-                onClick={() => setIsAddBalanceModalOpen(false)}
+                onClick={() => {
+                  setIsAddBalanceModalOpen(false);
+                  setCreditTargetUserId('');
+                }}
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
               >
                 <X className="w-4 h-4" />
@@ -3732,6 +3746,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             </div>
 
             <div className="p-6 space-y-4">
+              {/* Select Target User Account */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Select User Account to Credit *
+                </label>
+                {liveUsersList && liveUsersList.length > 0 ? (
+                  <select
+                    value={creditTargetUserId}
+                    onChange={(e) => setCreditTargetUserId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-sans font-bold text-slate-800 bg-white outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                  >
+                    <option value="">-- Choose a Registered User --</option>
+                    {liveUsersList.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.name} ({u.userId}) - {u.mobile} [Bal: ₹{u.walletBalance.toLocaleString('en-IN')}]
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      placeholder="Enter Target User ID or Mobile (e.g. +91 98452...)"
+                      value={creditTargetUserId}
+                      onChange={(e) => setCreditTargetUserId(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"
+                    />
+                    <p className="text-[11px] text-slate-400">
+                      No users registered yet. Enter the target User ID or Phone number above.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Credit Preset */}
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">Quick Credit Preset</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -3748,8 +3797,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 </div>
               </div>
 
+              {/* Custom Amount */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Custom Amount (₹) *</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Credit Amount (₹) *</label>
                 <input
                   type="number"
                   placeholder="Enter amount (e.g. 1000)"
@@ -3759,6 +3809,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 />
               </div>
 
+              {/* Reason / Note */}
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1">Reason / Note</label>
                 <input
@@ -3773,22 +3824,74 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <div className="pt-2 flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsAddBalanceModalOpen(false)}
+                  onClick={() => {
+                    setIsAddBalanceModalOpen(false);
+                    setCreditTargetUserId('');
+                  }}
                   className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     const val = Number(quickBalanceAmt);
+                    if (!creditTargetUserId.trim()) {
+                      showToast('Please select or enter the user account to credit', 'error');
+                      return;
+                    }
                     if (!val || val <= 0) {
                       showToast('Please enter an amount greater than 0', 'error');
                       return;
                     }
-                    adjustUserBalance(val, quickBalanceNote || 'Admin Wallet Credit');
-                    showToast(`₹${val.toLocaleString()} credited successfully!`);
+
+                    const target = liveUsersList.find(u => u.id === creditTargetUserId || u.userId === creditTargetUserId || u.mobile === creditTargetUserId);
+                    const note = quickBalanceNote || 'Admin Wallet Credit';
+
+                    if (target) {
+                      const updatedBal = Number(target.walletBalance || 0) + val;
+                      await updateUserProfileDB(target.id, {
+                        availableBalance: updatedBal,
+                        withdrawableBalance: updatedBal,
+                      });
+                      const adminTxn: Transaction = {
+                        id: `TXN-ADM-${Date.now().toString().slice(-6)}`,
+                        type: 'RECHARGE',
+                        amount: val,
+                        status: 'COMPLETED',
+                        timestamp: simulatedTime.getTime(),
+                        formattedTime: simulatedTime.toLocaleString(),
+                        description: `Admin Credit: ${note}`,
+                        referenceId: `ADMIN-${Date.now().toString().slice(-4)}`
+                      };
+                      await insertTransactionDB(target.id, adminTxn);
+
+                      setLiveUsersList(prev => prev.map(u => u.id === target.id ? { ...u, walletBalance: updatedBal } : u));
+                      setLiveTransactionsList(prev => [adminTxn, ...prev]);
+
+                      if (user && user.id === target.id) {
+                        adjustUserBalance(val, note);
+                      }
+
+                      showToast(`₹${val.toLocaleString()} credited successfully to ${target.name} (${target.userId})!`);
+                    } else {
+                      const adminTxn: Transaction = {
+                        id: `TXN-ADM-${Date.now().toString().slice(-6)}`,
+                        type: 'RECHARGE',
+                        amount: val,
+                        status: 'COMPLETED',
+                        timestamp: simulatedTime.getTime(),
+                        formattedTime: simulatedTime.toLocaleString(),
+                        description: `Admin Credit to ${creditTargetUserId}: ${note}`,
+                        referenceId: `ADMIN-${Date.now().toString().slice(-4)}`
+                      };
+                      await insertTransactionDB(creditTargetUserId, adminTxn);
+                      setLiveTransactionsList(prev => [adminTxn, ...prev]);
+                      showToast(`₹${val.toLocaleString()} credited successfully to account ${creditTargetUserId}!`);
+                    }
+
                     setIsAddBalanceModalOpen(false);
+                    setCreditTargetUserId('');
                     setQuickBalanceAmt('');
                     setQuickBalanceNote('');
                   }}
