@@ -34,6 +34,7 @@ const AppContent: React.FC = () => {
     showAdminPanel,
     setShowAdminPanel,
     setNavigateToRechargeFn,
+    setNavigateToWithdrawFn,
     user,
     setShowAuthModal,
   } = useApp();
@@ -111,9 +112,10 @@ const AppContent: React.FC = () => {
     setCurrentSubView('recharge');
   };
 
-  // Register with context so any component (e.g. BuyModal) can trigger recharge navigation
+  // Register with context so any component (e.g. BuyModal, Navbar) can trigger recharge navigation
   React.useEffect(() => {
     setNavigateToRechargeFn(handleOpenRecharge);
+    setNavigateToWithdrawFn(handleOpenWithdraw);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.isLoggedIn]);
 

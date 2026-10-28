@@ -134,6 +134,8 @@ interface AppContextType {
   getDailyWithdrawalLogs: () => DailyWithdrawalLog[];
   navigateToRecharge: () => void;
   setNavigateToRechargeFn: (fn: () => void) => void;
+  navigateToWithdraw: () => void;
+  setNavigateToWithdrawFn: (fn: () => void) => void;
   refreshUserData?: (userId?: string) => Promise<void>;
   logoutUser: () => Promise<void>;
 }
@@ -329,6 +331,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const navigateToRechargeRef = React.useRef<() => void>(() => {});
   const navigateToRecharge = () => navigateToRechargeRef.current();
   const setNavigateToRechargeFn = (fn: () => void) => { navigateToRechargeRef.current = fn; };
+  const navigateToWithdrawRef = React.useRef<() => void>(() => {});
+  const navigateToWithdraw = () => navigateToWithdrawRef.current();
+  const setNavigateToWithdrawFn = (fn: () => void) => { navigateToWithdrawRef.current = fn; };
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
   const [showBuyModal, setShowBuyModal] = useState<InvestmentProduct | null>(null);
   const [showCustomerCare, setShowCustomerCare] = useState<boolean>(false);
@@ -2024,6 +2029,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         getDailyWithdrawalLogs,
         navigateToRecharge,
         setNavigateToRechargeFn,
+        navigateToWithdraw,
+        setNavigateToWithdrawFn,
         refreshUserData,
         logoutUser,
       }}
