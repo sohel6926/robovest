@@ -209,7 +209,7 @@ export const AuthModal: React.FC = () => {
     resetFormState();
 
     if (!otpToken.trim()) {
-      setErrorMessage('Please enter the 6-digit verification code.');
+      setErrorMessage('Please enter the verification code.');
       return;
     }
 
@@ -562,7 +562,7 @@ export const AuthModal: React.FC = () => {
             <div className="text-center space-y-1">
               <p className="font-bold text-slate-800 text-sm">Verify Your Email</p>
               <p className="text-[11px] text-slate-500">
-                Enter the 6-digit confirmation code sent to <br />
+                Enter the verification code sent to <br />
                 <span className="font-semibold text-slate-800">{email}</span>
               </p>
             </div>
@@ -573,10 +573,10 @@ export const AuthModal: React.FC = () => {
               </span>
               <input
                 type="text"
-                maxLength={8}
+                maxLength={10}
                 value={otpToken}
                 onChange={(e) => setOtpToken(e.target.value)}
-                placeholder="6-Digit OTP Code"
+                placeholder="Enter OTP Code"
                 className="w-full bg-transparent py-3 px-3 text-center text-slate-900 font-mono text-base tracking-widest focus:outline-none"
                 required
               />
