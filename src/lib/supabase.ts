@@ -17,18 +17,26 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const MAIN_DOMAIN = 'https://robovest-git-main-sohel6926.vercel.app';
+export const getAppBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return window.location.origin;
+  }
+  return 'https://robovest.vercel.app';
+};
+
+export const MAIN_DOMAIN = 'https://robovest.vercel.app';
 
 /* -------------------------------------------------------------------------- */
 /*                               AUTHENTICATION                                */
 /* -------------------------------------------------------------------------- */
 
 export async function signUpWithEmail(email: string, password: string, options?: { inviteCode?: string; phone?: string }) {
+  const origin = getAppBaseUrl();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${MAIN_DOMAIN}/`,
+      emailRedirectTo: `${origin}/`,
       data: {
         invite_code: options?.inviteCode || '',
         phone: options?.phone || ''
@@ -56,8 +64,9 @@ export async function verifyEmailOtp(email: string, token: string, type: 'signup
 }
 
 export async function sendPasswordResetEmail(email: string) {
+  const origin = getAppBaseUrl();
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${MAIN_DOMAIN}/?reset=true`
+    redirectTo: `${origin}/?reset=true`
   });
   return { data, error };
 }

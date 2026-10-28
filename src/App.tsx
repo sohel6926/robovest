@@ -67,21 +67,41 @@ const AppContent: React.FC = () => {
   }, [user.isLoggedIn, setShowAuthModal]);
 
   React.useEffect(() => {
-    const checkAdminRoute = () => {
+    const handleUrlRoutes = () => {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
+
+      // Admin route check
       if (path === '/admin' || path.startsWith('/admin/') || hash === '#admin') {
         setShowAdminPanel(true);
       }
+
+      // Auth routes check (/login, /signin, /register, /signup, etc.)
+      const isAuthPath = 
+        path === '/login' || 
+        path === '/signin' || 
+        path === '/register' || 
+        path === '/signup' || 
+        hash === '#login' || 
+        hash === '#signin' || 
+        hash === '#register' || 
+        hash === '#signup' ||
+        hash.includes('access_token=') ||
+        window.location.search.includes('reset=true');
+
+      if (isAuthPath) {
+        setShowAuthModal(true);
+      }
     };
-    checkAdminRoute();
-    window.addEventListener('hashchange', checkAdminRoute);
-    window.addEventListener('popstate', checkAdminRoute);
+
+    handleUrlRoutes();
+    window.addEventListener('hashchange', handleUrlRoutes);
+    window.addEventListener('popstate', handleUrlRoutes);
     return () => {
-      window.removeEventListener('hashchange', checkAdminRoute);
-      window.removeEventListener('popstate', checkAdminRoute);
+      window.removeEventListener('hashchange', handleUrlRoutes);
+      window.removeEventListener('popstate', handleUrlRoutes);
     };
-  }, [setShowAdminPanel]);
+  }, [setShowAdminPanel, setShowAuthModal]);
 
   const handleOpenRecharge = () => {
     if (!user.isLoggedIn) {

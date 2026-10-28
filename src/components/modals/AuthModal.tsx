@@ -42,21 +42,44 @@ export const AuthModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
-  // Reset to login mode every time modal opens (or register if ref link used)
+  // Reset to login mode every time modal opens (or register if ref link used), and sync URL hash
   React.useEffect(() => {
     if (showAuthModal) {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
       const storedRef = sessionStorage.getItem('fancode_ref_code') || localStorage.getItem('fancode_ref_code') || '';
-      if (storedRef) {
+      if (storedRef || path.includes('register') || path.includes('signup') || hash.includes('register') || hash.includes('signup')) {
         setInviteCode(storedRef);
         setMode('register');
+        try { window.history.replaceState(null, '', '#register'); } catch (e) {}
+      } else if (search.includes('reset=true') || hash.includes('reset-password')) {
+        setMode('reset_password');
       } else {
         setMode('login');
+        try { window.history.replaceState(null, '', '#login'); } catch (e) {}
       }
       setErrorMessage(null);
       setSuccessNotice(null);
       setOtpToken('');
+    } else {
+      try {
+        if (['#login', '#register', '#signin', '#signup'].includes(window.location.hash)) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      } catch (e) {}
     }
   }, [showAuthModal]);
+
+  const handleClose = () => {
+    setShowAuthModal(false);
+    try {
+      if (['#login', '#register', '#signin', '#signup'].includes(window.location.hash)) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    } catch (e) {}
+  };
 
   if (!showAuthModal) return null;
 
@@ -69,6 +92,13 @@ export const AuthModal: React.FC = () => {
   const switchMode = (newMode: AuthMode) => {
     resetFormState();
     setMode(newMode);
+    try {
+      if (newMode === 'login') {
+        window.history.replaceState(null, '', '#login');
+      } else if (newMode === 'register') {
+        window.history.replaceState(null, '', '#register');
+      }
+    } catch (e) {}
   };
 
   // 1. Handle Login
@@ -284,7 +314,7 @@ export const AuthModal: React.FC = () => {
       <div className="relative w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl space-y-4 text-slate-900 overflow-hidden max-h-[94vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          onClick={() => setShowAuthModal(false)}
+          onClick={handleClose}
           className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:text-slate-900 flex items-center justify-center transition border border-slate-200"
         >
           <X className="w-4 h-4" />

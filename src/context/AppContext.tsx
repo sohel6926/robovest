@@ -337,9 +337,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [showColorTrustGuide, setShowColorTrustGuide] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return (localStorage.getItem('fancode_admin_auth') || localStorage.getItem('robovest_admin_auth')) === 'true';
-  });
+  // Admin authentication strictly in-memory session (never persisted in localStorage for security)
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
 
   // Dynamic Catalog backed by Supabase
   const [catalog, setCatalog] = useState<InvestmentProduct[]>(() => {
@@ -683,8 +682,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [teamMembers]);
 
   useEffect(() => {
-    localStorage.setItem('fancode_admin_auth', isAdminAuthenticated ? 'true' : 'false');
-  }, [isAdminAuthenticated]);
+    // Purge legacy admin auth tokens to guarantee password is required on every visit
+    try {
+      localStorage.removeItem('fancode_admin_auth');
+      localStorage.removeItem('robovest_admin_auth');
+    } catch (e) {}
+  }, []);
 
   // Count how many units user already owns of a product
   const getProductOwnedCount = (productId: string): number => {

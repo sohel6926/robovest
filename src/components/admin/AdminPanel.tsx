@@ -1148,7 +1148,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   <Lock className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={onClose}
+                  onClick={() => {
+                    setIsAdminAuthenticated(false);
+                    onClose();
+                  }}
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1536] hover:bg-[#16224f] text-white text-xs font-bold transition shadow-xs"
                 >
                   <Eye className="w-3.5 h-3.5" />
