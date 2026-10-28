@@ -153,7 +153,7 @@ const INITIAL_TEAM: TeamMember[] = [
     phone: '+91 98234 11029', 
     joinDate: '2026-10-02', 
     level: 1, 
-    inviterId: 'User5294 (You)',
+    inviterId: '',
     inviteCount: 4, 
     rechargeAmount: 4000, 
     teamInvested: 12500,
@@ -182,7 +182,7 @@ const INITIAL_TEAM: TeamMember[] = [
     phone: '+91 97112 88472', 
     joinDate: '2026-10-04', 
     level: 1, 
-    inviterId: 'User5294 (You)',
+    inviterId: '',
     inviteCount: 2, 
     rechargeAmount: 2100, 
     teamInvested: 4200,
@@ -269,7 +269,7 @@ const INITIAL_TEAM: TeamMember[] = [
     phone: '+91 96541 77290', 
     joinDate: '2026-10-08', 
     level: 1, 
-    inviterId: 'User5294 (You)',
+    inviterId: '',
     inviteCount: 3, 
     rechargeAmount: 8200, 
     teamInvested: 6000,
@@ -502,7 +502,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const navigateToRechargeRef = React.useRef<() => void>(() => {});
   const navigateToRecharge = () => navigateToRechargeRef.current();
   const setNavigateToRechargeFn = (fn: () => void) => { navigateToRechargeRef.current = fn; };
-  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(true);
+  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
   const [showBuyModal, setShowBuyModal] = useState<InvestmentProduct | null>(null);
   const [showCustomerCare, setShowCustomerCare] = useState<boolean>(false);
   const [showOrdersModal, setShowOrdersModal] = useState<boolean>(false);
@@ -719,6 +719,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           if (isMounted) {
             setInvestments(userInvs || []);
             setTransactions(userTxns || []);
+          }
+        } else if (isMounted) {
+          // No active session — show auth modal so user must login/register
+          // Only show on first visit (not when user explicitly dismissed it before)
+          const hasSeenAuthPrompt = sessionStorage.getItem('fc_auth_prompted');
+          if (!hasSeenAuthPrompt) {
+            sessionStorage.setItem('fc_auth_prompted', 'true');
+            setTimeout(() => {
+              if (isMounted) setShowAuthModal(true);
+            }, 800);
           }
         }
       } catch (err) {

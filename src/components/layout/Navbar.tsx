@@ -1,12 +1,13 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Shield, Key } from 'lucide-react';
+import { Shield, LogIn, LogOut } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { 
     user, 
     setShowAuthModal,
-    setShowAdminPanel,
+    logoutUser,
+    setActiveTab,
   } = useApp();
 
   return (
@@ -32,26 +33,37 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Actions: Admin & VIP Badge */}
+        {/* Right Actions: Auth & VIP Badge */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Admin Panel Trigger */}
-          <button
-            onClick={() => setShowAdminPanel(true)}
-            title="Open Admin Panel"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-bold border border-slate-700/80 shadow-xs transition active:scale-95 cursor-pointer"
-          >
-            <Key className="w-3.5 h-3.5 text-amber-400" />
-            <span>Admin</span>
-          </button>
-
-          {/* User VIP Status */}
-          <button
-            onClick={() => setShowAuthModal(true)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:brightness-105 text-white text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer"
-          >
-            <Shield className="w-3.5 h-3.5 fill-white/20 text-white" />
-            <span>VIP{user?.vipLevel || 1}</span>
-          </button>
+          {user?.isLoggedIn ? (
+            <>
+              {/* VIP Badge when logged in */}
+              <button
+                onClick={() => setActiveTab('profile')}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:brightness-105 text-white text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer"
+              >
+                <Shield className="w-3.5 h-3.5 fill-white/20 text-white" />
+                <span>VIP{user?.vipLevel || 1}</span>
+              </button>
+              {/* Logout button */}
+              <button
+                onClick={() => logoutUser()}
+                title="Sign Out"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold border border-slate-200 shadow-xs transition active:scale-95 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </>
+          ) : (
+            /* Sign In button when logged out */
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:brightness-105 text-white text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

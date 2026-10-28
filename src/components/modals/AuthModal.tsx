@@ -33,7 +33,7 @@ export const AuthModal: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [inviteCode, setInviteCode] = useState<string>('TOP_ADMIN');
+  const [inviteCode, setInviteCode] = useState<string>('');
   const [otpToken, setOtpToken] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
@@ -41,6 +41,16 @@ export const AuthModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
+
+  // Reset to login mode every time modal opens
+  React.useEffect(() => {
+    if (showAuthModal) {
+      setMode('login');
+      setErrorMessage(null);
+      setSuccessNotice(null);
+      setOtpToken('');
+    }
+  }, [showAuthModal]);
 
   if (!showAuthModal) return null;
 

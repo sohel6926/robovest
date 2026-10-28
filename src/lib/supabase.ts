@@ -30,7 +30,7 @@ export async function signUpWithEmail(email: string, password: string, options?:
     options: {
       emailRedirectTo: `${MAIN_DOMAIN}/`,
       data: {
-        invite_code: options?.inviteCode || 'TOP_ADMIN',
+        invite_code: options?.inviteCode || '',
         phone: options?.phone || ''
       }
     }
@@ -107,7 +107,7 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
   // Create new user profile in Supabase
   const inviteCode = generateInviteCode();
   const phone = metadata?.phone || '';
-  const inviterCode = metadata?.invite_code || metadata?.inviterCode || 'TOP_ADMIN';
+  const inviterCode = metadata?.invite_code || metadata?.inviterCode || '';
 
   const newProfile = {
     id: userId,

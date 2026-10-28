@@ -23,7 +23,6 @@ import { BankCardModal } from './components/modals/BankCardModal';
 import { ColorTrustGuideModal } from './components/modals/ColorTrustGuideModal';
 import { AuthModal } from './components/modals/AuthModal';
 import { AdminPanel } from './components/admin/AdminPanel';
-import { Key } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const { 
