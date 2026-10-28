@@ -27,6 +27,10 @@ interface AdminDashboardViewProps {
   pendingTopupsCount: number;
   totalUsersCount?: number;
   totalWalletBalance?: number;
+  totalInvested?: number;
+  totalWithdrawn?: number;
+  activeUsersCount?: number;
+  inactiveUsersCount?: number;
 }
 
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
@@ -35,8 +39,12 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   onOpenAddBalanceModal,
   pendingWithdrawalsCount,
   pendingTopupsCount,
-  totalUsersCount = 693,
-  totalWalletBalance = 4897392.55,
+  totalUsersCount = 1,
+  totalWalletBalance = 0,
+  totalInvested = 0,
+  totalWithdrawn = 0,
+  activeUsersCount = 1,
+  inactiveUsersCount = 0,
 }) => {
 
   return (
@@ -73,7 +81,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <div className="text-3xl font-black text-[#0B1536] font-sans tracking-tight mt-1">
               {totalUsersCount.toLocaleString()}
             </div>
-            <span className="text-[11px] text-slate-400 block mt-1">1 registered today</span>
+            <span className="text-[11px] text-slate-400 block mt-1">Verified live accounts</span>
           </div>
         </div>
 
@@ -101,7 +109,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <div className={`text-3xl font-black font-sans tracking-tight mt-1 ${pendingWithdrawalsCount > 0 ? 'text-rose-600 animate-pulse' : 'text-[#0B1536]'}`}>
               {pendingWithdrawalsCount}
             </div>
-            <span className="text-[11px] text-slate-400 block mt-1">₹ 2,21,99,913.94 total withdrawn</span>
+            <span className="text-[11px] text-slate-400 block mt-1">₹ {totalWithdrawn.toLocaleString('en-IN', { maximumFractionDigits: 2 })} total disbursed</span>
           </div>
         </div>
 
@@ -456,7 +464,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               Total Invested
             </span>
             <div className="text-xl sm:text-2xl font-black font-sans text-white mt-1">
-              ₹ 7,42,00,000
+              ₹ {totalInvested.toLocaleString('en-IN')}
             </div>
           </div>
 
@@ -465,7 +473,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               Total Withdrawn
             </span>
             <div className="text-xl sm:text-2xl font-black font-sans text-white mt-1">
-              ₹ 2,21,99,913.94
+              ₹ {totalWithdrawn.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
             </div>
           </div>
 
@@ -474,7 +482,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               Active Users
             </span>
             <div className="text-xl sm:text-2xl font-black font-sans text-emerald-400 mt-1">
-              557
+              {activeUsersCount}
             </div>
           </div>
 
@@ -483,7 +491,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               Inactive Users
             </span>
             <div className="text-xl sm:text-2xl font-black font-sans text-slate-300 mt-1">
-              136
+              {inactiveUsersCount}
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { TablePagination } from '../TablePagination';
+import { fetchAllUserProfilesDB } from '../../../lib/supabase';
 import { 
   Search, 
   Calendar, 
@@ -246,8 +247,8 @@ export const INITIAL_BEE_GROW_USERS: AdminUserItem[] = [
   },
   {
     id: 'usr-11',
-    userId: 'FC5294001',
-    name: 'User5294 (Master Account)',
+    userId: 'FC99182',
+    name: 'Master Account',
     mobile: '9876543210',
     sponsorId: 'Root',
     kycStatus: 'APPROVED',
@@ -278,13 +279,29 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
   const [dateFilter, setDateFilter] = useState<'' | 'today' | 'custom'>('');
   const [customDate, setCustomDate] = useState('');
   const [statusFilter, setStatusFilter] = useState<'' | 'Active' | 'InActive'>('');
+
+  // Fetch real users from Supabase on mount
+  useEffect(() => {
+    async function loadRealUsers() {
+      try {
+        const liveUsers = await fetchAllUserProfilesDB();
+        if (liveUsers && liveUsers.length > 0) {
+          // Merge real users at top
+          setUsers(liveUsers);
+        }
+      } catch (e) {
+        console.error('Error fetching live users in admin:', e);
+      }
+    }
+    loadRealUsers();
+  }, []);
   
   // Create User Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({
     name: '',
     mobile: '',
-    sponsorId: 'FC5294001',
+    sponsorId: 'Root',
     password: '',
     initialBalance: 0,
   });
@@ -381,7 +398,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
     setUsers(prev => [newUser, ...prev]);
     showToast(`User ${newUser.name} created successfully with ID ${newUser.userId}!`);
     setShowCreateModal(false);
-    setCreateForm({ name: '', mobile: '', sponsorId: 'FC5294001', password: '', initialBalance: 0 });
+    setCreateForm({ name: '', mobile: '', sponsorId: 'Root', password: '', initialBalance: 0 });
   };
 
   // Export Excel / CSV
@@ -708,7 +725,7 @@ export const AdminUserManagementView: React.FC<AdminUserManagementViewProps> = (
                 <label className="text-xs font-bold text-slate-700 block mb-1">Sponsor ID</label>
                 <input
                   type="text"
-                  placeholder="e.g. FC5294001 or Root"
+                  placeholder="e.g. Sponsor ID or Root"
                   value={createForm.sponsorId}
                   onChange={(e) => setCreateForm({ ...createForm, sponsorId: e.target.value })}
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-sans font-bold outline-none focus:border-[#FF4A00] focus:ring-1 focus:ring-[#FF4A00]"

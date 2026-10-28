@@ -1171,6 +1171,70 @@ export async function deleteMemberPlanHoldingDB(planHoldingId: string): Promise<
 /*                            ADMIN SETTINGS & AUTH                           */
 /* -------------------------------------------------------------------------- */
 
+export async function fetchAllTransactionsDB(): Promise<Transaction[]> {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('timestamp', { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((t) => ({
+      id: t.id,
+      userId: t.user_id,
+      type: t.type,
+      amount: Number(t.amount),
+      status: t.status,
+      timestamp: Number(t.timestamp),
+      formattedTime: t.formatted_time,
+      description: t.description,
+      referenceId: t.reference_id || undefined,
+      fee: t.fee ? Number(t.fee) : undefined,
+      netAmount: t.net_amount ? Number(t.net_amount) : undefined,
+      adminNote: t.admin_note || undefined,
+      rejectionReason: t.rejection_reason || undefined
+    }));
+  } catch (e) {
+    console.error('fetchAllTransactionsDB exception:', e);
+    return [];
+  }
+}
+
+export async function fetchAllUserProfilesDB(): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*, bank_accounts(*)')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((p) => {
+      const bank = Array.isArray(p.bank_accounts) && p.bank_accounts.length > 0 ? p.bank_accounts[0] : null;
+      return {
+        id: p.id,
+        userId: p.invite_code ? `FC-${p.invite_code}` : p.id.slice(0, 8),
+        name: p.email ? p.email.split('@')[0] : (p.phone || 'User'),
+        mobile: p.phone || p.email || 'N/A',
+        email: p.email || '',
+        city: 'Verified Member',
+        sponsorId: p.inviter_code || 'Root',
+        kycStatus: bank?.is_bound ? 'APPROVED' : 'UNFILLED',
+        vipLevel: `VIP ${p.vip_level || 1}`,
+        status: p.is_logged_in !== false ? 'Active' : 'InActive',
+        walletBalance: Number(p.available_balance || 0),
+        totalEarned: Number(p.total_income || 0),
+        totalInvested: Number(p.total_recharge || 0),
+        joined: p.created_at ? p.created_at.slice(0, 10) : '2026-10-28',
+        profileLocked: false,
+        bankAccount: bank
+      };
+    });
+  } catch (e) {
+    console.error('fetchAllUserProfilesDB exception:', e);
+    return [];
+  }
+}
+
 export async function verifyAdminPinDB(inputPin: string): Promise<boolean> {
   if (inputPin === 'Sri@2026') return true;
   try {
@@ -1181,7 +1245,7 @@ export async function verifyAdminPinDB(inputPin: string): Promise<boolean> {
       .maybeSingle();
 
     if (error || !data) {
-      return inputPin === 'Sri@2026' || inputPin === 'admin888';
+      return inputPin === 'Sri@2026';
     }
 
     if (data.admin_pin === inputPin) return true;
@@ -1189,6 +1253,6 @@ export async function verifyAdminPinDB(inputPin: string): Promise<boolean> {
     return backupPins.includes(inputPin);
   } catch (e) {
     console.error('verifyAdminPinDB exception:', e);
-    return inputPin === 'Sri@2026' || inputPin === 'admin888';
+    return inputPin === 'Sri@2026';
   }
 }

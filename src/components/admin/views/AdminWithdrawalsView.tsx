@@ -34,94 +34,8 @@ export interface WithdrawalRequestItem {
   rejectReason?: string;
 }
 
-// Initial withdrawal items from Bee Grow live console (Screenshot 1)
-export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [
-  {
-    id: 'w-1',
-    serialNo: 1,
-    userName: 'S Viswananda Chowdary',
-    userId: 'FC9271551',
-    requestedDate: '12 Oct 2026',
-    amount: 560,
-    tdsPercent: 10,
-    tdsAmount: 56,
-    netAmount: 504,
-    bankName: 'State Bank of india',
-    accountNumber: '31877094491',
-    ifscCode: 'SBIN0000919',
-    accountHolder: 'S viswananda chowdary',
-    status: 'PROCESSED',
-    utrReference: 'UTR2026101201948',
-  },
-  {
-    id: 'w-2',
-    serialNo: 2,
-    userName: 'KALISETTTI VENKATA RAMANA',
-    userId: 'FC2447574',
-    requestedDate: '12 Oct 2026',
-    amount: 10000,
-    tdsPercent: 10,
-    tdsAmount: 1000,
-    netAmount: 9000,
-    bankName: 'Sbi',
-    accountNumber: '33997522575',
-    ifscCode: 'SBIN0004827',
-    accountHolder: 'KALISETTTI VENKATA RAMANA',
-    status: 'PROCESSED',
-    utrReference: 'UTR2026101208819',
-  },
-  {
-    id: 'w-3',
-    serialNo: 3,
-    userName: 'MEESALA RAMU',
-    userId: 'FC7638923',
-    requestedDate: '14 Oct 2026',
-    amount: 2500,
-    tdsPercent: 10,
-    tdsAmount: 250,
-    netAmount: 2250,
-    bankName: 'Union Bank of India',
-    accountNumber: '09811010004921',
-    ifscCode: 'UBIN0530981',
-    accountHolder: 'MEESALA RAMU',
-    status: 'PROCESSED',
-    utrReference: 'UTR2026101404112',
-  },
-  {
-    id: 'w-4',
-    serialNo: 4,
-    userName: 'YEDDU NAGABHUSHANA RAO',
-    userId: 'FC1402520',
-    requestedDate: '15 Oct 2026',
-    amount: 1200,
-    tdsPercent: 10,
-    tdsAmount: 120,
-    netAmount: 1080,
-    bankName: 'Punjab National Bank',
-    accountNumber: '4421000100234190',
-    ifscCode: 'PUNB0442100',
-    accountHolder: 'YEDDU NAGABHUSHANA RAO',
-    status: 'PROCESSED',
-    utrReference: 'UTR2026101509121',
-  },
-  {
-    id: 'w-5',
-    serialNo: 5,
-    userName: 'Varshitha varma',
-    userId: 'FC4553454',
-    requestedDate: '16 Oct 2026',
-    amount: 800,
-    tdsPercent: 10,
-    tdsAmount: 80,
-    netAmount: 720,
-    bankName: 'HDFC Bank',
-    accountNumber: '50100349182910',
-    ifscCode: 'HDFC0001290',
-    accountHolder: 'Varshitha varma',
-    status: 'REJECTED',
-    rejectReason: 'IFSC code and Account Holder name mismatched',
-  }
-];
+// Initial withdrawal items (clean for production live transactions)
+export const INITIAL_WITHDRAWAL_ITEMS: WithdrawalRequestItem[] = [];
 
 interface AdminWithdrawalsViewProps {
   onApproveLiveWithdrawal?: (id: string, utr: string) => void;
@@ -138,32 +52,44 @@ export const AdminWithdrawalsView: React.FC<AdminWithdrawalsViewProps> = ({
   onExportCSV,
   showToast,
 }) => {
-  const [items, setItems] = useState<WithdrawalRequestItem[]>(() => {
-    // Merge any live pending withdrawal transactions from FanCode
-    const livePendingItems: WithdrawalRequestItem[] = pendingTransactions
-      .filter(t => t.type === 'WITHDRAWAL' && (t.status === 'PROCESSING' || t.status === 'PENDING'))
-      .map((t, idx) => ({
-        id: t.id,
-        serialNo: 0,
-        userName: t.bankDetails?.accountHolder || 'User Account',
-        userId: 'FC5294001',
-        requestedDate: t.formattedTime || t.timestamp,
-        amount: Math.abs(t.amount),
-        tdsPercent: 10,
-        tdsAmount: Math.round(Math.abs(t.amount) * 0.10),
-        netAmount: Math.round(Math.abs(t.amount) * 0.90),
-        bankName: t.bankDetails?.bankName || 'State Bank of India',
-        accountNumber: t.bankDetails?.accountNumber || '31877094491',
-        ifscCode: t.bankDetails?.ifscCode || 'SBIN0000919',
-        accountHolder: t.bankDetails?.accountHolder || 'Master Account Holder',
-        status: 'PENDING',
-      }));
+  const mapTransactionsToItems = (txns: Transaction[]): WithdrawalRequestItem[] => {
+    return txns
+      .filter(t => t.type === 'WITHDRAWAL')
+      .map((t, idx) => {
+        const feePercent = t.fee ? Math.round((t.fee / Math.abs(t.amount)) * 100) : 10;
+        const feeAmt = t.fee || Math.round(Math.abs(t.amount) * (feePercent / 100));
+        const net = t.netAmount || (Math.abs(t.amount) - feeAmt);
+        
+        let reqStatus: 'PENDING' | 'PROCESSED' | 'REJECTED' = 'PENDING';
+        if (t.status === 'COMPLETED') reqStatus = 'PROCESSED';
+        else if (t.status === 'REJECTED') reqStatus = 'REJECTED';
 
-    return [...livePendingItems, ...INITIAL_WITHDRAWAL_ITEMS].map((item, idx) => ({
-      ...item,
-      serialNo: idx + 1,
-    }));
-  });
+        return {
+          id: t.id,
+          serialNo: idx + 1,
+          userName: t.bankDetails?.accountHolder || t.userPhone || 'Member Account',
+          userId: t.userId ? (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId) : `FC-${t.id.slice(-6).toUpperCase()}`,
+          requestedDate: t.formattedTime || (typeof t.timestamp === 'number' ? new Date(t.timestamp).toLocaleDateString('en-IN') : String(t.timestamp)),
+          amount: Math.abs(t.amount),
+          tdsPercent: feePercent,
+          tdsAmount: feeAmt,
+          netAmount: net,
+          bankName: t.bankDetails?.bankName || 'Direct Bank Transfer',
+          accountNumber: t.bankDetails?.accountNumber || '—',
+          ifscCode: t.bankDetails?.ifscCode || '—',
+          accountHolder: t.bankDetails?.accountHolder || 'Beneficiary',
+          status: reqStatus,
+          utrReference: t.referenceId,
+          rejectReason: t.rejectionReason,
+        };
+      });
+  };
+
+  const [items, setItems] = useState<WithdrawalRequestItem[]>(() => mapTransactionsToItems(pendingTransactions));
+
+  React.useEffect(() => {
+    setItems(mapTransactionsToItems(pendingTransactions));
+  }, [pendingTransactions]);
 
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'PENDING' | 'REJECTED' | 'PROCESSED'>('ALL');
   const [search, setSearch] = useState('');

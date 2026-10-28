@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp, calculateDaysPassed } from '../../context/AppContext';
 import { InvestmentProduct, Transaction, PlatformSettings, TeamMember, MemberPlanHolding, DailyWithdrawalLog } from '../../types';
-import { verifyAdminPinDB } from '../../lib/supabase';
+import { verifyAdminPinDB, fetchAllTransactionsDB, fetchAllUserProfilesDB } from '../../lib/supabase';
 import { 
   Shield, 
   ShieldCheck, 
@@ -136,6 +136,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     'dashboard' | 'users' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'dailyWithdrawals'
   >('dashboard');
   const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
+
+  // Live Supabase Data State
+  const [liveUsersList, setLiveUsersList] = useState<AdminUserItem[]>([]);
+  const [liveTransactionsList, setLiveTransactionsList] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    async function loadLiveAdminData() {
+      try {
+        const [usersData, txnsData] = await Promise.all([
+          fetchAllUserProfilesDB(),
+          fetchAllTransactionsDB()
+        ]);
+        if (usersData && usersData.length > 0) {
+          setLiveUsersList(usersData);
+        }
+        if (txnsData && txnsData.length > 0) {
+          setLiveTransactionsList(txnsData);
+        }
+      } catch (err) {
+        console.warn('AdminPanel: Error loading live data from DB', err);
+      }
+    }
+    if (isAdminAuthenticated) {
+      loadLiveAdminData();
+    }
+  }, [isAdminAuthenticated]);
+
+  const allConsolidatedTransactions = React.useMemo(() => {
+    const map = new Map<string, Transaction>();
+    (liveTransactionsList || []).forEach(t => map.set(t.id, t));
+    (transactions || []).forEach(t => map.set(t.id, t));
+    return Array.from(map.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  }, [liveTransactionsList, transactions]);
 
   // Quick Balance Modal
   const [isAddBalanceModalOpen, setIsAddBalanceModalOpen] = useState(false);
@@ -283,7 +316,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     phone: '+91 98',
     joinDate: new Date().toISOString().slice(0, 10),
     level: 1,
-    inviterId: 'User5294 (You)',
+    inviterId: user?.id || 'ROOT',
     inviteCount: 0,
     rechargeAmount: 520,
     teamInvested: 0,
@@ -561,13 +594,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Calculations for summary metrics with defensive array guards
   const dailyWithdrawalLogs = typeof getDailyWithdrawalLogs === 'function' ? (getDailyWithdrawalLogs() || []) : [];
-  const pendingRecharges = (transactions || []).filter(t => t.type === 'RECHARGE' && t.status === 'PROCESSING');
-  const pendingWithdrawals = (transactions || []).filter(t => t.type === 'WITHDRAWAL' && t.status === 'PROCESSING');
+  const pendingRecharges = allConsolidatedTransactions.filter(t => t.type === 'RECHARGE' && (t.status === 'PROCESSING' || t.status === 'PENDING'));
+  const pendingWithdrawals = allConsolidatedTransactions.filter(t => t.type === 'WITHDRAWAL' && (t.status === 'PROCESSING' || t.status === 'PENDING'));
   const activeNodes = (investments || []).filter(i => i.status === 'ACTIVE');
-  const allWithdrawalsSum = (transactions || [])
-    .filter(t => t.type === 'WITHDRAWAL')
+  const allWithdrawalsSum = allConsolidatedTransactions
+    .filter(t => t.type === 'WITHDRAWAL' && t.status === 'COMPLETED')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  const allFeesSum = (transactions || [])
+  const allFeesSum = allConsolidatedTransactions
     .filter(t => t.type === 'WITHDRAWAL')
     .reduce((sum, t) => sum + (t.fee || 0), 0);
   const totalNetworkInvestment = (teamMembers || []).reduce((sum, m) => sum + (m.rechargeAmount || 0), 0);
@@ -598,11 +631,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   };
 
   const getDownlineStats = (memberId: string) => {
-    const isRoot = memberId === 'ROOT' || memberId === 'User5294 (You)';
+    const isRoot = memberId === 'ROOT' || memberId === 'Root' || memberId === user?.id;
     
     // Direct invites (Level 1 relative to this member)
     const l1Members = isRoot 
-      ? teamMembers.filter(m => m.inviterId === 'User5294 (You)' || m.level === 1)
+      ? teamMembers.filter(m => m.inviterId === user?.id || m.inviterId === 'ROOT' || m.level === 1)
       : teamMembers.filter(m => m.inviterId === memberId);
     
     // 2nd gen invites (Level 2 relative to this member)
@@ -1081,6 +1114,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 onOpenAddBalanceModal={() => setIsAddBalanceModalOpen(true)}
                 pendingWithdrawalsCount={pendingWithdrawals.length}
                 pendingTopupsCount={pendingRecharges.length}
+                totalUsersCount={liveUsersList.length > 0 ? liveUsersList.length : (teamMembers.length + 1)}
+                totalWalletBalance={liveUsersList.length > 0 ? liveUsersList.reduce((acc, u) => acc + (u.walletBalance || 0), 0) : user.availableBalance}
+                totalInvested={liveUsersList.length > 0 ? liveUsersList.reduce((acc, u) => acc + (u.totalInvested || 0), 0) : user.totalRecharge}
+                totalWithdrawn={allWithdrawalsSum}
+                activeUsersCount={liveUsersList.length > 0 ? liveUsersList.filter(u => u.status === 'Active').length : 1}
+                inactiveUsersCount={liveUsersList.length > 0 ? liveUsersList.filter(u => u.status !== 'Active').length : 0}
               />
             )}
 
@@ -1135,7 +1174,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                   rejectWithdrawal(id, reason);
                   showToast(`Withdrawal rejected: ${reason}`);
                 }}
-                pendingTransactions={transactions}
+                pendingTransactions={allConsolidatedTransactions}
                 onExportCSV={exportToCSV}
                 showToast={showToast}
               />
@@ -1144,7 +1183,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             {/* TAB 5: TOP-UP REQUESTS (Bee Grow Top-up Management) */}
             {activeTab === 'recharges' && (
               <AdminTopupsView
-                pendingTransactions={transactions}
+                pendingTransactions={allConsolidatedTransactions}
                 onApproveRecharge={(id) => {
                   approveRecharge(id);
                   showToast('Top-up approved!');
@@ -1754,7 +1793,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                     {txn.userPhone || user.phone}
                                   </span>
                                   <span className="text-[10px] text-slate-400 font-sans">
-                                    User: {txn.userId || user.id || 'User5294'}
+                                    User: {txn.userId || user?.id || 'Member'}
                                   </span>
                                 </td>
 
@@ -2052,7 +2091,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                                     {txn.userPhone || user.phone}
                                   </span>
                                   <span className="text-[10px] text-slate-400 font-sans">
-                                    User ID: {txn.userId || user.id || 'User5294'}
+                                    User ID: {txn.userId || user?.id || 'Member'}
                                   </span>
                                 </td>
 
@@ -3333,7 +3372,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={async () => {
-                    const res = await assignPlanToUser(user.id || 'User5294', assignPlanId, assignPlanQuantity);
+                    const targetUserId = selectedAdminUser?.id || user?.id || 'Master';
+                    const res = await assignPlanToUser(targetUserId, assignPlanId, assignPlanQuantity);
                     showToast(res.message);
                     setIsAssignPlanModalOpen(false);
                   }}
@@ -3368,7 +3408,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                    ID: {user.id || 'User5294'} · Invite Code: {user.inviteCode} · Joined: {user.joinDate || '2026-03-12'}
+                    ID: {user?.id || 'Master'} · Invite Code: {user?.inviteCode} · Joined: {user?.joinDate || '2026-03-12'}
                   </p>
                 </div>
               </div>
@@ -3486,7 +3526,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           />
                           <button
                             onClick={async () => {
-                              await updateUserSecurity(user.id || 'User5294', { pin: securityPinInput });
+                              const targetUserId = selectedAdminUser?.id || user?.id || 'Master';
+                              await updateUserSecurity(targetUserId, { pin: securityPinInput });
                               showToast(`Security PIN updated to: ${securityPinInput}`);
                             }}
                             className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition"
@@ -3510,8 +3551,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                           </div>
                           <button
                             onClick={async () => {
+                              const targetUserId = selectedAdminUser?.id || user?.id || 'Master';
                               const newLock = !user.bankDetailsLocked;
-                              await updateUserSecurity(user.id || 'User5294', { bankDetailsLocked: newLock });
+                              await updateUserSecurity(targetUserId, { bankDetailsLocked: newLock });
                               showToast(`Bank details lock set to: ${newLock}`);
                             }}
                             className={`px-3 py-1.5 rounded-xl font-bold text-xs transition ${
