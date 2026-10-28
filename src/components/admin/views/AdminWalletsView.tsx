@@ -16,83 +16,12 @@ export interface WalletRecordItem {
   source: 'Level Income' | 'Daily ROI' | 'Recharge' | 'Withdrawal' | 'Admin Bonus';
 }
 
-export const INITIAL_WALLET_RECORDS: WalletRecordItem[] = [
-  {
-    id: 'wr-1',
-    serialNo: 1,
-    date: '18/10/2026',
-    userName: 'IPPLI USHA RANI',
-    userId: 'FC2181901',
-    type: 'Credit',
-    amount: 0.27,
-    balanceAfter: 45906.81,
-    description: 'Level 8 income credited',
-    source: 'Level Income',
-  },
-  {
-    id: 'wr-2',
-    serialNo: 2,
-    date: '18/10/2026',
-    userName: 'Vadarevu Sujatha',
-    userId: 'FC3039084',
-    type: 'Credit',
-    amount: 0.27,
-    balanceAfter: 30342.17,
-    description: 'Level 7 income credited',
-    source: 'Level Income',
-  },
-  {
-    id: 'wr-3',
-    serialNo: 3,
-    date: '18/10/2026',
-    userName: 'GUDLA NARESH',
-    userId: 'FC3434967',
-    type: 'Credit',
-    amount: 0.27,
-    balanceAfter: 30041.59,
-    description: 'Level 6 income credited',
-    source: 'Level Income',
-  },
-  {
-    id: 'wr-4',
-    serialNo: 4,
-    date: '18/10/2026',
-    userName: 'VADDI KAVYA',
-    userId: 'FC3723445',
-    type: 'Credit',
-    amount: 0.53,
-    balanceAfter: 21439.95,
-    description: 'Level 5 income credited',
-    source: 'Level Income',
-  },
-  {
-    id: 'wr-5',
-    serialNo: 5,
-    date: '18/10/2026',
-    userName: 'MEESALA RAMU',
-    userId: 'FC7638923',
-    type: 'Credit',
-    amount: 130.00,
-    balanceAfter: 5146.67,
-    description: 'Daily Node ROI credited',
-    source: 'Daily ROI',
-  },
-  {
-    id: 'wr-6',
-    serialNo: 6,
-    date: '17/10/2026',
-    userName: 'Sponsor Leader',
-    userId: 'FC99182',
-    type: 'Credit',
-    amount: 520.00,
-    balanceAfter: 12450.00,
-    description: 'Top-up Verification Approved',
-    source: 'Recharge',
-  }
-];
+// Initial wallet records (clean for production live transactions)
+export const INITIAL_WALLET_RECORDS: WalletRecordItem[] = [];
 
 interface AdminWalletsViewProps {
   currentBalance: number;
+  transactions?: Transaction[];
   onAdjustBalance: (amount: number, reason: string) => void;
   onOpenAddMoneyModal: () => void;
   onExportCSV: (filename: string, headers: string[], rows: (string | number)[][]) => void;
@@ -101,12 +30,41 @@ interface AdminWalletsViewProps {
 
 export const AdminWalletsView: React.FC<AdminWalletsViewProps> = ({
   currentBalance,
+  transactions = [],
   onAdjustBalance,
   onOpenAddMoneyModal,
   onExportCSV,
   showToast,
 }) => {
-  const [records, setRecords] = useState<WalletRecordItem[]>(INITIAL_WALLET_RECORDS);
+  const mapTransactionsToWalletRecords = (txns: Transaction[]): WalletRecordItem[] => {
+    return txns.map((t, idx) => {
+      const isCredit = t.amount >= 0;
+      let src: WalletRecordItem['source'] = 'Admin Bonus';
+      if (t.type === 'RECHARGE') src = 'Recharge';
+      else if (t.type === 'WITHDRAWAL') src = 'Withdrawal';
+      else if (t.type === 'COMMISSION' || t.type === 'REFERRAL') src = 'Level Income';
+      else if (t.type === 'DAILY_INCOME' || t.type === 'DAILY_ROI') src = 'Daily ROI';
+
+      return {
+        id: t.id,
+        serialNo: idx + 1,
+        date: t.formattedTime || (typeof t.timestamp === 'number' ? new Date(t.timestamp).toLocaleDateString('en-IN') : String(t.timestamp)),
+        userName: t.bankDetails?.accountHolder || t.userPhone || 'Member Account',
+        userId: t.userId ? (t.userId.length > 12 ? `FC-${t.userId.slice(-6).toUpperCase()}` : t.userId) : `FC-${t.id.slice(-6).toUpperCase()}`,
+        type: isCredit ? 'Credit' : 'Debit',
+        amount: Math.abs(t.amount),
+        balanceAfter: 0,
+        description: t.description || `${t.type} transaction`,
+        source: src,
+      };
+    });
+  };
+
+  const [records, setRecords] = useState<WalletRecordItem[]>(() => mapTransactionsToWalletRecords(transactions));
+
+  React.useEffect(() => {
+    setRecords(mapTransactionsToWalletRecords(transactions));
+  }, [transactions]);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');

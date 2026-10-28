@@ -175,38 +175,28 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [quickBalanceAmt, setQuickBalanceAmt] = useState('');
   const [quickBalanceNote, setQuickBalanceNote] = useState('');
 
-  // Notifications State (Bee Grow Screenshot 5)
+  // Notifications State (dynamically derived from live database users)
   const [showNotifications, setShowNotifications] = useState(false);
-  const notificationsList = [
-    {
-      id: 'n-1',
+  const notificationsList = React.useMemo(() => {
+    if (!liveUsersList || liveUsersList.length === 0) {
+      return [
+        {
+          id: 'n-sys',
+          icon: 'bell',
+          text: 'Admin console active and connected to Supabase.',
+          time: 'Active',
+          unread: false,
+        }
+      ];
+    }
+    return liveUsersList.slice(0, 5).map((u, idx) => ({
+      id: `n-${u.id || idx}`,
       icon: 'user',
-      text: 'Rowthu Bangarulaxmi (B1326654) has just registered.',
-      time: 'about 4 hours ago',
+      text: `${u.name} (${u.userId}) registered via email/mobile.`,
+      time: u.joined ? `Joined on ${u.joined}` : 'Recently',
       unread: true,
-    },
-    {
-      id: 'n-2',
-      icon: 'bell',
-      text: 'Congratulations! Your KYC has been verified successfully.',
-      time: 'about 7 hours ago',
-      unread: true,
-    },
-    {
-      id: 'n-3',
-      icon: 'bell',
-      text: 'Congratulations! Your KYC has been verified successfully.',
-      time: 'about 7 hours ago',
-      unread: true,
-    },
-    {
-      id: 'n-4',
-      icon: 'user',
-      text: 'Korada Ramya haritha (B7206777) has submitted their profile for KYC verification.',
-      time: 'about 8 hours ago',
-      unread: true,
-    },
-  ];
+    }));
+  }, [liveUsersList]);
 
   // Toast
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -1153,6 +1143,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
             {activeTab === 'wallets' && (
               <AdminWalletsView
                 currentBalance={user.availableBalance}
+                transactions={allConsolidatedTransactions}
                 onAdjustBalance={(amt, note) => {
                   adjustUserBalance(amt, note);
                   showToast(`Balance adjusted: ₹${amt.toLocaleString()}`);

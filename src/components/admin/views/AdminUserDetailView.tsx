@@ -55,12 +55,10 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileName, setProfileName] = useState(currentUser.name);
   const [profileMobile, setProfileMobile] = useState(currentUser.mobile);
-  const [profileEmail, setProfileEmail] = useState(
-    currentUser.email || `${currentUser.name.toLowerCase().replace(/\s+/g, '')}821@gmail.com`
-  );
-  const [profileCity, setProfileCity] = useState(currentUser.city || 'Amadalavalasa');
-  const [profilePassword, setProfilePassword] = useState('12345678');
-  const [profilePin, setProfilePin] = useState('9025');
+  const [profileEmail, setProfileEmail] = useState(currentUser.email || '');
+  const [profileCity, setProfileCity] = useState(currentUser.city || '—');
+  const [profilePassword, setProfilePassword] = useState('');
+  const [profilePin, setProfilePin] = useState('');
   const [profileAddress, setProfileAddress] = useState('—');
   const [profileDistrict, setProfileDistrict] = useState('—');
   const [profileState, setProfileState] = useState('—');
@@ -89,22 +87,7 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
   const [userInvestments, setUserInvestments] = useState(
     currentUser.investments && currentUser.investments.length > 0
       ? currentUser.investments
-      : [
-          {
-            id: 'fnc-spt-7721',
-            planName: 'Product B',
-            category: 'FanCode Sports Yield',
-            amountInvested: currentUser.totalInvested || 500000,
-            totalReturn: (currentUser.totalInvested || 500000) * 2,
-            earnedSoFar: currentUser.totalEarned || 2220,
-            monthlyReturn: '₹500 / Day',
-            startDate: '23/10/2026, 8:43:57 pm',
-            endDate: '22/03/2027, 8:43:57 pm',
-            duration: '150 Days',
-            nextPayout: 'Daily 18:30 IST',
-            status: 'Active' as const,
-          }
-        ]
+      : []
   );
 
   // New investment modal state (FanCode Sports Catalog)
@@ -120,15 +103,15 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
   const [walletHistPageSize, setWalletHistPageSize] = useState<number>(10);
 
   // Calculations & default fallbacks
-  const walletBal = currentUser.walletBalance ?? 2220;
-  const totalEarned = currentUser.totalEarned ?? 2220;
-  const totalInvested = currentUser.totalInvested ?? 500000;
-  const activePlansCount = userInvestments.filter(i => i.status === 'Active').length || 1;
+  const walletBal = currentUser.walletBalance ?? 0;
+  const totalEarned = currentUser.totalEarned ?? 0;
+  const totalInvested = currentUser.totalInvested ?? 0;
+  const activePlansCount = userInvestments.filter(i => i.status === 'Active').length;
   const directRefs = currentUser.directReferrals ?? 0;
   const totalTeam = currentUser.totalTeam ?? 0;
   const referralIncome = currentUser.referralIncome ?? 0;
   const levelIncome = currentUser.levelIncome ?? 0;
-  const roiIncome = currentUser.roiIncome ?? 2220;
+  const roiIncome = currentUser.roiIncome ?? 0;
 
   // Toggle user active status
   const handleToggleActive = () => {
@@ -782,48 +765,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily ROI Yield</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Product B</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Settled
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 14:15</td>
-                  <td className="px-4 py-3 font-bold text-blue-600">Level 1 Referral Bonus (22%)</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Direct Partner: FC994821</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 462.00</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Settled
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-24 18:30</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">Daily ROI Yield</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">Product B</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 500.00</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Settled
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:45</td>
-                  <td className="px-4 py-3 font-bold text-emerald-600">Welcome Activation Bonus</td>
-                  <td className="px-4 py-3 font-sans text-slate-600">FanCode Platform Tier</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 100.00</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Settled
-                    </span>
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-400 font-medium">
+                    No sports yield or referral commission records found for this account.
                   </td>
                 </tr>
               </tbody>
@@ -865,40 +809,9 @@ export const AdminUserDetailView: React.FC<AdminUserDetailViewProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-DEP-9921</td>
-                  <td className="px-4 py-3 font-bold text-blue-600">RECHARGE</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 5,00,000</td>
-                  <td className="px-4 py-3 text-slate-600">Bank Transfer / UPI (Ref: UTR884920491)</td>
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:43</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Completed
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-INV-4412</td>
-                  <td className="px-4 py-3 font-bold text-indigo-600">SPORTS_CONTRACT</td>
-                  <td className="px-4 py-3 font-sans font-bold text-slate-800">-₹ 5,00,000</td>
-                  <td className="px-4 py-3 text-slate-600">Subscribed Product B</td>
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-23 20:44</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Completed
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-sans font-bold text-slate-800">TXN-YLD-1102</td>
-                  <td className="px-4 py-3 font-bold text-amber-600">DAILY_YIELD</td>
-                  <td className="px-4 py-3 font-sans font-bold text-emerald-600">+₹ 2,220</td>
-                  <td className="px-4 py-3 text-slate-600">FanCode Automated Daily Sports Yield Cycle</td>
-                  <td className="px-4 py-3 font-sans text-slate-500">2026-10-25 18:30</td>
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Completed
-                    </span>
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
+                    No wallet transaction records found for this account.
                   </td>
                 </tr>
               </tbody>
