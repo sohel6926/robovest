@@ -137,6 +137,40 @@ export const RechargeTab: React.FC<RechargeTabProps> = ({ onBack, onSwitchToWith
     );
   }
 
+  if (!user.isLoggedIn) {
+    return (
+      <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900 font-sans">
+        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200/90 shadow-sm">
+          <button
+            onClick={onBack}
+            className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-base font-bold text-slate-900">Recharge</h1>
+          <div className="w-8" />
+        </div>
+        <div className="p-6 text-center space-y-4 pt-16">
+          <div className="w-16 h-16 mx-auto rounded-3xl bg-orange-100 text-[#FF4A00] flex items-center justify-center shadow-xs">
+            <LogIn className="w-8 h-8 stroke-[2.2]" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-black text-slate-900">Sign In Required</h2>
+            <p className="text-xs text-slate-500 max-w-xs mx-auto">
+              Please sign in to your FanCode account to recharge your wallet balance.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white font-black text-sm shadow-lg shadow-orange-500/25 active:scale-[0.98] transition cursor-pointer"
+          >
+            Sign In / Register
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-24 max-w-md mx-auto min-h-screen bg-[#FFF7F2] text-slate-900 font-sans">
       {/* Top Header */}

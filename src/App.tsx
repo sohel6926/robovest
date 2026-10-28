@@ -84,6 +84,10 @@ const AppContent: React.FC = () => {
   }, [setShowAdminPanel]);
 
   const handleOpenRecharge = () => {
+    if (!user.isLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
     setCurrentSubView('recharge');
   };
 
@@ -91,9 +95,13 @@ const AppContent: React.FC = () => {
   React.useEffect(() => {
     setNavigateToRechargeFn(handleOpenRecharge);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user.isLoggedIn]);
 
   const handleOpenWithdraw = () => {
+    if (!user.isLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
     setCurrentSubView('withdraw');
   };
 
