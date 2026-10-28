@@ -107,7 +107,24 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
   // Create new user profile in Supabase
   const inviteCode = generateInviteCode();
   const phone = metadata?.phone || '';
-  const inviterCode = metadata?.invite_code || metadata?.inviterCode || '';
+  const inviterCode = (metadata?.invite_code || metadata?.inviterCode || '').trim().toUpperCase();
+
+  let inviterId: string | null = null;
+  if (inviterCode) {
+    try {
+      const { data: inviterUser } = await supabase
+        .from('user_profiles')
+        .select('id, phone, email, invite_code')
+        .eq('invite_code', inviterCode)
+        .maybeSingle();
+
+      if (inviterUser?.id) {
+        inviterId = inviterUser.id;
+      }
+    } catch (e) {
+      console.warn('Error looking up sponsor inviter:', e);
+    }
+  }
 
   const newProfile = {
     id: userId,
@@ -131,6 +148,28 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
 
   if (profileErr) {
     console.warn('ensureUserProfile insert error:', profileErr.message);
+  }
+
+  // If user was invited by an existing sponsor, register them under that sponsor's team
+  if (inviterId) {
+    try {
+      const memberEntry = {
+        id: `TM-${userId.slice(0, 8)}`,
+        user_id: userId,
+        phone: phone || (email ? email.split('@')[0] : 'User'),
+        join_date: new Date().toISOString().split('T')[0],
+        level: 1, // direct referral
+        inviter_id: inviterId,
+        invite_count: 0,
+        recharge_amount: 0,
+        team_invested: 0,
+        commission_generated: 0,
+        status: 'ACTIVE'
+      };
+      await supabase.from('team_members').upsert(memberEntry);
+    } catch (e) {
+      console.warn('Error recording team member under sponsor:', e);
+    }
   }
 
   const initialBank: BankAccount = {
@@ -767,15 +806,275 @@ export async function fetchTeamMembersWithPlans(): Promise<TeamMember[]> {
   }
 }
 
-export async function saveTeamMemberDB(member: TeamMember, userId: string = 'User5294'): Promise<boolean> {
+export async function fetchUserReferralNetwork(userId: string): Promise<TeamMember[]> {
+  try {
+    if (!userId) return [];
+
+    // 1. Fetch direct referrals (Level 1)
+    const { data: l1Members, error: l1Err } = await supabase
+      .from('team_members')
+      .select('*')
+      .eq('inviter_id', userId)
+      .order('join_date', { ascending: false });
+
+    if (l1Err || !l1Members || l1Members.length === 0) {
+      return [];
+    }
+
+    const l1List: TeamMember[] = l1Members.map((m) => ({
+      id: m.id,
+      phone: m.phone,
+      joinDate: m.join_date,
+      level: 1,
+      inviterId: m.inviter_id || undefined,
+      inviteCount: Number(m.invite_count || 0),
+      rechargeAmount: Number(m.recharge_amount || 0),
+      teamInvested: Number(m.team_invested || 0),
+      commissionGenerated: Number(m.commission_generated || 0),
+      status: m.status as 'ACTIVE' | 'INACTIVE',
+      plans: []
+    }));
+
+    // 2. Fetch Level 2 referrals (where inviter is a Level 1 member)
+    const l1UserIds = l1Members.map((m) => m.user_id).filter(Boolean);
+    let l2List: TeamMember[] = [];
+    if (l1UserIds.length > 0) {
+      const { data: l2Members } = await supabase
+        .from('team_members')
+        .select('*')
+        .in('inviter_id', l1UserIds);
+
+      if (l2Members && l2Members.length > 0) {
+        l2List = l2Members.map((m) => ({
+          id: m.id,
+          phone: m.phone,
+          joinDate: m.join_date,
+          level: 2,
+          inviterId: m.inviter_id || undefined,
+          inviteCount: Number(m.invite_count || 0),
+          rechargeAmount: Number(m.recharge_amount || 0),
+          teamInvested: Number(m.team_invested || 0),
+          commissionGenerated: Number(m.commission_generated || 0),
+          status: m.status as 'ACTIVE' | 'INACTIVE',
+          plans: []
+        }));
+      }
+    }
+
+    // 3. Fetch Level 3 referrals (where inviter is a Level 2 member)
+    const l2UserIds = l2List.map((m) => (m as any).user_id || m.id).filter(Boolean);
+    let l3List: TeamMember[] = [];
+    if (l2UserIds.length > 0) {
+      const { data: l3Members } = await supabase
+        .from('team_members')
+        .select('*')
+        .in('inviter_id', l2UserIds);
+
+      if (l3Members && l3Members.length > 0) {
+        l3List = l3Members.map((m) => ({
+          id: m.id,
+          phone: m.phone,
+          joinDate: m.join_date,
+          level: 3,
+          inviterId: m.inviter_id || undefined,
+          inviteCount: Number(m.invite_count || 0),
+          rechargeAmount: Number(m.recharge_amount || 0),
+          teamInvested: Number(m.team_invested || 0),
+          commissionGenerated: Number(m.commission_generated || 0),
+          status: m.status as 'ACTIVE' | 'INACTIVE',
+          plans: []
+        }));
+      }
+    }
+
+    const allMembers = [...l1List, ...l2List, ...l3List];
+    const memberIds = allMembers.map((m) => m.id);
+
+    if (memberIds.length > 0) {
+      const { data: holdings } = await supabase
+        .from('member_plan_holdings')
+        .select('*')
+        .in('member_id', memberIds);
+
+      if (holdings && holdings.length > 0) {
+        const holdingsMap: Record<string, MemberPlanHolding[]> = {};
+        holdings.forEach((h) => {
+          const plan: MemberPlanHolding = {
+            id: h.id,
+            planId: h.plan_id,
+            planName: h.plan_name,
+            robotModel: h.robot_model,
+            quantity: Number(h.quantity),
+            unitPrice: Number(h.unit_price),
+            totalInvested: Number(h.total_invested),
+            dailyYield: Number(h.daily_yield),
+            purchaseDate: h.purchase_date,
+            daysElapsed: Number(h.days_elapsed),
+            durationDays: Number(h.duration_days),
+            totalEarned: Number(h.total_earned),
+            status: h.status
+          };
+          if (!holdingsMap[h.member_id]) holdingsMap[h.member_id] = [];
+          holdingsMap[h.member_id].push(plan);
+        });
+
+        allMembers.forEach((m) => {
+          m.plans = holdingsMap[m.id] || [];
+        });
+      }
+    }
+
+    return allMembers;
+  } catch (e) {
+    console.error('fetchUserReferralNetwork exception:', e);
+    return [];
+  }
+}
+
+export async function distributeReferralCommissions(
+  purchaserUserId: string,
+  purchaserLabel: string,
+  totalCost: number
+): Promise<{ success: boolean; l1Comm: number; l2Comm: number; l3Comm: number }> {
+  try {
+    if (!purchaserUserId || totalCost <= 0) {
+      return { success: false, l1Comm: 0, l2Comm: 0, l3Comm: 0 };
+    }
+
+    // 1. Get purchaser's profile to find direct inviter
+    const { data: purchaser } = await supabase
+      .from('user_profiles')
+      .select('id, inviter_code')
+      .eq('id', purchaserUserId)
+      .maybeSingle();
+
+    if (!purchaser?.inviter_code) {
+      return { success: false, l1Comm: 0, l2Comm: 0, l3Comm: 0 };
+    }
+
+    let l1Comm = 0;
+    let l2Comm = 0;
+    let l3Comm = 0;
+
+    // 2. LEVEL 1: Direct Inviter (22%)
+    const { data: l1Inviter } = await supabase
+      .from('user_profiles')
+      .select('id, available_balance, total_income, inviter_code')
+      .eq('invite_code', purchaser.inviter_code)
+      .maybeSingle();
+
+    if (l1Inviter) {
+      l1Comm = Math.round(totalCost * 0.22 * 100) / 100;
+      await supabase
+        .from('user_profiles')
+        .update({
+          available_balance: Number(l1Inviter.available_balance || 0) + l1Comm,
+          total_income: Number(l1Inviter.total_income || 0) + l1Comm
+        })
+        .eq('id', l1Inviter.id);
+
+      const l1Txn: Transaction = {
+        id: `TXN-COMM1-${Date.now().toString().slice(-6)}`,
+        type: 'COMMISSION',
+        amount: l1Comm,
+        status: 'COMPLETED',
+        timestamp: Date.now(),
+        formattedTime: new Date().toLocaleString(),
+        description: `Level 1 Commission (22%): ${purchaserLabel} invested ₹${totalCost.toLocaleString()}`,
+        referenceId: `REF1-${purchaserUserId.slice(0, 6)}`
+      };
+      await insertTransactionDB(l1Inviter.id, l1Txn);
+
+      // Update team_members record
+      await supabase
+        .from('team_members')
+        .update({
+          team_invested: totalCost,
+          commission_generated: l1Comm
+        })
+        .match({ user_id: purchaserUserId, inviter_id: l1Inviter.id });
+
+      // 3. LEVEL 2: Inviter of Level 1 (2%)
+      if (l1Inviter.inviter_code) {
+        const { data: l2Inviter } = await supabase
+          .from('user_profiles')
+          .select('id, available_balance, total_income, inviter_code')
+          .eq('invite_code', l1Inviter.inviter_code)
+          .maybeSingle();
+
+        if (l2Inviter) {
+          l2Comm = Math.round(totalCost * 0.02 * 100) / 100;
+          await supabase
+            .from('user_profiles')
+            .update({
+              available_balance: Number(l2Inviter.available_balance || 0) + l2Comm,
+              total_income: Number(l2Inviter.total_income || 0) + l2Comm
+            })
+            .eq('id', l2Inviter.id);
+
+          const l2Txn: Transaction = {
+            id: `TXN-COMM2-${Date.now().toString().slice(-6)}`,
+            type: 'COMMISSION',
+            amount: l2Comm,
+            status: 'COMPLETED',
+            timestamp: Date.now(),
+            formattedTime: new Date().toLocaleString(),
+            description: `Level 2 Commission (2%): Downline member invested ₹${totalCost.toLocaleString()}`,
+            referenceId: `REF2-${purchaserUserId.slice(0, 6)}`
+          };
+          await insertTransactionDB(l2Inviter.id, l2Txn);
+
+          // 4. LEVEL 3: Inviter of Level 2 (1%)
+          if (l2Inviter.inviter_code) {
+            const { data: l3Inviter } = await supabase
+              .from('user_profiles')
+              .select('id, available_balance, total_income')
+              .eq('invite_code', l2Inviter.inviter_code)
+              .maybeSingle();
+
+            if (l3Inviter) {
+              l3Comm = Math.round(totalCost * 0.01 * 100) / 100;
+              await supabase
+                .from('user_profiles')
+                .update({
+                  available_balance: Number(l3Inviter.available_balance || 0) + l3Comm,
+                  total_income: Number(l3Inviter.total_income || 0) + l3Comm
+                })
+                .eq('id', l3Inviter.id);
+
+              const l3Txn: Transaction = {
+                id: `TXN-COMM3-${Date.now().toString().slice(-6)}`,
+                type: 'COMMISSION',
+                amount: l3Comm,
+                status: 'COMPLETED',
+                timestamp: Date.now(),
+                formattedTime: new Date().toLocaleString(),
+                description: `Level 3 Commission (1%): Downline member invested ₹${totalCost.toLocaleString()}`,
+                referenceId: `REF3-${purchaserUserId.slice(0, 6)}`
+              };
+              await insertTransactionDB(l3Inviter.id, l3Txn);
+            }
+          }
+        }
+      }
+    }
+
+    return { success: true, l1Comm, l2Comm, l3Comm };
+  } catch (e) {
+    console.error('distributeReferralCommissions exception:', e);
+    return { success: false, l1Comm: 0, l2Comm: 0, l3Comm: 0 };
+  }
+}
+
+export async function saveTeamMemberDB(member: TeamMember, userId?: string): Promise<boolean> {
   try {
     const payload = {
       id: member.id,
-      user_id: userId,
+      user_id: userId || null,
       phone: member.phone,
       join_date: member.joinDate,
       level: member.level,
-      inviter_id: member.inviterId || 'User5294 (You)',
+      inviter_id: member.inviterId || null,
       invite_count: member.inviteCount,
       recharge_amount: member.rechargeAmount,
       team_invested: member.teamInvested,

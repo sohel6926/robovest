@@ -24,6 +24,28 @@ export const TeamTab: React.FC<TeamTabProps> = ({ onNavigateToInvite }) => {
 
   const allRecharge = teamMembers.reduce((acc, m) => acc + m.rechargeAmount, 0);
 
+  if (!user.isLoggedIn) {
+    return (
+      <div className="pb-24 max-w-md mx-auto p-6 text-center space-y-4 pt-16 text-slate-900 font-sans">
+        <div className="w-16 h-16 mx-auto rounded-3xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-xs">
+          <Users className="w-8 h-8 stroke-[2.2]" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-xl font-black text-slate-900">Sign In to View Team</h2>
+          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+            Please sign in to view your downline network, member recharge volume, and tiered commission payouts.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#FF5A00] to-[#FF3500] hover:from-[#FF6500] hover:to-[#FF4000] text-white font-black text-sm shadow-lg shadow-orange-500/25 active:scale-[0.98] transition cursor-pointer"
+        >
+          Sign In / Register
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-24 max-w-md mx-auto space-y-4 px-4 pt-2 text-slate-900">
       {/* Top Header with Invite Code Badge */}

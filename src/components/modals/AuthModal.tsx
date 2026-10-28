@@ -42,10 +42,16 @@ export const AuthModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
-  // Reset to login mode every time modal opens
+  // Reset to login mode every time modal opens (or register if ref link used)
   React.useEffect(() => {
     if (showAuthModal) {
-      setMode('login');
+      const storedRef = sessionStorage.getItem('fancode_ref_code') || localStorage.getItem('fancode_ref_code') || '';
+      if (storedRef) {
+        setInviteCode(storedRef);
+        setMode('register');
+      } else {
+        setMode('login');
+      }
       setErrorMessage(null);
       setSuccessNotice(null);
       setOtpToken('');
@@ -465,17 +471,25 @@ export const AuthModal: React.FC = () => {
             </div>
 
             {/* Invite Code Field */}
-            <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white transition">
-              <span className="pl-3.5 text-slate-400">
-                <Gift className="w-4 h-4 text-orange-500" />
-              </span>
-              <input
-                type="text"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                placeholder="Referral Code (Optional)"
-                className="w-full bg-transparent py-3 px-3 text-slate-900 uppercase font-mono focus:outline-none"
-              />
+            <div className="space-y-1">
+              <div className="relative flex items-center bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:border-blue-600 focus-within:bg-white transition">
+                <span className="pl-3.5 text-slate-400">
+                  <Gift className="w-4 h-4 text-orange-500" />
+                </span>
+                <input
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  placeholder="Referral Code (Optional)"
+                  className="w-full bg-transparent py-3 px-3 text-slate-900 uppercase font-mono focus:outline-none"
+                />
+              </div>
+              {inviteCode && (
+                <div className="px-1 text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                  <span>✓</span>
+                  <span>Sponsor invite code: {inviteCode}</span>
+                </div>
+              )}
             </div>
 
             {/* Terms checkbox */}

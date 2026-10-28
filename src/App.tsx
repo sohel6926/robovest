@@ -34,9 +34,37 @@ const AppContent: React.FC = () => {
     showAdminPanel,
     setShowAdminPanel,
     setNavigateToRechargeFn,
+    user,
+    setShowAuthModal,
   } = useApp();
 
   const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>('none');
+
+  // Detect referral code in URL (e.g. ?ref=ABC123 or /join?ref=ABC123)
+  React.useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      let ref = params.get('ref') || params.get('invite') || params.get('code') || params.get('r');
+      
+      if (!ref) {
+        const match = window.location.pathname.match(/\/(?:join|ref)\/([a-zA-Z0-9]+)/i);
+        if (match && match[1]) {
+          ref = match[1];
+        }
+      }
+
+      if (ref) {
+        const cleanRef = ref.trim().toUpperCase();
+        sessionStorage.setItem('fancode_ref_code', cleanRef);
+        localStorage.setItem('fancode_ref_code', cleanRef);
+        if (!user.isLoggedIn) {
+          setShowAuthModal(true);
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing referral code from URL', e);
+    }
+  }, [user.isLoggedIn, setShowAuthModal]);
 
   React.useEffect(() => {
     const checkAdminRoute = () => {

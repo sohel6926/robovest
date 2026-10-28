@@ -28,6 +28,8 @@ import {
   saveUserInvestmentDB,
   cancelUserInvestmentDB,
   fetchTeamMembersWithPlans,
+  fetchUserReferralNetwork,
+  distributeReferralCommissions,
   saveTeamMemberDB,
   deleteTeamMemberDB,
   saveMemberPlanHoldingDB,
@@ -147,182 +149,7 @@ const INITIAL_BANK: BankAccount = {
   isBound: false,
 };
 
-const INITIAL_TEAM: TeamMember[] = [
-  { 
-    id: 'TM-101', 
-    phone: '+91 98234 11029', 
-    joinDate: '2026-10-02', 
-    level: 1, 
-    inviterId: '',
-    inviteCount: 4, 
-    rechargeAmount: 4000, 
-    teamInvested: 12500,
-    commissionGenerated: 880, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-101-A',
-        planId: 'C',
-        planName: 'Product C',
-        robotModel: 'ASIMO-V Precision Service Biped',
-        quantity: 1,
-        unitPrice: 4000,
-        totalInvested: 4000,
-        dailyYield: 950,
-        purchaseDate: '2026-10-02',
-        daysElapsed: 8,
-        durationDays: 150,
-        totalEarned: 7600,
-        status: 'ACTIVE'
-      }
-    ]
-  },
-  { 
-    id: 'TM-102', 
-    phone: '+91 97112 88472', 
-    joinDate: '2026-10-04', 
-    level: 1, 
-    inviterId: '',
-    inviteCount: 2, 
-    rechargeAmount: 2100, 
-    teamInvested: 4200,
-    commissionGenerated: 462, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-102-A',
-        planId: 'B',
-        planName: 'Product B',
-        robotModel: 'Spot-X Quadruped Patrol Bot',
-        quantity: 1,
-        unitPrice: 2100,
-        totalInvested: 2100,
-        dailyYield: 500,
-        purchaseDate: '2026-10-04',
-        daysElapsed: 6,
-        durationDays: 150,
-        totalEarned: 3000,
-        status: 'ACTIVE'
-      }
-    ]
-  },
-  { 
-    id: 'TM-103', 
-    phone: '+91 88390 44910', 
-    joinDate: '2026-10-06', 
-    level: 2, 
-    inviterId: 'TM-101',
-    inviteCount: 1, 
-    rechargeAmount: 1040, 
-    teamInvested: 520,
-    commissionGenerated: 20.8, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-103-A',
-        planId: 'A',
-        planName: 'Product A',
-        robotModel: 'Nao Core Micro Assistant',
-        quantity: 2,
-        unitPrice: 520,
-        totalInvested: 1040,
-        dailyYield: 260,
-        purchaseDate: '2026-10-06',
-        daysElapsed: 4,
-        durationDays: 150,
-        totalEarned: 1040,
-        status: 'ACTIVE'
-      }
-    ]
-  },
-  { 
-    id: 'TM-104', 
-    phone: '+91 91456 22091', 
-    joinDate: '2026-10-07', 
-    level: 3, 
-    inviterId: 'TM-103',
-    inviteCount: 0, 
-    rechargeAmount: 520, 
-    teamInvested: 0,
-    commissionGenerated: 5.2, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-104-A',
-        planId: 'A',
-        planName: 'Product A',
-        robotModel: 'Nao Core Micro Assistant',
-        quantity: 1,
-        unitPrice: 520,
-        totalInvested: 520,
-        dailyYield: 130,
-        purchaseDate: '2026-10-07',
-        daysElapsed: 3,
-        durationDays: 150,
-        totalEarned: 390,
-        status: 'ACTIVE'
-      }
-    ]
-  },
-  { 
-    id: 'TM-105', 
-    phone: '+91 96541 77290', 
-    joinDate: '2026-10-08', 
-    level: 1, 
-    inviterId: '',
-    inviteCount: 3, 
-    rechargeAmount: 8200, 
-    teamInvested: 6000,
-    commissionGenerated: 1804, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-105-A',
-        planId: 'D',
-        planName: 'Product D',
-        robotModel: 'Atlas Prime AI Diagnostics Android',
-        quantity: 1,
-        unitPrice: 8200,
-        totalInvested: 8200,
-        dailyYield: 2000,
-        purchaseDate: '2026-10-08',
-        daysElapsed: 2,
-        durationDays: 150,
-        totalEarned: 4000,
-        status: 'ACTIVE'
-      }
-    ]
-  },
-  { 
-    id: 'TM-106', 
-    phone: '+91 81230 99401', 
-    joinDate: '2026-10-09', 
-    level: 2, 
-    inviterId: 'TM-102',
-    inviteCount: 0, 
-    rechargeAmount: 2100, 
-    teamInvested: 0,
-    commissionGenerated: 42, 
-    status: 'ACTIVE',
-    plans: [
-      {
-        id: 'MP-106-A',
-        planId: 'B',
-        planName: 'Product B',
-        robotModel: 'Spot-X Quadruped Patrol Bot',
-        quantity: 1,
-        unitPrice: 2100,
-        totalInvested: 2100,
-        dailyYield: 500,
-        purchaseDate: '2026-10-09',
-        daysElapsed: 1,
-        durationDays: 150,
-        totalEarned: 500,
-        status: 'ACTIVE'
-      }
-    ]
-  }
-];
+const INITIAL_TEAM: TeamMember[] = [];
 
 const DEFAULT_SETTINGS: PlatformSettings = {
   minRecharge: 520,
@@ -609,29 +436,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return [];
   });
 
-  // Team Members backed by Supabase
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => {
-    try {
-      const saved = localStorage.getItem('fancode_team_members') || localStorage.getItem('robovest_team_members');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.error('Failed to parse team members from storage', e);
-    }
-    return INITIAL_TEAM;
-  });
+  // Team Members backed by Supabase (only loads real user referrals)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   const refreshUserData = async (targetUserId?: string) => {
     try {
       const userId = targetUserId || user.id;
       if (!userId) return;
 
-      const [profileRes, userInvs, userTxns] = await Promise.all([
+      const [profileRes, userInvs, userTxns, userTeam] = await Promise.all([
         fetchUserProfile(userId),
         fetchUserInvestments(userId),
-        fetchTransactions(userId)
+        fetchTransactions(userId),
+        fetchUserReferralNetwork(userId)
       ]);
 
       if (profileRes) {
@@ -639,6 +456,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
       setInvestments(userInvs || []);
       setTransactions(userTxns || []);
+      setTeamMembers(userTeam || []);
     } catch (err) {
       console.error('refreshUserData error:', err);
     }
@@ -649,9 +467,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setUser(GUEST_USER);
     setInvestments([]);
     setTransactions([]);
+    setTeamMembers([]);
     localStorage.removeItem('fancode_user');
+    localStorage.removeItem('fancode_bank');
     localStorage.removeItem('fancode_investments');
     localStorage.removeItem('fancode_transactions');
+    localStorage.removeItem('fancode_team_members');
   };
 
   // ---------------------------------------------------------------------------
@@ -663,10 +484,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     async function initializeApp() {
       try {
         // 1. Fetch public platform settings and catalog
-        const [remoteSettings, remoteProducts, remoteTeam] = await Promise.all([
+        const [remoteSettings, remoteProducts] = await Promise.all([
           fetchPlatformSettings(),
-          fetchInvestmentProducts(),
-          fetchTeamMembersWithPlans()
+          fetchInvestmentProducts()
         ]);
 
         if (!isMounted) return;
@@ -694,10 +514,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           setCatalog(resolved);
         }
 
-        if (remoteTeam && remoteTeam.length > 0) {
-          setTeamMembers(remoteTeam);
-        }
-
         // 2. Check active Supabase Auth session
         const { session } = await getAuthSession();
         if (session?.user && isMounted) {
@@ -711,14 +527,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             setUser(profileRes.user);
           }
 
-          const [userInvs, userTxns] = await Promise.all([
+          const [userInvs, userTxns, userTeam] = await Promise.all([
             fetchUserInvestments(session.user.id),
-            fetchTransactions(session.user.id)
+            fetchTransactions(session.user.id),
+            fetchUserReferralNetwork(session.user.id)
           ]);
 
           if (isMounted) {
             setInvestments(userInvs || []);
             setTransactions(userTxns || []);
+            setTeamMembers(userTeam || []);
           }
         } else if (isMounted) {
           // No active session — show auth modal so user must login/register
@@ -1267,6 +1085,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       withdrawableBalance: updatedWithdrawableBalance,
       totalIncome: updatedTotalIncome,
     });
+
+    // Distribute multi-tier referral commissions to sponsor hierarchy (22% L1, 2% L2, 1% L3)
+    distributeReferralCommissions(user.id, user.email || user.phone || 'Member', totalCost);
 
     return {
       success: true,

@@ -3,14 +3,22 @@ import { useApp } from '../../context/AppContext';
 import { Home, UserPlus, Headset, Users, User } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, setShowCustomerCare } = useApp();
+  const { activeTab, setActiveTab, setShowCustomerCare, user, setShowAuthModal } = useApp();
+
+  const handleTabClick = (tab: 'home' | 'invite' | 'team' | 'profile') => {
+    if ((tab === 'invite' || tab === 'team') && !user.isLoggedIn) {
+      setShowAuthModal(true);
+      return;
+    }
+    setActiveTab(tab);
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_25px_rgba(0,0,0,0.04)]">
       <div className="max-w-md mx-auto relative flex items-center justify-around h-16 px-1">
         {/* Tab 1: Home */}
         <button
-          onClick={() => setActiveTab('home')}
+          onClick={() => handleTabClick('home')}
           className="flex flex-col items-center justify-center flex-1 py-1 transition-colors group cursor-pointer"
         >
           <Home
@@ -34,9 +42,9 @@ export const BottomNav: React.FC = () => {
           )}
         </button>
 
-        {/* Tab 2: Invite */}
+        {/* Tab 2: Invite (Login Protected) */}
         <button
-          onClick={() => setActiveTab('invite')}
+          onClick={() => handleTabClick('invite')}
           className="flex flex-col items-center justify-center flex-1 py-1 transition-colors group cursor-pointer"
         >
           <UserPlus
@@ -78,9 +86,9 @@ export const BottomNav: React.FC = () => {
           </span>
         </div>
 
-        {/* Tab 4: Team */}
+        {/* Tab 4: Team (Login Protected) */}
         <button
-          onClick={() => setActiveTab('team')}
+          onClick={() => handleTabClick('team')}
           className="flex flex-col items-center justify-center flex-1 py-1 transition-colors group cursor-pointer"
         >
           <Users
