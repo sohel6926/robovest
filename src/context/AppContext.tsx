@@ -449,10 +449,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Team Members backed by Supabase (only loads real user referrals)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
-  const refreshUserData = async (targetUserId?: string) => {
+  const isRefreshingRef = React.useRef<boolean>(false);
+
+  const refreshUserData = async (targetUserId?: string, calculationDate: Date = new Date()) => {
     try {
       const userId = targetUserId || user.id;
       if (!userId) return;
+
+      if (isRefreshingRef.current) return;
+      isRefreshingRef.current = true;
 
       const [profileRes, userInvs, userTxns, userTeam] = await Promise.all([
         fetchUserProfile(userId),
@@ -468,37 +473,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         let profileNeedsUpdate = false;
         let newTxns = [...(userTxns || [])];
 
-        // 1. Remove unwanted 100 signup bonus if present in transactions
+        // 1. Clean up any rogue signup bonus transaction if found (delete from DB silently without decrementing balance)
         const signupTxnIndex = newTxns.findIndex(t => t.type === 'SIGNUP_BONUS' || t.referenceId === 'SYS-WELCOME');
         if (signupTxnIndex !== -1) {
-          correctedBalance = Math.max(0, correctedBalance - 100);
-          correctedIncome = Math.max(0, correctedIncome - 100);
-          correctedWithdrawable = Math.max(0, correctedWithdrawable - 100);
+          const rogueId = newTxns[signupTxnIndex].id;
           newTxns.splice(signupTxnIndex, 1);
-          profileNeedsUpdate = true;
+          if (rogueId) {
+            supabase.from('transactions').delete().eq('id', rogueId).then(() => {});
+          }
         }
 
         // 2. Auto-credit ALL due Daily ROI cycles for any active plan across all elapsed days
-        const now = new Date();
-        const currentCycleKey = getCycleDateKey(now, platformSettings.dailyWithdrawalWindowStart);
+        const resetWindow = platformSettings.dailyWithdrawalWindowStart || '00:30';
+        const currentCycleKey = getCycleDateKey(calculationDate, resetWindow);
 
         const updatedInvs = (userInvs || []).map(inv => {
           if (inv.status === 'ACTIVE') {
             const dailyIncome = Number(inv.dailyIncome) || 0;
             if (dailyIncome <= 0) return inv;
 
-            const eligibleCycles = getInvestmentEligibleCycles(inv, now, platformSettings.dailyWithdrawalWindowStart);
+            const eligibleCycles = getInvestmentEligibleCycles(inv, calculationDate, resetWindow);
 
             // Count how many daily ROI returns have been recorded for this contract
             const planRoiTxns = newTxns.filter(t => 
               t.type === 'DAILY_RETURN' && 
               Number(t.amount) > 0 &&
-              (t.referenceId?.includes(inv.id) || t.description?.includes(inv.productName) || (t.referenceId?.startsWith('ROI-') && t.referenceId?.includes(inv.id.slice(-6))))
+              (
+                t.referenceId?.includes(inv.id) || 
+                t.description?.includes(inv.productName) || 
+                (t.referenceId?.startsWith('ROI-') && t.referenceId?.includes(inv.id.slice(-6)))
+              )
             );
 
+            // Authoritative count of cycles already credited
             const alreadyCreditedCycles = Math.max(
               planRoiTxns.length,
-              Math.floor(Number(inv.totalEarned || 0) / dailyIncome)
+              Math.floor(Number(inv.totalEarned || 0) / dailyIncome),
+              Number(inv.daysElapsed || 0)
             );
 
             const dueCycles = Math.max(0, eligibleCycles - alreadyCreditedCycles);
@@ -516,15 +527,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
               for (let d = 1; d <= dueCycles; d++) {
                 const cycleNum = alreadyCreditedCycles + d;
+                const cycleRef = `ROI-${inv.id}-C${cycleNum}`;
+
+                // Strict check: skip if this exact cycle is already in transactions
+                if (newTxns.some(t => t.referenceId === cycleRef)) {
+                  continue;
+                }
+
                 const roiTxn: Transaction = {
                   id: `TXN-ROI-${inv.id.slice(-6)}-C${cycleNum}-${Date.now().toString().slice(-4)}`,
                   type: 'DAILY_RETURN',
                   amount: dailyIncome,
                   status: 'COMPLETED',
-                  timestamp: Date.now() - (dueCycles - d) * 1000,
-                  formattedTime: new Date().toLocaleString(),
+                  timestamp: calculationDate.getTime() - (dueCycles - d) * 1000,
+                  formattedTime: calculationDate.toLocaleString(),
                   description: `Daily Return (Cycle ${cycleNum}) for ${inv.productName}`,
-                  referenceId: `ROI-${inv.id}-C${cycleNum}`
+                  referenceId: cycleRef
                 };
                 newTxns.unshift(roiTxn);
                 insertTransactionDB(userId, roiTxn);
@@ -566,6 +584,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setTeamMembers(userTeam || []);
     } catch (err) {
       console.error('refreshUserData error:', err);
+    } finally {
+      isRefreshingRef.current = false;
     }
   };
 
@@ -879,35 +899,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // AUTOMATED EVERYDAY NIGHT RESET ENGINE
   // (Advances days elapsed for all active user & downline plans, credits returns & commissions)
   // ---------------------------------------------------------------------------
-  const performNightResetSettlement = (resetDate: Date = new Date()) => {
+  const performNightResetSettlement = async (resetDate: Date = new Date()) => {
     let completedInvsCount = 0;
     let memberPlansUpdatedCount = 0;
-
-    // Synchronous yield sum of all active user investments
-    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
-    const yieldSum = activeInvs.reduce((sum, inv) => sum + inv.dailyIncome, 0);
     let commissionSum = 0;
 
-    // 1. Advance all active user robot investments
-    setInvestments(prevInvs => {
-      return prevInvs.map(inv => {
-        if (inv.status !== 'ACTIVE') return inv;
-        const dailyYield = inv.dailyIncome;
-        const newDays = calculateDaysPassed(inv.purchaseTimestamp || inv.purchaseDateFormatted, resetDate, platformSettings.dailyWithdrawalWindowStart, inv.daysElapsed + 1);
-        const newEarned = newDays * dailyYield;
-        const isCompleted = newDays >= 150 || newEarned >= (inv.totalInvested * 2);
-        if (isCompleted) completedInvsCount++;
+    // 1. Authoritative user daily ROI credit through the idempotent engine
+    if (user.id) {
+      await refreshUserData(user.id, resetDate);
+    }
 
-        const updated: UserInvestment = {
-          ...inv,
-          daysElapsed: newDays,
-          totalEarned: newEarned,
-          status: isCompleted ? 'COMPLETED' : 'ACTIVE',
-        };
-        saveUserInvestmentDB(user.id, updated);
-        return updated;
-      });
-    });
+    const activeInvs = investments.filter(inv => inv.status === 'ACTIVE');
+    const yieldSum = activeInvs.reduce((sum, inv) => sum + inv.dailyIncome, 0);
 
     // 2. Advance all team members' plan holdings (Level 1, Level 2, Level 3)
     const levelRates: Record<number, number> = { 1: 0.10, 2: 0.05, 3: 0.02 };
@@ -922,6 +925,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const newDays = p.daysElapsed + 1;
           const newEarned = newDays * p.dailyYield;
           const isCompleted = newDays >= p.durationDays;
+          if (isCompleted) completedInvsCount++;
           const updatedPlan: MemberPlanHolding = {
             ...p,
             daysElapsed: newDays,
@@ -950,70 +954,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       });
     });
 
-    // 3. Automated daily yield payout credited directly to user wallet
-    if (yieldSum > 0 && user.id) {
-      setUser(prev => {
-        const newAvail = prev.availableBalance + yieldSum;
-        const newWithdr = prev.withdrawableBalance + yieldSum;
-        const newIncome = prev.totalIncome + yieldSum;
-        updateUserProfileDB(prev.id, {
-          availableBalance: newAvail,
-          withdrawableBalance: newWithdr,
-          totalIncome: newIncome,
+    // 3. Referral commissions credited to user wallet if applicable (deduplicated by date)
+    if (commissionSum > 0 && user.id) {
+      const commDateKey = resetDate.toLocaleDateString('en-CA');
+      const commTxnRef = `COMM-TREE-${commDateKey}`;
+      const alreadyCredited = transactions.some(t => t.referenceId === commTxnRef);
+
+      if (!alreadyCredited) {
+        setUser(prev => {
+          const newAvail = prev.availableBalance + commissionSum;
+          const newWithdr = prev.withdrawableBalance + commissionSum;
+          const newIncome = prev.totalIncome + commissionSum;
+          updateUserProfileDB(prev.id, {
+            availableBalance: newAvail,
+            withdrawableBalance: newWithdr,
+            totalIncome: newIncome,
+          });
+          return {
+            ...prev,
+            availableBalance: newAvail,
+            withdrawableBalance: newWithdr,
+            totalIncome: newIncome,
+          };
         });
-        return {
-          ...prev,
-          availableBalance: newAvail,
-          withdrawableBalance: newWithdr,
-          totalIncome: newIncome,
+
+        const commTxn: Transaction = {
+          id: `TXN-COMM-${commDateKey.replace(/-/g, '')}-${user.id.slice(-4)}`,
+          type: 'COMMISSION',
+          amount: commissionSum,
+          status: 'COMPLETED',
+          timestamp: resetDate.getTime(),
+          formattedTime: resetDate.toLocaleString(),
+          description: `Referral Level Commission Distributed Across Downline Network`,
+          referenceId: commTxnRef
         };
-      });
-
-      const yieldTxn: Transaction = {
-        id: `TXN-ROI-${Date.now().toString().slice(-6)}`,
-        type: 'DAILY_RETURN',
-        amount: yieldSum,
-        status: 'COMPLETED',
-        timestamp: resetDate.getTime(),
-        formattedTime: resetDate.toLocaleString(),
-        description: `Automated Daily ROI Payout across ${activeInvs.length} active contract(s)`,
-        referenceId: `ROI-DAILY-${Date.now().toString().slice(-4)}`
-      };
-      insertTransactionDB(user.id, yieldTxn);
-      setTransactions(prev => [yieldTxn, ...prev]);
-    }
-
-    // 4. Referral commissions credited to user wallet if applicable
-    if (commissionSum > 0) {
-      setUser(prev => {
-        const newAvail = prev.availableBalance + commissionSum;
-        const newWithdr = prev.withdrawableBalance + commissionSum;
-        const newIncome = prev.totalIncome + commissionSum;
-        updateUserProfileDB(prev.id, {
-          availableBalance: newAvail,
-          withdrawableBalance: newWithdr,
-          totalIncome: newIncome,
-        });
-        return {
-          ...prev,
-          availableBalance: newAvail,
-          withdrawableBalance: newWithdr,
-          totalIncome: newIncome,
-        };
-      });
-
-      const commTxn: Transaction = {
-        id: `TXN-COMM-${Date.now().toString().slice(-6)}`,
-        type: 'COMMISSION',
-        amount: commissionSum,
-        status: 'COMPLETED',
-        timestamp: resetDate.getTime(),
-        formattedTime: resetDate.toLocaleString(),
-        description: `Referral Level Commission Distributed Across Downline Network`,
-        referenceId: `COMM-TREE-${Date.now().toString().slice(-4)}`
-      };
-      insertTransactionDB(user.id, commTxn);
-      setTransactions(prev => [commTxn, ...prev]);
+        insertTransactionDB(user.id, commTxn);
+        setTransactions(prev => [commTxn, ...prev]);
+      }
     }
 
     return {
@@ -1021,7 +998,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       message: `Night reset completed! Active plans advanced to next cycle. Distributed ₹${commissionSum.toLocaleString()} in referral commissions. ₹${yieldSum.toLocaleString()} daily ROI auto-credited to wallet. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
       yieldDistributed: yieldSum,
       commissionDistributed: commissionSum,
-      activeNodesCount: investments.filter(inv => inv.status === 'ACTIVE').length,
+      activeNodesCount: activeInvs.length,
       memberPlansUpdatedCount
     };
   };
@@ -1167,7 +1144,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const purchaseTxn: Transaction = {
       id: `TXN-BUY-${Date.now().toString().slice(-6)}`,
-      type: 'DAILY_RETURN',
+      type: 'INVESTMENT',
       amount: -totalCost,
       status: 'COMPLETED',
       timestamp: simulatedTime.getTime(),
@@ -1195,7 +1172,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       timestamp: simulatedTime.getTime(),
       formattedTime: simulatedTime.toLocaleString(),
       description: `Day 1 Daily Return for ${quantity}x ${product.name}`,
-      referenceId: `ROI-${newInvestment.id}`
+      referenceId: `ROI-${newInvestment.id}-C1`
     };
 
     const updatedAvailBalance = user.availableBalance - totalCost + totalBonus + totalDaily;

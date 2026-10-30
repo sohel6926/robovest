@@ -97,7 +97,8 @@ export default async function handler(req, res) {
 
         const alreadyCreditedCycles = Math.max(
           planRoiTxns.length,
-          Math.floor(Number(inv.total_earned || 0) / dailyIncome)
+          Math.floor(Number(inv.total_earned || 0) / dailyIncome),
+          Number(inv.days_elapsed || 0)
         );
 
         const dueCycles = Math.max(0, eligibleCycles - alreadyCreditedCycles);
@@ -114,6 +115,12 @@ export default async function handler(req, res) {
 
           for (let d = 1; d <= dueCycles; d++) {
             const cycleNumber = alreadyCreditedCycles + d;
+            const cycleRef = `ROI-${inv.id}-C${cycleNumber}`;
+
+            if ((existingTxns || []).some(t => t.reference_id === cycleRef)) {
+              continue;
+            }
+
             const roiTxn = {
               id: `TXN-ROI-${inv.id.slice(-6)}-C${cycleNumber}-${Date.now().toString().slice(-4)}`,
               user_id: userId,
@@ -123,7 +130,7 @@ export default async function handler(req, res) {
               timestamp: Date.now() - (dueCycles - d) * 1000,
               formatted_time: new Date().toLocaleString(),
               description: `Daily Return (Cycle ${cycleNumber}) for ${inv.product_name}`,
-              reference_id: `ROI-${inv.id}-C${cycleNumber}`
+              reference_id: cycleRef
             };
             await supabase.from('transactions').insert(roiTxn);
           }
