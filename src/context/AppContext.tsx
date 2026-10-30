@@ -327,7 +327,34 @@ export function getInvestmentUnharvested(
 }
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<'home' | 'invite' | 'contact' | 'team' | 'profile'>('home');
+  // Persisted Active Tab (Default to saved or hash route, never losing place on refresh)
+  const [activeTab, setActiveTabState] = useState<'home' | 'invite' | 'contact' | 'team' | 'profile'>(() => {
+    try {
+      const hash = window.location.hash.toLowerCase().replace('#', '');
+      if (['home', 'invite', 'team', 'profile'].includes(hash)) {
+        return hash as any;
+      }
+      const saved = localStorage.getItem('fancode_active_tab');
+      if (saved && ['home', 'invite', 'team', 'profile'].includes(saved)) {
+        return saved as any;
+      }
+    } catch {}
+    return 'home';
+  });
+
+  const setActiveTab = (tab: 'home' | 'invite' | 'contact' | 'team' | 'profile') => {
+    setActiveTabState(tab);
+    try {
+      localStorage.setItem('fancode_active_tab', tab);
+      if (['home', 'invite', 'team', 'profile'].includes(tab)) {
+        const curHash = window.location.hash.toLowerCase().replace('#', '');
+        if (curHash !== tab && curHash !== 'recharge' && curHash !== 'withdraw' && curHash !== 'admin') {
+          window.history.replaceState(null, '', `#${tab}`);
+        }
+      }
+    } catch {}
+  };
+
   const navigateToRechargeRef = React.useRef<() => void>(() => {});
   const navigateToRecharge = () => navigateToRechargeRef.current();
   const setNavigateToRechargeFn = (fn: () => void) => { navigateToRechargeRef.current = fn; };
@@ -336,14 +363,129 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const setNavigateToWithdrawFn = (fn: () => void) => { navigateToWithdrawRef.current = fn; };
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
   const [showBuyModal, setShowBuyModal] = useState<InvestmentProduct | null>(null);
-  const [showCustomerCare, setShowCustomerCare] = useState<boolean>(false);
-  const [showOrdersModal, setShowOrdersModal] = useState<boolean>(false);
-  const [showBankCardModal, setShowBankCardModal] = useState<boolean>(false);
+
+  // Persisted Modals
+  const [showCustomerCare, setShowCustomerCareState] = useState<boolean>(() => {
+    try {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#contact') return true;
+      return localStorage.getItem('fancode_modal_contact') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const setShowCustomerCare = (show: boolean) => {
+    setShowCustomerCareState(show);
+    try {
+      if (show) {
+        localStorage.setItem('fancode_modal_contact', 'true');
+        window.history.replaceState(null, '', '#contact');
+      } else {
+        localStorage.removeItem('fancode_modal_contact');
+        if (window.location.hash.toLowerCase() === '#contact') {
+          window.history.replaceState(null, '', `#${activeTab}`);
+        }
+      }
+    } catch {}
+  };
+
+  const [showOrdersModal, setShowOrdersModalState] = useState<boolean>(() => {
+    try {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#orders') return true;
+      return localStorage.getItem('fancode_modal_orders') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const setShowOrdersModal = (show: boolean) => {
+    setShowOrdersModalState(show);
+    try {
+      if (show) {
+        localStorage.setItem('fancode_modal_orders', 'true');
+        window.history.replaceState(null, '', '#orders');
+      } else {
+        localStorage.removeItem('fancode_modal_orders');
+        if (window.location.hash.toLowerCase() === '#orders') {
+          window.history.replaceState(null, '', `#${activeTab}`);
+        }
+      }
+    } catch {}
+  };
+
+  const [showBankCardModal, setShowBankCardModalState] = useState<boolean>(() => {
+    try {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#bank') return true;
+      return localStorage.getItem('fancode_modal_bank') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const setShowBankCardModal = (show: boolean) => {
+    setShowBankCardModalState(show);
+    try {
+      if (show) {
+        localStorage.setItem('fancode_modal_bank', 'true');
+        window.history.replaceState(null, '', '#bank');
+      } else {
+        localStorage.removeItem('fancode_modal_bank');
+        if (window.location.hash.toLowerCase() === '#bank') {
+          window.history.replaceState(null, '', `#${activeTab}`);
+        }
+      }
+    } catch {}
+  };
+
   const [showColorTrustGuide, setShowColorTrustGuide] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
-  // Admin authentication strictly in-memory session (never persisted in localStorage for security)
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
+
+  // Persisted Admin Panel View
+  const [showAdminPanel, setShowAdminPanelState] = useState<boolean>(() => {
+    try {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/') || hash === '#admin') return true;
+      return localStorage.getItem('fancode_admin_panel_open') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const setShowAdminPanel = (show: boolean) => {
+    setShowAdminPanelState(show);
+    try {
+      if (show) {
+        localStorage.setItem('fancode_admin_panel_open', 'true');
+        if (window.location.pathname.toLowerCase() !== '/admin') {
+          window.history.replaceState(null, '', '#admin');
+        }
+      } else {
+        localStorage.removeItem('fancode_admin_panel_open');
+        if (window.location.hash.toLowerCase() === '#admin') {
+          window.history.replaceState(null, '', `#${activeTab}`);
+        }
+      }
+    } catch {}
+  };
+
+  // Persisted Admin Authentication Session (remains authenticated until explicit logout)
+  const [isAdminAuthenticated, setIsAdminAuthenticatedState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('fancode_admin_authenticated') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const setIsAdminAuthenticated = (auth: boolean) => {
+    setIsAdminAuthenticatedState(auth);
+    try {
+      if (auth) {
+        localStorage.setItem('fancode_admin_authenticated', 'true');
+      } else {
+        localStorage.removeItem('fancode_admin_authenticated');
+      }
+    } catch {}
+  };
 
   // Dynamic Catalog backed by Supabase
   const [catalog, setCatalog] = useState<InvestmentProduct[]>(() => {

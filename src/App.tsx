@@ -39,7 +39,30 @@ const AppContent: React.FC = () => {
     setShowAuthModal,
   } = useApp();
 
-  const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>('none');
+  const [currentSubView, setCurrentSubView] = useState<'none' | 'recharge' | 'withdraw'>(() => {
+    try {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#recharge') return 'recharge';
+      if (hash === '#withdraw') return 'withdraw';
+      const saved = localStorage.getItem('fancode_current_subview');
+      if (saved === 'recharge' || saved === 'withdraw') return saved;
+    } catch {}
+    return 'none';
+  });
+
+  const updateSubView = (view: 'none' | 'recharge' | 'withdraw') => {
+    setCurrentSubView(view);
+    try {
+      localStorage.setItem('fancode_current_subview', view);
+      if (view === 'recharge') {
+        window.history.replaceState(null, '', '#recharge');
+      } else if (view === 'withdraw') {
+        window.history.replaceState(null, '', '#withdraw');
+      } else {
+        window.history.replaceState(null, '', `#${activeTab}`);
+      }
+    } catch {}
+  };
 
   // Detect referral code in URL (e.g. ?ref=ABC123 or /join?ref=ABC123)
   React.useEffect(() => {
@@ -75,6 +98,55 @@ const AppContent: React.FC = () => {
       // Admin route check
       if (path === '/admin' || path.startsWith('/admin/') || hash === '#admin') {
         setShowAdminPanel(true);
+        return;
+      }
+
+      // Subviews check
+      if (hash === '#recharge') {
+        setCurrentSubView('recharge');
+        return;
+      }
+      if (hash === '#withdraw') {
+        setCurrentSubView('withdraw');
+        return;
+      }
+
+      // Modals check
+      if (hash === '#orders') {
+        setActiveTab('profile');
+        setShowOrdersModal(true);
+        return;
+      }
+      if (hash === '#bank') {
+        setActiveTab('profile');
+        setShowBankCardModal(true);
+        return;
+      }
+      if (hash === '#contact') {
+        setShowCustomerCare(true);
+        return;
+      }
+
+      // Tabs check
+      if (hash === '#invite') {
+        setActiveTab('invite');
+        setCurrentSubView('none');
+        return;
+      }
+      if (hash === '#team') {
+        setActiveTab('team');
+        setCurrentSubView('none');
+        return;
+      }
+      if (hash === '#profile') {
+        setActiveTab('profile');
+        setCurrentSubView('none');
+        return;
+      }
+      if (hash === '#home') {
+        setActiveTab('home');
+        setCurrentSubView('none');
+        return;
       }
 
       // Auth routes check (/login, /signin, /register, /signup, etc.)
@@ -102,14 +174,14 @@ const AppContent: React.FC = () => {
       window.removeEventListener('hashchange', handleUrlRoutes);
       window.removeEventListener('popstate', handleUrlRoutes);
     };
-  }, [setShowAdminPanel, setShowAuthModal]);
+  }, [setShowAdminPanel, setShowAuthModal, setActiveTab, setShowOrdersModal, setShowBankCardModal, setShowCustomerCare]);
 
   const handleOpenRecharge = () => {
     if (!user.isLoggedIn) {
       setShowAuthModal(true);
       return;
     }
-    setCurrentSubView('recharge');
+    updateSubView('recharge');
   };
 
   // Register with context so any component (e.g. BuyModal, Navbar) can trigger recharge navigation
@@ -124,11 +196,11 @@ const AppContent: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
-    setCurrentSubView('withdraw');
+    updateSubView('withdraw');
   };
 
   const handleBackToMain = () => {
-    setCurrentSubView('none');
+    updateSubView('none');
   };
 
   return (
@@ -196,8 +268,8 @@ const AppContent: React.FC = () => {
           setShowAdminPanel(false);
           if (window.location.pathname.toLowerCase() === '/admin') {
             window.history.pushState(null, '', '/');
-          } else if (window.location.hash.toLowerCase() === '#admin') {
-            window.history.pushState(null, '', window.location.pathname);
+          } else {
+            window.history.pushState(null, '', `#${activeTab}`);
           }
         }} />
       )}

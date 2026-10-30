@@ -131,10 +131,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
 
-  // Navigation Tab
-  const [activeTab, setActiveTab] = useState<
+  // Navigation Tab (Persisted across refreshes)
+  const [activeTab, setActiveTabState] = useState<
     'dashboard' | 'users' | 'wallets' | 'withdrawals' | 'recharges' | 'rechargeGateway' | 'kyc' | 'settings' | 'plans' | 'dailyWithdrawals'
-  >('dashboard');
+  >(() => {
+    try {
+      const saved = localStorage.getItem('fancode_admin_active_tab');
+      if (saved) return saved as any;
+    } catch {}
+    return 'dashboard';
+  });
+
+  const setActiveTab = (tab: any) => {
+    setActiveTabState(tab);
+    try {
+      localStorage.setItem('fancode_admin_active_tab', tab);
+    } catch {}
+  };
   const [selectedAdminUser, setSelectedAdminUser] = useState<AdminUserItem | null>(null);
 
   // Live Supabase Data State
@@ -374,6 +387,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     const isValid = await verifyAdminPinDB(pinInput);
     if (isValid || pinInput === 'Sri@2026') {
       setIsAdminAuthenticated(true);
+      try {
+        localStorage.setItem('fancode_admin_authenticated', 'true');
+        localStorage.setItem('fancode_admin_panel_open', 'true');
+      } catch {}
       setPinError('');
       showToast('Admin Console Unlocked! Welcome Administrator.');
     } else {
@@ -383,7 +400,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   const handleLogoutAdmin = () => {
     setIsAdminAuthenticated(false);
-    showToast('Admin session locked.');
+    try {
+      localStorage.removeItem('fancode_admin_authenticated');
+      localStorage.removeItem('fancode_admin_panel_open');
+      localStorage.removeItem('fancode_admin_active_tab');
+    } catch {}
+    showToast('Admin session logged out.');
   };
 
   // Plan Management
@@ -1061,9 +1083,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 advanceTimeToNextDayAfter1230();
                 showToast('Fast forwarded to Next Day 12:35 AM.');
               }}
-              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-[#FF4A00] hover:bg-[#E04000] text-white text-[10px] font-bold transition shadow-xs"
+              className="mt-2 w-full py-1.5 px-2 rounded-lg bg-[#FF4A00] hover:bg-[#E04000] text-white text-[10px] font-bold transition shadow-xs cursor-pointer"
             >
               Advance Next Day 12:35 AM
+            </button>
+
+            {/* Explicit Admin Logout Button in Sidebar */}
+            <button
+              onClick={handleLogoutAdmin}
+              className="mt-2 w-full py-2 px-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 hover:text-white text-[11px] font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout Admin</span>
             </button>
           </div>
         </aside>
@@ -1138,21 +1169,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                 </span>
               </div>
 
-              {/* Lock & Back to Live Website */}
+              {/* Logout & Back to Live Website */}
               <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
                 <button
                   onClick={handleLogoutAdmin}
-                  title="Lock Admin Session"
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                  title="Logout Admin Session"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition border border-rose-200 cursor-pointer"
                 >
-                  <Lock className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Logout</span>
                 </button>
                 <button
-                  onClick={() => {
-                    setIsAdminAuthenticated(false);
-                    onClose();
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1536] hover:bg-[#16224f] text-white text-xs font-bold transition shadow-xs"
+                  onClick={onClose}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1536] hover:bg-[#16224f] text-white text-xs font-bold transition shadow-xs cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Back to Live Website</span>
