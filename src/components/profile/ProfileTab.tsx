@@ -14,7 +14,9 @@ import {
   Bell, 
   LogOut, 
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  CheckCircle2
 } from 'lucide-react';
 
 interface ProfileTabProps {
@@ -28,10 +30,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
   onNavigateToBank, 
   onNavigateToContact 
 }) => {
-  const { user, transactions, setShowAuthModal, logoutUser } = useApp();
+  const { user, transactions, investments, setShowAuthModal, logoutUser, setActiveTab } = useApp();
   const [activeSubModal, setActiveSubModal] = useState<
     'personal' | 'balanceDetails' | 'withdrawalDetails' | 'notifications' | 'about' | null
   >(null);
+
+  const activeInvestments = (investments || []).filter(inv => inv.status === 'ACTIVE');
+  const totalDailyRoi = activeInvestments.reduce((sum, inv) => sum + (inv.dailyIncome || 0), 0);
 
   const withdrawalsList = transactions.filter(t => t.type === 'WITHDRAWAL');
 
@@ -132,15 +137,20 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
 
       {/* 4 Quick Action Rounded Cards */}
       <div className="grid grid-cols-4 gap-2.5">
-        {/* Orders */}
+        {/* Orders / My Plans */}
         <button
           onClick={onNavigateToOrders}
-          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 transition group active:scale-95 shadow-sm"
+          className="relative flex flex-col items-center justify-center p-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 transition group active:scale-95 shadow-sm"
         >
-          <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+          <div className="relative w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
             <FileText className="w-5 h-5" />
+            {activeInvestments.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-black flex items-center justify-center shadow-xs">
+                {activeInvestments.length}
+              </span>
+            )}
           </div>
-          <span className="text-xs font-semibold text-slate-800 mt-2">Orders</span>
+          <span className="text-xs font-semibold text-slate-800 mt-2">My Plans</span>
         </button>
 
         {/* Contact */}
@@ -175,6 +185,105 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
           <span className="text-xs font-semibold text-slate-800 mt-2">Bank Card</span>
         </button>
+      </div>
+
+      {/* Active Plans & Contracts Section */}
+      <div className="rounded-2xl p-4 bg-white border border-slate-200 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-orange-100 text-[#FF4A00] flex items-center justify-center">
+              <Zap className="w-4 h-4 fill-orange-500" />
+            </div>
+            <div>
+              <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                My Active Contracts ({activeInvestments.length})
+              </h2>
+              {activeInvestments.length > 0 && (
+                <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Earning ₹{totalDailyRoi.toLocaleString()}/day automatically
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={onNavigateToOrders}
+            className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 cursor-pointer"
+          >
+            <span>View All</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {activeInvestments.length === 0 ? (
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center space-y-2">
+            <Bot className="w-8 h-8 text-slate-300 mx-auto" />
+            <p className="text-xs text-slate-500 font-medium">
+              You don't have any active sports contracts deployed yet.
+            </p>
+            <button
+              onClick={() => setActiveTab('home')}
+              className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#FF5E00] to-[#FF4500] text-white text-xs font-bold shadow-xs active:scale-95 transition cursor-pointer"
+            >
+              Explore FanCode Plans →
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {activeInvestments.slice(0, 3).map((inv) => (
+              <div
+                key={inv.id}
+                onClick={onNavigateToOrders}
+                className="p-3 rounded-xl bg-gradient-to-r from-slate-50 to-orange-50/30 border border-slate-200/80 hover:border-orange-300 transition cursor-pointer space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-sm text-slate-900">
+                      {inv.productName}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 text-[9px] font-black uppercase">
+                      {inv.quantity}x Units
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    ACTIVE
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-[11px] pt-1 border-t border-slate-200/50">
+                  <div>
+                    <span className="text-slate-400 block text-[9.5px]">Daily ROI</span>
+                    <span className="font-bold text-emerald-600">
+                      ₹{inv.dailyIncome.toLocaleString()}/day
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[9.5px]">Total Earned</span>
+                    <span className="font-bold text-slate-800">
+                      ₹{(inv.totalEarned || 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[9.5px]">Invested</span>
+                    <span className="font-bold text-slate-800">
+                      ₹{inv.totalInvested.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {activeInvestments.length > 3 && (
+              <button
+                onClick={onNavigateToOrders}
+                className="w-full py-1.5 text-center text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+              >
+                + {activeInvestments.length - 3} more contract(s) · View Details
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Account Section List Rows */}

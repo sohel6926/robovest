@@ -462,10 +462,77 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       ]);
 
       if (profileRes) {
+        let correctedBalance = profileRes.user.availableBalance;
+        let correctedIncome = profileRes.user.totalIncome;
+        let correctedWithdrawable = profileRes.user.withdrawableBalance;
+        let profileNeedsUpdate = false;
+        let newTxns = [...(userTxns || [])];
+
+        // 1. Remove unwanted 100 signup bonus if present in transactions
+        const signupTxnIndex = newTxns.findIndex(t => t.type === 'SIGNUP_BONUS' || t.referenceId === 'SYS-WELCOME');
+        if (signupTxnIndex !== -1) {
+          correctedBalance = Math.max(0, correctedBalance - 100);
+          correctedIncome = Math.max(0, correctedIncome - 100);
+          correctedWithdrawable = Math.max(0, correctedWithdrawable - 100);
+          newTxns.splice(signupTxnIndex, 1);
+          profileNeedsUpdate = true;
+        }
+
+        // 2. Auto-credit Day 1 Daily ROI for any active plan that hasn't received it yet
+        const updatedInvs = (userInvs || []).map(inv => {
+          if (inv.status === 'ACTIVE' && (!inv.totalEarned || inv.totalEarned === 0 || !inv.cyclesHarvested || inv.cyclesHarvested === 0)) {
+            const day1Roi = inv.dailyIncome || 0;
+            if (day1Roi > 0) {
+              correctedBalance += day1Roi;
+              correctedIncome += day1Roi;
+              correctedWithdrawable += day1Roi;
+              profileNeedsUpdate = true;
+              
+              const day1Txn: Transaction = {
+                id: `TXN-ROI-${Date.now().toString().slice(-6)}`,
+                type: 'DAILY_RETURN',
+                amount: day1Roi,
+                status: 'COMPLETED',
+                timestamp: Date.now(),
+                formattedTime: new Date().toLocaleString(),
+                description: `Day 1 Daily Return for ${inv.productName}`,
+                referenceId: `ROI-${inv.id}`
+              };
+              newTxns.unshift(day1Txn);
+              insertTransactionDB(userId, day1Txn);
+
+              const updatedInv: UserInvestment = {
+                ...inv,
+                daysElapsed: Math.max(1, inv.daysElapsed || 1),
+                totalEarned: (inv.totalEarned || 0) + day1Roi,
+                cyclesHarvested: Math.max(1, inv.cyclesHarvested || 1),
+                lastHarvestDate: getCycleDateKey(new Date(), platformSettings.dailyWithdrawalWindowStart),
+              };
+              saveUserInvestmentDB(userId, updatedInv);
+              return updatedInv;
+            }
+          }
+          return inv;
+        });
+
+        if (profileNeedsUpdate) {
+          profileRes.user.availableBalance = correctedBalance;
+          profileRes.user.totalIncome = correctedIncome;
+          profileRes.user.withdrawableBalance = correctedWithdrawable;
+          updateUserProfileDB(userId, {
+            availableBalance: correctedBalance,
+            totalIncome: correctedIncome,
+            withdrawableBalance: correctedWithdrawable
+          });
+        }
+
         setUser(profileRes.user);
+        setInvestments(updatedInvs);
+        setTransactions(newTxns);
+      } else {
+        setInvestments(userInvs || []);
+        setTransactions(userTxns || []);
       }
-      setInvestments(userInvs || []);
-      setTransactions(userTxns || []);
       setTeamMembers(userTeam || []);
     } catch (err) {
       console.error('refreshUserData error:', err);
@@ -527,26 +594,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // 2. Check active Supabase Auth session
         const { session } = await getAuthSession();
         if (session?.user && isMounted) {
-          const profileRes = await ensureUserProfile(
+          await ensureUserProfile(
             session.user.id, 
             session.user.email!, 
             session.user.user_metadata
           );
-
-          if (profileRes && isMounted) {
-            setUser(profileRes.user);
-          }
-
-          const [userInvs, userTxns, userTeam] = await Promise.all([
-            fetchUserInvestments(session.user.id),
-            fetchTransactions(session.user.id),
-            fetchUserReferralNetwork(session.user.id)
-          ]);
-
           if (isMounted) {
-            setInvestments(userInvs || []);
-            setTransactions(userTxns || []);
-            setTeamMembers(userTeam || []);
+            await refreshUserData(session.user.id);
           }
         } else if (isMounted) {
           // No active session — show auth modal so user must login/register
@@ -571,17 +625,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (!isMounted) return;
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (session?.user) {
-          const profileRes = await ensureUserProfile(session.user.id, session.user.email!, session.user.user_metadata);
-          if (profileRes && isMounted) {
-            setUser(profileRes.user);
-          }
-          const [userInvs, userTxns] = await Promise.all([
-            fetchUserInvestments(session.user.id),
-            fetchTransactions(session.user.id)
-          ]);
+          await ensureUserProfile(session.user.id, session.user.email!, session.user.user_metadata);
           if (isMounted) {
-            setInvestments(userInvs || []);
-            setTransactions(userTxns || []);
+            await refreshUserData(session.user.id);
           }
         }
       } else if (event === 'SIGNED_OUT') {
@@ -874,7 +920,40 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       });
     });
 
-    // 3. Referral commissions credited to user wallet if applicable
+    // 3. Automated daily yield payout credited directly to user wallet
+    if (yieldSum > 0 && user.id) {
+      setUser(prev => {
+        const newAvail = prev.availableBalance + yieldSum;
+        const newWithdr = prev.withdrawableBalance + yieldSum;
+        const newIncome = prev.totalIncome + yieldSum;
+        updateUserProfileDB(prev.id, {
+          availableBalance: newAvail,
+          withdrawableBalance: newWithdr,
+          totalIncome: newIncome,
+        });
+        return {
+          ...prev,
+          availableBalance: newAvail,
+          withdrawableBalance: newWithdr,
+          totalIncome: newIncome,
+        };
+      });
+
+      const yieldTxn: Transaction = {
+        id: `TXN-ROI-${Date.now().toString().slice(-6)}`,
+        type: 'DAILY_RETURN',
+        amount: yieldSum,
+        status: 'COMPLETED',
+        timestamp: resetDate.getTime(),
+        formattedTime: resetDate.toLocaleString(),
+        description: `Automated Daily ROI Payout across ${activeInvs.length} active contract(s)`,
+        referenceId: `ROI-DAILY-${Date.now().toString().slice(-4)}`
+      };
+      insertTransactionDB(user.id, yieldTxn);
+      setTransactions(prev => [yieldTxn, ...prev]);
+    }
+
+    // 4. Referral commissions credited to user wallet if applicable
     if (commissionSum > 0) {
       setUser(prev => {
         const newAvail = prev.availableBalance + commissionSum;
@@ -909,7 +988,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     return {
       success: true,
-      message: `Night reset completed! Active plans advanced to next cycle. Distributed ₹${commissionSum.toLocaleString()} in referral commissions. Daily yields of ₹${yieldSum.toLocaleString()} accumulated for manual harvest. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
+      message: `Night reset completed! Active plans advanced to next cycle. Distributed ₹${commissionSum.toLocaleString()} in referral commissions. ₹${yieldSum.toLocaleString()} daily ROI auto-credited to wallet. ${completedInvsCount > 0 ? `${completedInvsCount} plan(s) completed.` : ''}`,
       yieldDistributed: yieldSum,
       commissionDistributed: commissionSum,
       activeNodesCount: investments.filter(inv => inv.status === 'ACTIVE').length,
@@ -1035,6 +1114,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const totalBonus = product.bonus * quantity;
     const totalDaily = product.dailyIncome * quantity;
+    const currentCycle = getCycleDateKey(simulatedTime, platformSettings.dailyWithdrawalWindowStart);
 
     const newInvestment: UserInvestment = {
       id: `INV-${productId}-${Date.now().toString().slice(-6)}`,
@@ -1048,9 +1128,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       bonusReceived: totalBonus,
       purchaseTimestamp: simulatedTime.getTime(),
       purchaseDateFormatted: simulatedTime.toLocaleDateString(),
-      daysElapsed: 0,
-      totalEarned: 0,
-      cyclesHarvested: 0,
+      daysElapsed: 1,
+      totalEarned: totalDaily,
+      cyclesHarvested: 1,
+      lastHarvestDate: currentCycle,
       status: 'ACTIVE',
     };
 
@@ -1076,9 +1157,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       referenceId: `BONUS-${productId}`
     };
 
-    const updatedAvailBalance = user.availableBalance - totalCost + totalBonus;
-    const updatedWithdrawableBalance = user.withdrawableBalance + totalBonus;
-    const updatedTotalIncome = user.totalIncome + totalBonus;
+    const roiTxn: Transaction = {
+      id: `TXN-ROI-${Date.now().toString().slice(-6)}`,
+      type: 'DAILY_RETURN',
+      amount: totalDaily,
+      status: 'COMPLETED',
+      timestamp: simulatedTime.getTime(),
+      formattedTime: simulatedTime.toLocaleString(),
+      description: `Day 1 Daily Return for ${quantity}x ${product.name}`,
+      referenceId: `ROI-${newInvestment.id}`
+    };
+
+    const updatedAvailBalance = user.availableBalance - totalCost + totalBonus + totalDaily;
+    const updatedWithdrawableBalance = user.withdrawableBalance + totalBonus + totalDaily;
+    const updatedTotalIncome = user.totalIncome + totalBonus + totalDaily;
 
     setUser(prev => ({
       ...prev,
@@ -1088,12 +1180,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
 
     setInvestments(prev => [newInvestment, ...prev]);
-    setTransactions(prev => [bonusTxn, purchaseTxn, ...prev]);
+    setTransactions(prev => [roiTxn, bonusTxn, purchaseTxn, ...prev]);
 
     // Persist to Supabase
     saveUserInvestmentDB(user.id, newInvestment);
     insertTransactionDB(user.id, purchaseTxn);
     insertTransactionDB(user.id, bonusTxn);
+    insertTransactionDB(user.id, roiTxn);
     updateUserProfileDB(user.id, {
       availableBalance: updatedAvailBalance,
       withdrawableBalance: updatedWithdrawableBalance,
@@ -1105,7 +1198,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     return {
       success: true,
-      message: `Congratulations! Successfully deployed ${quantity} unit(s) of ${product.name}. ₹${totalBonus.toLocaleString()} bonus credited to your wallet!`
+      message: `Congratulations! Successfully deployed ${quantity} unit(s) of ${product.name}. ₹${totalBonus.toLocaleString()} bonus + ₹${totalDaily.toLocaleString()} daily ROI credited to your wallet!`
     };
   };
 

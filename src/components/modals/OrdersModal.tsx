@@ -7,35 +7,14 @@ export const OrdersModal: React.FC = () => {
     showOrdersModal, 
     setShowOrdersModal, 
     investments, 
-    claimDailyReturns, 
-    unharvestedYield,
-    isHarvestedToday,
-    unharvestedDays,
-    simulatedTime,
-    platformSettings,
     setActiveTab 
   } = useApp();
-  const [claimNotice, setClaimNotice] = useState<{ message: string; type: 'success' | 'info' | 'warning' } | null>(null);
 
   if (!showOrdersModal) return null;
 
   const activeInvestments = investments.filter(inv => inv.status === 'ACTIVE');
   const totalDailyRevenue = activeInvestments.reduce((sum, inv) => sum + inv.dailyIncome, 0);
   const totalUnits = activeInvestments.reduce((sum, inv) => sum + inv.quantity, 0);
-
-  const handleClaim = () => {
-    const res = claimDailyReturns();
-    if (res.success) {
-      setClaimNotice({ message: res.message, type: 'success' });
-      setTimeout(() => setClaimNotice(null), 4000);
-    } else {
-      setClaimNotice({ 
-        message: res.message, 
-        type: res.alreadyHarvested ? 'info' : 'warning' 
-      });
-      setTimeout(() => setClaimNotice(null), 4000);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 animate-in fade-in">
@@ -61,85 +40,33 @@ export const OrdersModal: React.FC = () => {
           </button>
         </div>
 
-        {/* Daily Harvest Summary Box */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 shrink-0 shadow-xs">
+        {/* Automated Daily Yield Summary Box (No Manual Harvest Needed) */}
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 space-y-2 shrink-0 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">
-                Daily Combined Yield
+              <span className="text-[10px] text-emerald-800 uppercase font-black tracking-wider block">
+                Daily Combined Return
               </span>
-              <div className="text-xl font-black text-emerald-600 tabular-nums">
-                ₹{totalDailyRevenue.toLocaleString()} <span className="text-xs font-semibold text-slate-400">/ day</span>
+              <div className="text-xl font-black text-emerald-700 tabular-nums">
+                ₹{totalDailyRevenue.toLocaleString()} <span className="text-xs font-semibold text-emerald-600">/ day</span>
               </div>
             </div>
 
-            <button
-              onClick={handleClaim}
-              disabled={totalDailyRevenue <= 0}
-              title={isHarvestedToday ? 'Click to check harvest status' : 'Harvest your daily returns'}
-              className={`px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-xs active:scale-95 transition flex items-center gap-1.5 cursor-pointer shrink-0 ${
-                isHarvestedToday
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 shadow-emerald-500/10'
-                  : 'bg-gradient-to-r from-[#FF5500] to-[#FF3500] hover:brightness-105 text-white shadow-orange-500/25'
-              }`}
-            >
-              {isHarvestedToday ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Harvested Today</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-4 h-4 fill-white text-white" />
-                  <span>
-                    {unharvestedDays > 1 
-                      ? `Harvest Stacked (₹${unharvestedYield.toLocaleString()})` 
-                      : `Harvest Yield (₹${unharvestedYield.toLocaleString()})`}
-                  </span>
-                </>
-              )}
-            </button>
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Auto-Credited</span>
+            </div>
           </div>
 
           {/* Subtext info pill */}
-          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[11px]">
-            {isHarvestedToday ? (
-              <span className="text-emerald-700 font-medium flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="line-clamp-1">Harvested for today · Next cycle at 00:30 AM</span>
-              </span>
-            ) : unharvestedDays > 1 ? (
-              <span className="text-orange-600 font-bold flex items-center gap-1">
-                <Zap className="w-3.5 h-3.5 text-orange-600 fill-orange-600 shrink-0" />
-                <span>{unharvestedDays} days unharvested · Harvest in 1 click!</span>
-              </span>
-            ) : (
-              <span className="text-slate-600 font-medium flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-orange-600 shrink-0" />
-                <span>Ready to harvest for today's cycle</span>
-              </span>
-            )}
-            <span className="font-mono text-slate-400 text-[10px] shrink-0 ml-1">1 harvest / day</span>
+          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[11px] text-emerald-800">
+            <span className="font-medium flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+              <span>Automatically credited directly to wallet daily at 00:30 AM</span>
+            </span>
+            <span className="font-bold text-emerald-700 text-[10px] shrink-0 ml-1">Automated</span>
           </div>
         </div>
-
-        {/* Claim Notice Message Banner */}
-        {claimNotice && (
-          <div className={`p-3 rounded-2xl text-xs flex items-start gap-2 animate-in fade-in transition-all ${
-            claimNotice.type === 'success' 
-              ? 'bg-emerald-50 border border-emerald-300 text-emerald-800 shadow-xs' 
-              : 'bg-amber-50 border border-amber-300 text-amber-900 shadow-xs'
-          }`}>
-            {claimNotice.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            ) : (
-              <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            )}
-            <div className="leading-snug">
-              <span className="font-semibold block">{claimNotice.message}</span>
-            </div>
-          </div>
-        )}
 
         {/* Investments List */}
         <div className="overflow-y-auto space-y-3 flex-1 pr-1">

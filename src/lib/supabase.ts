@@ -142,10 +142,10 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
     invite_code: inviteCode,
     inviter_code: inviterCode,
     vip_level: 1,
-    available_balance: 100, // ₹100 Welcome Bonus
+    available_balance: 0,
     withdrawable_balance: 0,
     total_recharge: 0,
-    total_income: 100,
+    total_income: 0,
     is_logged_in: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -201,18 +201,6 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
     is_bound: false
   });
 
-  const welcomeTxn: Transaction = {
-    id: `TXN-WEL-${Date.now().toString().slice(-6)}`,
-    type: 'SIGNUP_BONUS',
-    amount: 100,
-    status: 'COMPLETED',
-    timestamp: Date.now(),
-    formattedTime: new Date().toLocaleString(),
-    description: 'New Member Welcome Bonus',
-    referenceId: 'SYS-WELCOME'
-  };
-  await insertTransactionDB(userId, welcomeTxn);
-
   return {
     user: {
       id: userId,
@@ -220,10 +208,10 @@ export async function ensureUserProfile(userId: string, email: string, metadata?
       phone,
       inviteCode,
       vipLevel: 1,
-      availableBalance: 100,
+      availableBalance: 0,
       withdrawableBalance: 0,
       totalRecharge: 0,
-      totalIncome: 100,
+      totalIncome: 0,
       isLoggedIn: true,
       bankAccount: initialBank,
       pin: '1234',

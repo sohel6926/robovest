@@ -8,7 +8,8 @@ import {
   Gift, 
   Zap, 
   ChevronRight, 
-  Crown
+  Crown,
+  CheckCircle2
 } from 'lucide-react';
 
 interface HomeTabProps {
@@ -161,6 +162,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   FAN<span className="text-[#FF4A00]">CODE</span>
                 </div>
 
+                {/* Top-right ACTIVE Badge if user owns this plan */}
+                {ownedCount > 0 && (
+                  <div className="absolute top-2 right-2 bg-emerald-600 text-white text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full shadow-md flex items-center gap-1 border border-white/20">
+                    <CheckCircle2 className="w-2.5 h-2.5 stroke-[3]" />
+                    <span>ACTIVE</span>
+                  </div>
+                )}
+
                 {/* Bottom Overlay: Bonus Pill Badge */}
                 <div className="absolute bottom-2 left-1.5 right-1.5 bg-white/95 backdrop-blur-xs py-1 px-1.5 rounded-full border border-slate-100 shadow-sm flex items-center justify-center gap-1">
                   <Gift className="w-3 h-3 text-[#FF4A00] shrink-0" />
@@ -173,6 +182,20 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               {/* Right Column: Title, Separate Colored Boxes for All Metrics, and View Plan CTA */}
               <div className="flex-1 flex flex-col justify-between min-w-0">
                 
+                {/* 0. Active Banner if user purchased this plan */}
+                {ownedCount > 0 && (
+                  <div className="mb-1 flex items-center justify-between gap-1 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-0.5">
+                    <span className="flex items-center gap-1 text-[9.5px] sm:text-[10px] font-black text-emerald-800 uppercase tracking-tight">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                      <span>{ownedCount} Contract{ownedCount > 1 ? 's' : ''} Active</span>
+                    </span>
+                    <span className="text-[9.5px] font-bold text-emerald-700 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      ₹{(product.dailyIncome * ownedCount).toLocaleString()}/day
+                    </span>
+                  </div>
+                )}
+
                 {/* 1. Header Row: Product Name + POPULAR Crown Badge */}
                 <div className="flex items-center justify-between gap-1.5 min-w-0">
                   <h3 className="font-black text-base sm:text-lg text-slate-900 font-sans leading-tight truncate shrink min-w-0">
@@ -264,14 +287,28 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   </div>
                 </div>
 
-                {/* 4. Full-width Orange Pill View Plan Button */}
+                {/* 4. Action Button: Emerald for Active Plans, Orange for Available */}
                 <button
                   onClick={() => setShowBuyModal(product)}
-                  className="w-full py-2 px-3 rounded-full bg-gradient-to-r from-[#FF5E00] via-[#FF4D00] to-[#FF3500] hover:from-[#FF6800] hover:to-[#FF4000] text-white font-black text-xs tracking-wide shadow-md shadow-orange-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className={`w-full py-2 px-3 rounded-full text-white font-black text-xs tracking-wide shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    ownedCount > 0
+                      ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-600 shadow-emerald-600/25'
+                      : 'bg-gradient-to-r from-[#FF5E00] via-[#FF4D00] to-[#FF3500] hover:from-[#FF6800] hover:to-[#FF4000] shadow-orange-500/25'
+                  }`}
                 >
-                  <Zap className="w-3.5 h-3.5 fill-white text-white" />
-                  <span>View Plan</span>
-                  <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+                  {ownedCount > 0 ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                      <span>Active ({ownedCount}) · Manage / Buy More</span>
+                      <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3.5 h-3.5 fill-white text-white" />
+                      <span>View Plan</span>
+                      <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
