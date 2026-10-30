@@ -1,0 +1,28 @@
+name: Automated Daily ROI Settlement
+
+on:
+  schedule:
+    # 19:00 UTC = 00:30 AM IST (Indian Standard Time) every night
+    - cron: '0 19 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  settle-roi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Daily ROI Settlement
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://khlwshpucfdkoefknxtp.supabase.co' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtobHdzaHB1Y2Zka29lZmtueHRwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjI4NTg4NCwiZXhwIjoyMTA3ODYxODg0fQ.YMoyktHVEqHpWoZfDQPs0aBLQniHSh8y_P3DQ6LJbAo' }}
+        run: node scripts/settle-daily-roi.js

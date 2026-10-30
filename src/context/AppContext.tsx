@@ -478,35 +478,65 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           profileNeedsUpdate = true;
         }
 
-        // 2. Auto-credit Day 1 Daily ROI for any active plan that hasn't received it yet
+        // 2. Auto-credit ALL due Daily ROI cycles for any active plan across all elapsed days
+        const now = new Date();
+        const currentCycleKey = getCycleDateKey(now, platformSettings.dailyWithdrawalWindowStart);
+
         const updatedInvs = (userInvs || []).map(inv => {
-          if (inv.status === 'ACTIVE' && (!inv.totalEarned || inv.totalEarned === 0 || !inv.cyclesHarvested || inv.cyclesHarvested === 0)) {
-            const day1Roi = inv.dailyIncome || 0;
-            if (day1Roi > 0) {
-              correctedBalance += day1Roi;
-              correctedIncome += day1Roi;
-              correctedWithdrawable += day1Roi;
+          if (inv.status === 'ACTIVE') {
+            const dailyIncome = Number(inv.dailyIncome) || 0;
+            if (dailyIncome <= 0) return inv;
+
+            const eligibleCycles = getInvestmentEligibleCycles(inv, now, platformSettings.dailyWithdrawalWindowStart);
+
+            // Count how many daily ROI returns have been recorded for this contract
+            const planRoiTxns = newTxns.filter(t => 
+              t.type === 'DAILY_RETURN' && 
+              Number(t.amount) > 0 &&
+              (t.referenceId?.includes(inv.id) || t.description?.includes(inv.productName) || (t.referenceId?.startsWith('ROI-') && t.referenceId?.includes(inv.id.slice(-6))))
+            );
+
+            const alreadyCreditedCycles = Math.max(
+              planRoiTxns.length,
+              Math.floor(Number(inv.totalEarned || 0) / dailyIncome)
+            );
+
+            const dueCycles = Math.max(0, eligibleCycles - alreadyCreditedCycles);
+
+            if (dueCycles > 0) {
+              const dueAmount = dueCycles * dailyIncome;
+              correctedBalance += dueAmount;
+              correctedIncome += dueAmount;
+              correctedWithdrawable += dueAmount;
               profileNeedsUpdate = true;
-              
-              const day1Txn: Transaction = {
-                id: `TXN-ROI-${Date.now().toString().slice(-6)}`,
-                type: 'DAILY_RETURN',
-                amount: day1Roi,
-                status: 'COMPLETED',
-                timestamp: Date.now(),
-                formattedTime: new Date().toLocaleString(),
-                description: `Day 1 Daily Return for ${inv.productName}`,
-                referenceId: `ROI-${inv.id}`
-              };
-              newTxns.unshift(day1Txn);
-              insertTransactionDB(userId, day1Txn);
+
+              const newDaysElapsed = eligibleCycles;
+              const newTotalEarned = alreadyCreditedCycles * dailyIncome + dueAmount;
+              const isCompleted = newDaysElapsed >= 150 || newTotalEarned >= (Number(inv.totalInvested) * 2);
+
+              for (let d = 1; d <= dueCycles; d++) {
+                const cycleNum = alreadyCreditedCycles + d;
+                const roiTxn: Transaction = {
+                  id: `TXN-ROI-${inv.id.slice(-6)}-C${cycleNum}-${Date.now().toString().slice(-4)}`,
+                  type: 'DAILY_RETURN',
+                  amount: dailyIncome,
+                  status: 'COMPLETED',
+                  timestamp: Date.now() - (dueCycles - d) * 1000,
+                  formattedTime: new Date().toLocaleString(),
+                  description: `Daily Return (Cycle ${cycleNum}) for ${inv.productName}`,
+                  referenceId: `ROI-${inv.id}-C${cycleNum}`
+                };
+                newTxns.unshift(roiTxn);
+                insertTransactionDB(userId, roiTxn);
+              }
 
               const updatedInv: UserInvestment = {
                 ...inv,
-                daysElapsed: Math.max(1, inv.daysElapsed || 1),
-                totalEarned: (inv.totalEarned || 0) + day1Roi,
-                cyclesHarvested: Math.max(1, inv.cyclesHarvested || 1),
-                lastHarvestDate: getCycleDateKey(new Date(), platformSettings.dailyWithdrawalWindowStart),
+                daysElapsed: newDaysElapsed,
+                totalEarned: newTotalEarned,
+                cyclesHarvested: newDaysElapsed,
+                lastHarvestDate: currentCycleKey,
+                status: isCompleted ? 'COMPLETED' : 'ACTIVE',
               };
               saveUserInvestmentDB(userId, updatedInv);
               return updatedInv;
