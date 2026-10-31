@@ -16,7 +16,9 @@ import {
   ChevronRight,
   ShieldCheck,
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  Clock,
+  Calendar
 } from 'lucide-react';
 
 interface ProfileTabProps {
@@ -229,57 +231,105 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             </button>
           </div>
         ) : (
-          <div className="space-y-2.5">
-            {activeInvestments.slice(0, 3).map((inv) => (
-              <div
-                key={inv.id}
-                onClick={onNavigateToOrders}
-                className="p-3 rounded-xl bg-gradient-to-r from-slate-50 to-orange-50/30 border border-slate-200/80 hover:border-orange-300 transition cursor-pointer space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-sm text-slate-900">
-                      {inv.productName}
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 text-[9px] font-black uppercase">
-                      {inv.quantity}x Units
-                    </span>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    ACTIVE
-                  </span>
-                </div>
+          <div className="space-y-3">
+            {activeInvestments.slice(0, 4).map((inv) => {
+              const totalDays = 150;
+              const daysReceived = Math.min(totalDays, Math.max(1, inv.daysElapsed || 1));
+              const daysPending = Math.max(0, totalDays - daysReceived);
+              const progressPercent = Math.min(100, Math.round((daysReceived / totalDays) * 100));
+              const roiEarned = daysReceived * inv.dailyIncome;
+              const bonusEarned = Number(inv.bonusReceived || 0);
+              const totalEarned = inv.totalEarned || (roiEarned + bonusEarned);
 
-                <div className="grid grid-cols-3 gap-2 text-[11px] pt-1 border-t border-slate-200/50">
-                  <div>
-                    <span className="text-slate-400 block text-[9.5px]">Daily ROI</span>
-                    <span className="font-bold text-emerald-600">
-                      ₹{inv.dailyIncome.toLocaleString()}/day
+              return (
+                <div
+                  key={inv.id}
+                  onClick={onNavigateToOrders}
+                  className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-orange-50/40 border border-slate-200/90 hover:border-orange-300 transition-all cursor-pointer space-y-2.5 shadow-xs"
+                >
+                  {/* Top: Name, Units, Status */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-sm text-slate-900 tracking-tight">
+                        {inv.productName}
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-orange-100 text-orange-700 text-[9.5px] font-black uppercase">
+                        {inv.quantity}x Units
+                      </span>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      ACTIVE
                     </span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[9.5px]">Total Earned</span>
-                    <span className="font-bold text-slate-800">
-                      ₹{(inv.totalEarned || 0).toLocaleString()}
-                    </span>
+
+                  {/* Days Received & Days Pending Layout */}
+                  <div className="bg-white/90 p-2.5 rounded-xl border border-slate-200/80 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      {/* Days Received Badge */}
+                      <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 text-[11px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                        <span><strong>{daysReceived}</strong> Days Received</span>
+                      </span>
+
+                      {/* Days Pending Badge */}
+                      <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 text-[11px]">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 stroke-[2.5]" />
+                        <span><strong>{daysPending}</strong> Days Pending</span>
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="space-y-1">
+                      <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200/60">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-[#FF4A00] rounded-full transition-all duration-500"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold px-0.5">
+                        <span>Day {daysReceived} of {totalDays}</span>
+                        <span>{progressPercent}% Completed</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[9.5px]">Invested</span>
-                    <span className="font-bold text-slate-800">
-                      ₹{inv.totalInvested.toLocaleString()}
-                    </span>
+
+                  {/* 3 Metrics: Daily ROI, Total Earned, Invested */}
+                  <div className="grid grid-cols-3 gap-2 text-[11px] pt-1 border-t border-slate-200/60">
+                    <div className="p-2 rounded-xl bg-emerald-50/60 border border-emerald-100/90">
+                      <span className="text-slate-400 block text-[9.5px]">Daily ROI</span>
+                      <span className="font-extrabold text-emerald-600 tabular-nums text-xs">
+                        ₹{inv.dailyIncome.toLocaleString()}/day
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-blue-50/60 border border-blue-100/90">
+                      <span className="text-slate-400 block text-[9.5px]">Total Earned</span>
+                      <span className="font-extrabold text-blue-700 tabular-nums text-xs">
+                        ₹{totalEarned.toLocaleString()}
+                      </span>
+                      {bonusEarned > 0 && (
+                        <span className="text-[8.5px] text-blue-500 block leading-tight font-medium mt-0.5">
+                          (₹{roiEarned} + ₹{bonusEarned} bonus)
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/70">
+                      <span className="text-slate-400 block text-[9.5px]">Invested</span>
+                      <span className="font-extrabold text-slate-800 tabular-nums text-xs">
+                        ₹{inv.totalInvested.toLocaleString()}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
-            {activeInvestments.length > 3 && (
+            {activeInvestments.length > 4 && (
               <button
                 onClick={onNavigateToOrders}
                 className="w-full py-1.5 text-center text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
               >
-                + {activeInvestments.length - 3} more contract(s) · View Details
+                + {activeInvestments.length - 4} more contract(s) · View Details
               </button>
             )}
           </div>

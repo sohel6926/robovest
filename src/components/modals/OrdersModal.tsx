@@ -85,58 +85,99 @@ export const OrdersModal: React.FC = () => {
               </button>
             </div>
           ) : (
-            investments.map((inv) => (
-              <div
-                key={inv.id}
-                className="p-3.5 rounded-2xl bg-white border border-slate-200/90 space-y-2 text-xs shadow-xs hover:border-blue-200 transition"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900 text-sm">{inv.productName}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
-                        {inv.quantity}x Units
+            investments.map((inv) => {
+              const totalDays = 150;
+              const daysReceived = Math.min(totalDays, Math.max(1, inv.daysElapsed || 1));
+              const daysPending = Math.max(0, totalDays - daysReceived);
+              const progressPercent = Math.min(100, Math.round((daysReceived / totalDays) * 100));
+              const roiEarned = daysReceived * inv.dailyIncome;
+              const bonusEarned = Number(inv.bonusReceived || 0);
+              const totalEarned = inv.totalEarned || (roiEarned + bonusEarned);
+
+              return (
+                <div
+                  key={inv.id}
+                  className="p-3.5 rounded-2xl bg-white border border-slate-200/90 space-y-2.5 text-xs shadow-xs hover:border-blue-200 transition"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-slate-900 text-sm">{inv.productName}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
+                          {inv.quantity}x Units
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500">{inv.robotModel}</p>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                      ACTIVE
+                    </span>
+                  </div>
+
+                  {/* Days Received vs Days Pending */}
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 text-[11px]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                        <span><strong>{daysReceived}</strong> Days Received</span>
+                      </span>
+
+                      <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200 text-[11px]">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 stroke-[2.5]" />
+                        <span><strong>{daysPending}</strong> Days Pending</span>
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500">{inv.robotModel}</p>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                    ACTIVE
-                  </span>
-                </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 text-[11px]">
-                  <div>
-                    <span className="text-slate-500 block">Total Invested</span>
-                    <span className="font-bold text-slate-900 tabular-nums">
-                      ₹{inv.totalInvested.toLocaleString()}
-                    </span>
+                    <div className="space-y-1">
+                      <div className="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-[#FF4A00] rounded-full"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
+                        <span>Day {daysReceived} of {totalDays}</span>
+                        <span>{progressPercent}% Complete</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-slate-500 block">Daily Payout</span>
-                    <span className="font-bold text-emerald-600 tabular-nums">
-                      +₹{inv.dailyIncome.toLocaleString()}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Deploy Date</span>
-                    <span className="text-slate-700">{inv.purchaseDateFormatted}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Contract Period</span>
-                    <span className="text-blue-700 font-semibold">150 Days</span>
-                  </div>
-                </div>
 
-                <div className="pt-1 flex items-center justify-between text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-orange-600" />
-                    <span>Payout cycle: Daily 00:30 AM</span>
-                  </span>
-                  <span className="text-blue-600 font-medium">+₹{inv.bonusReceived} Bonus Given</span>
+                  <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100 text-[11px]">
+                    <div>
+                      <span className="text-slate-500 block text-[9.5px]">Daily Payout</span>
+                      <span className="font-bold text-emerald-600 tabular-nums">
+                        +₹{inv.dailyIncome.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9.5px]">Total Earned</span>
+                      <span className="font-black text-blue-700 tabular-nums">
+                        ₹{totalEarned.toLocaleString()}
+                      </span>
+                      {bonusEarned > 0 && (
+                        <span className="text-[8.5px] text-blue-500 block leading-tight font-medium">
+                          (₹{roiEarned} + ₹{bonusEarned} bonus)
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9.5px]">Total Invested</span>
+                      <span className="font-bold text-slate-900 tabular-nums">
+                        ₹{inv.totalInvested.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 flex items-center justify-between text-[10px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-orange-600" />
+                      <span>Payout cycle: Daily 00:30 AM</span>
+                    </span>
+                    <span className="text-blue-600 font-medium">+₹{inv.bonusReceived} Bonus Given</span>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

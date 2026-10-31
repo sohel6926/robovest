@@ -654,7 +654,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               Number(inv.daysElapsed || 0)
             );
 
-            const dueCycles = Math.max(0, eligibleCycles - alreadyCreditedCycles);
+            const totalCycles = Math.max(alreadyCreditedCycles + dueCycles, eligibleCycles, 1);
+            const totalRoi = totalCycles * dailyIncome;
+            const totalPlanEarned = totalRoi + Number(inv.bonusReceived || 0);
+            const isCompleted = totalCycles >= 150 || totalPlanEarned >= (Number(inv.totalInvested) * 2);
 
             if (dueCycles > 0) {
               const dueAmount = dueCycles * dailyIncome;
@@ -662,10 +665,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               correctedIncome += dueAmount;
               correctedWithdrawable += dueAmount;
               profileNeedsUpdate = true;
-
-              const newDaysElapsed = eligibleCycles;
-              const newTotalEarned = alreadyCreditedCycles * dailyIncome + dueAmount;
-              const isCompleted = newDaysElapsed >= 150 || newTotalEarned >= (Number(inv.totalInvested) * 2);
 
               for (let d = 1; d <= dueCycles; d++) {
                 const cycleNum = alreadyCreditedCycles + d;
@@ -689,18 +688,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 newTxns.unshift(roiTxn);
                 insertTransactionDB(userId, roiTxn);
               }
-
-              const updatedInv: UserInvestment = {
-                ...inv,
-                daysElapsed: newDaysElapsed,
-                totalEarned: newTotalEarned,
-                cyclesHarvested: newDaysElapsed,
-                lastHarvestDate: currentCycleKey,
-                status: isCompleted ? 'COMPLETED' : 'ACTIVE',
-              };
-              saveUserInvestmentDB(userId, updatedInv);
-              return updatedInv;
             }
+
+            const updatedInv: UserInvestment = {
+              ...inv,
+              daysElapsed: totalCycles,
+              totalEarned: totalPlanEarned,
+              cyclesHarvested: totalCycles,
+              lastHarvestDate: currentCycleKey,
+              status: isCompleted ? 'COMPLETED' : 'ACTIVE',
+            };
+
+            // Keep Supabase updated if daysElapsed or totalEarned changed
+            if (Number(inv.daysElapsed) !== totalCycles || Number(inv.totalEarned) !== totalPlanEarned) {
+              saveUserInvestmentDB(userId, updatedInv);
+            }
+
+            return updatedInv;
           }
           return inv;
         });

@@ -110,7 +110,7 @@ export default async function handler(req, res) {
           updatedContracts++;
 
           const newDaysElapsed = eligibleCycles;
-          const newTotalEarned = alreadyCreditedCycles * dailyIncome + dueAmount;
+          const newTotalEarned = (alreadyCreditedCycles + dueCycles) * dailyIncome + Number(inv.bonus_received || 0);
           const isCompleted = newDaysElapsed >= 150 || newTotalEarned >= (Number(inv.total_invested) * 2);
 
           for (let d = 1; d <= dueCycles; d++) {
@@ -140,8 +140,7 @@ export default async function handler(req, res) {
             .update({
               days_elapsed: newDaysElapsed,
               total_earned: newTotalEarned,
-              status: isCompleted ? 'COMPLETED' : 'ACTIVE',
-              updated_at: new Date().toISOString()
+              status: isCompleted ? 'COMPLETED' : 'ACTIVE'
             })
             .eq('id', inv.id);
         }
