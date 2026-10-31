@@ -675,6 +675,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                   continue;
                 }
 
+                const cleanName = (inv.productId === 'A' || inv.productName?.includes('Cricket')) ? 'Product - A' : inv.productName;
                 const roiTxn: Transaction = {
                   id: `TXN-ROI-${inv.id.slice(-6)}-C${cycleNum}-${Date.now().toString().slice(-4)}`,
                   type: 'DAILY_RETURN',
@@ -682,7 +683,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                   status: 'COMPLETED',
                   timestamp: calculationDate.getTime() - (dueCycles - d) * 1000,
                   formattedTime: calculationDate.toLocaleString(),
-                  description: `Daily Return (Cycle ${cycleNum}) for ${inv.productName}`,
+                  description: `Daily Return (Cycle ${cycleNum}) for ${cleanName}`,
                   referenceId: cycleRef
                 };
                 newTxns.unshift(roiTxn);
@@ -690,8 +691,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               }
             }
 
+            const cleanInvProductName = (inv.productId === 'A' || inv.productName?.includes('Cricket')) ? 'Product - A' : inv.productName;
             const updatedInv: UserInvestment = {
               ...inv,
+              productName: cleanInvProductName,
               daysElapsed: totalCycles,
               totalEarned: totalPlanEarned,
               cyclesHarvested: totalCycles,

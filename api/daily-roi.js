@@ -121,6 +121,7 @@ export default async function handler(req, res) {
               continue;
             }
 
+            const cleanProductName = (inv.product_id === 'A' || inv.product_name?.includes('Cricket')) ? 'Product - A' : inv.product_name;
             const roiTxn = {
               id: `TXN-ROI-${inv.id.slice(-6)}-C${cycleNumber}-${Date.now().toString().slice(-4)}`,
               user_id: userId,
@@ -129,7 +130,7 @@ export default async function handler(req, res) {
               status: 'COMPLETED',
               timestamp: Date.now() - (dueCycles - d) * 1000,
               formatted_time: new Date().toLocaleString(),
-              description: `Daily Return (Cycle ${cycleNumber}) for ${inv.product_name}`,
+              description: `Daily Return (Cycle ${cycleNumber}) for ${cleanProductName}`,
               reference_id: cycleRef
             };
             await supabase.from('transactions').insert(roiTxn);

@@ -57,7 +57,7 @@ export function resolveProductImage(id?: string, rawImage?: string): string {
 export const PRODUCTS_CATALOG: InvestmentProduct[] = [
   {
     id: 'A',
-    name: 'Product A',
+    name: 'Product - A',
     tagline: 'FanCode Premier League Cricket Tier',
     robotModel: 'Cricket Premier League',
     price: 5200,

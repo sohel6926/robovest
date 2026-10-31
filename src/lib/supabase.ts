@@ -339,7 +339,7 @@ export async function fetchInvestmentProducts(): Promise<InvestmentProduct[]> {
 
     return data.map((p) => ({
       id: p.id,
-      name: p.name,
+      name: (p.id === 'A' || p.name?.includes('Cricket')) ? 'Product - A' : p.name,
       tagline: p.tagline,
       robotModel: p.robot_model,
       price: Number(p.price),
@@ -665,7 +665,7 @@ export async function fetchUserInvestments(userId: string): Promise<UserInvestme
     return data.map((inv) => ({
       id: inv.id,
       productId: inv.product_id,
-      productName: inv.product_name,
+      productName: (inv.product_id === 'A' || inv.product_name?.includes('Cricket')) ? 'Product - A' : inv.product_name,
       robotModel: inv.robot_model,
       quantity: Number(inv.quantity),
       unitPrice: Number(inv.unit_price),
